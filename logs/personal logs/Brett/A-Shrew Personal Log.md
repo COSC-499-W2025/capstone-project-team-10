@@ -1,10 +1,10 @@
-# Week 1 (9/14/2025 - 9/21/2025)
+# Week 3 (9/14/2025 - 9/21/2025)
 
-![Week 1 Tasks](Week1Tasks.png)
+![Week 3 Tasks](Week1Tasks.png)
 
 ## Features
 
-![Week 1 Kanban](Week1KanBan.png)
+![Week 3 Kanban](Week1KanBan.png)
 
 ## Recap
 
