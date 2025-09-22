@@ -8,11 +8,8 @@
 
 | Feature/Component | Task | Status | Notes |
 |---|---|---|---|
-| | | | |
-| | | | |
-| | | | |
-| | | | |
-| | | | |
+| Creating the Requirements for the Proj. | #1 | Completed | Discussions and results were fruitful |
+| Creating Project Proposals | #2 | In-Progress | Is intended for the next Milestone |
 
 ## Additional Notes
 
