@@ -1,6 +1,6 @@
 # Weekly Group Report
 ## Team Members and Github Alias:
-- Abdalla: @rayhan-ahmed91
+- Abdalla: @AbdallaHaider
 - Adam: @Sk3tch7y
 - Brett: @A-Shrew
 - Bao: @notbaopham
