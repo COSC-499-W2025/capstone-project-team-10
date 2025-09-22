@@ -8,8 +8,8 @@
 
 | Feature/Component | Task | Status | Notes |
 |---|---|---|---|
-| Creating the Requirements for the Proj. | #1 | Completed | Discussions and results were fruitful |
-| Creating Project Proposals | #2 | In-Progress | Is intended for the next Milestone |
+| Creating the Requirements for the Proj. | [#1](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/2) | Completed | Discussions and results were fruitful |
+| Creating Project Proposals | [#2](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/2) | In-Progress | Is intended for the next Milestone |
 
 ## Additional Notes
 
