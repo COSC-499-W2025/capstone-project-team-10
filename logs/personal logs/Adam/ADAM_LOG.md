@@ -19,4 +19,20 @@ https://github.com/COSC-499-W2025/capstone-project-team-10/pull/3
 ![alt text](Week3/image-2.png)
 
 
+# Week 4 (9/21/2025 - 9/28/2025)
 
+![Week 4 Tasks completed](Week4/image.png)
+
+## Features
+
+![Week 4 Tasks In-progress](Week4/image-1.png)
+
+## Recap
+
+Group collaboration on System Architecture diagram, and Project proposal with no individual tasks assigned. Completed documents and created starter code for Rust EGUI development. Beginning work on Data Flow Diagram
+
+## Additional Context
+## Team Survey:
+![alt text](Week4/image-2.png)
+![alt text](Week4/image-3.png)
+![alt text](Week4/image-4.png)
