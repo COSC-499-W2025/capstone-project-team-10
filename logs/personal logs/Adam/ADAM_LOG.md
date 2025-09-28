@@ -1,10 +1,10 @@
-# Week 1 (9/14/2025 - 9/21/2025)
+# Week 3 (9/14/2025 - 9/21/2025)
 
-![Week 1 Tasks](image-3.png)
+![Week 3 Tasks](Week3/image-3.png)
 
 ## Features
 
-![Week 1 Kanban](image-4.png)
+![Week 3 Kanban](Week3/image-4.png)
 
 ## Recap
 
@@ -14,6 +14,9 @@ https://github.com/COSC-499-W2025/capstone-project-team-10/pull/3
 
 ## Additional Context
 ## Team Survey:
-![alt text](image.png)
-![alt text](image-1.png)
-![alt text](image-2.png)
+![alt text](Week3/image.png)
+![alt text](Week3/image-1.png)
+![alt text](Week3/image-2.png)
+
+
+
