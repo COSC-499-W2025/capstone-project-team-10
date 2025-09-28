@@ -6,7 +6,7 @@
 - Bao: @notbaopham
 - Sam: @sfjalex
 - Toby: @TobyNguyen710
-## Sprint for 09/15/2025 -> 09/22/2025
+# Sprint for 09/15/2025 -> 09/22/2025
 ## Milestone Goals
  - Complete Draft of Project Requirements
     https://github.com/COSC-499-W2025/capstone-project-team-10/issues/1
@@ -30,6 +30,16 @@
 ## Test Report
 - No Testing required for Project requirements (No Code)
 
-## Additional Notes
+# Sprint for 09/22/2025 -> 09/28/2025
+## Milestone Goals
+ - Complete [Project Proposal](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/2) document
+ - Complete [System Architecture Diagram](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/5)
 
-No Additional Notes
+## Project Status
+- Draft of [Project Requirements](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/1) and [Project Proposal](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/2) completed and submitted
+- [System Architecture Diagram](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/5) Completed
+
+## Burnup Chart
+## Completed Tasks
+## In-progress
+## Test Report
