@@ -52,7 +52,7 @@ One of the major advantages our system will hold over other groups is specifical
 
 ***3		Use Cases***
 
-![][image1]
+![The UML file][image1.png]
 
 **Use Case 1: Configure File Scan Parameters**
 
