@@ -11,7 +11,7 @@
 ## Recap
 
 Group collaboration on System Architecture diagram, and Project proposal with no individual tasks assigned. Completed documents and created starter code for Rust EGUI development. Beginning work on Data Flow Diagram
-
+  
 
 ## Additional Context
 ## Team Survey:
