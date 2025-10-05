@@ -1,21 +1,22 @@
+use std::env;
+use std::thread::{self, JoinHandle};
+use std::sync::mpsc;
+use crate::core::msg::MSG;
+fn main()
+{
+    let args: Vec<String> = env::args().collect();
+    // Message Structure
+    let (ui_tx, ui_rx) = mpsc::channel::<Msg>();
+    let (file_search_tx, file_search_rx) = mpsc::channel::<types::Msg>();
+    let (file_analysis_tx, file_analysis_rx) = mpsc::channel::<types::Msg>();
+    let (file_export_tx, file_export_rx) = mpsc::channel::<types::Msg>();
 
-use eframe::egui;
 
-fn main() -> eframe::Result<()> {
-    eframe::run_native(
-        "My egui App",
-        eframe::NativeOptions::default(),
-        Box::new(|_cc| Ok(Box::new(MyApp::default()))),
-    )
-}
 
-#[derive(Default)]
-struct MyApp {}
-
-impl eframe::App for MyApp {
-    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::CentralPanel::default().show(ctx, |ui| {
-            ui.label("Hello, egui!");
-        });
-    }
+    // start tasks
+    let mut fileSearchSubscribers: HashMap<String, Sender<Msg> = HashMap::new();
+    fileSearchSubscribers.insert("file_analysis_tx".to_string(), file_analysis_tx)
+    let _file_search_handle = thread::spawn(move || {fss::start_fss(file_search_rx, )});
+    // TODO: Determine if the GUI or CLI is being used
+    gui::start_gui(ui_rx, Vec<Tran)
 }
