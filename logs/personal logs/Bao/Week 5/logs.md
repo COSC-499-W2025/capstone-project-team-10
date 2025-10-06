@@ -8,11 +8,10 @@
 
 | Feature/Component | Task | Status | Notes |
 |---|---|---|---|
-| Created Requirements documents | [#1](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/1) | Finished | Team! |
-| Created Proposals | [#2](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/2) | Finished | Team! |
-| Created System Architecture Diagram | [#5](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/5) | Finished | Team! |
+| Created and finalized DFDs | [#6](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/6) | Finished | Team! |
+| Congregating and Organizing Documents | [#12](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/12) | In Progress | Should be a major housekeeping issue to do |
 
 ## Additional Notes
 
-- Workflows are being discovered - and the team seems to be in the groove and active
-- Keep it up for next week - we will start implementing right away when the final requirements are presented in the next class
+- Our repo is going under a mass reconstruction - cleaning up and populating issues, mandating branches for different purposes, and swapping the architecture to a Python-supported repo
+- Should be a busy week next week - we will be having our repo completely revamped
