@@ -40,7 +40,7 @@ Group collaboration on System Architecture diagram, and Project proposal with no
 ![alt text](Week4/image-3.png)
 ![alt text](Week4/image-4.png)
 
-# Week 5 (9/21/2025 - 9/28/2025)
+# Week 5 (9/28/2025 - 10/05/2025)
 
 ![Week 5 Tasks completed](Week5/image-1.png)
 
