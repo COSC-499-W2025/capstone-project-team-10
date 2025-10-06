@@ -1,3 +1,29 @@
+# Week 5 (9/28/2025 - 10/05/2025)
+
+![Week 5 - Task Completed](W5/Done.png)
+
+
+## Features
+
+![Week 5 - In Progress](W5/Features.png)
+
+
+## Recap
+
+Group collaboration on Data Flow Diagram.
+I move logs from main in to a different branch ("Logs")
+
+DFD, System Architecture Diagram, Project proposal, and Requirement Documents require updating, Requirements shall also be codified into github issues
+
+## Additional Context
+## Team Survey:
+
+
+![Week 5 - Team Survey](W5/Team_Survey.png)
+![Week 5 - Team Survey](W5/Team_Survey_(1).png)
+![Week 5 - Team Survey](W5/Team_Survey_(2).png)
+![Week 5 - Team Survey](W5/Team_Survey_(3).png)
+
 # Week 4 (9/21/2025 - 9/28/2025)
 
 ![Week 4 - Task Completed](W4/Done.png)
