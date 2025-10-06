@@ -7,11 +7,10 @@
 
 ![Week 5 - In Progress](W5/Features.png)
 
-
 ## Recap
 
 Group collaboration on Data Flow Diagram.
-I move logs from main in to a different branch ("Logs")
+I move all logs from main branch to a different branch ("Logs").
 
 DFD, System Architecture Diagram, Project proposal, and Requirement Documents require updating, Requirements shall also be codified into github issues
 
