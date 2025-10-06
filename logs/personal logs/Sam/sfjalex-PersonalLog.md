@@ -1,3 +1,15 @@
+# Week 5 (9/29/2025 - 10/05/2025)
+
+![Week Five Tasks](Week5/WeekFiveTasks.png)
+
+# Features
+
+![Week Five Features](Week5/WeekFiveIssueOne.png)
+
+# Recap
+
+Worked on the data flow diagrams and participated in group discussion surrounding the best practice to proceed with regrading our project. Looked into possible coding languages and continued analysis of Rust syntax and cleaned up the current github repo.
+
 # Week 4 (9/22/2025 - 9/28/2025)
 
 ![Week Four Tasks](Week4/WeekFourTasks.png)
