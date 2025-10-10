@@ -1,9 +1,0 @@
-pub enum MID {
-    MID_SEARCH_QUEUE,
-    MID_SEARCH_ABORT,
-    MID_FILE_FOUND,
-    MID_ANALYSIS_COMPLETE,
-    MID_EXPORT_REQUEST,
-    MID_EXPORT_RESULT,
-    MID_COUNT, //This must be last
-}
