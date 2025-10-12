@@ -5,7 +5,7 @@
 - Abdalla Abbas
 - Bao Pham
 - Brett Hardy
-- Sam Alexander
+- Samuel Alexander
 - Toby Nguyen
 
 ## Project Conventions and Guide for Contribution
