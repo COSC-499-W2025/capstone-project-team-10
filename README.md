@@ -1,21 +1,147 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=20510455&assignment_repo_type=AssignmentRepo)
-# Project-Starter
-Please use the provided folder structure for your project. You are free to organize any additional internal folder structure as required by the project. 
+# Team 10 Capstone
+## Authors
+
+- Adam Badry
+- Abdalla Abbas
+- Bao Pham
+- Brett Hardy
+- Samuel Alexander
+- Toby Nguyen
+
+## Project Conventions and Guide for Contribution
+
+### Naming Conventions
+
+#### Variables & Functions:
+Use snake_case (lowercase, words separated by underscores).
+Example: user_name, calculate_total()
+
+#### Classes:
+Use PascalCase (capitalize each word, no underscores).
+Example: UserProfile, DataProcessor
+
+#### Constants:
+Use UPPER_CASE with underscores.
+Example: MAX_RETRIES, DEFAULT_TIMEOUT
+
+#### Modules & Files:
+Use snake_case.
+Example: data_loader.py, utils.py
+
+#### Private Members:
+Prefix with a single underscore.
+Example: _internal_method, _hidden_variable
+
+### Readable Code Practices
+
+#### Type Systems
+
+- Each declaration shall have a explicit type hint for any variables, as well as function return types 
+Example:
+```python
+def numbers_equal(number_1: int, number_2: int) -> bool:
+    return number_1 == number_2
+```
+
+#### Indentation:
+- Tab size shall be 4 spaces per indentation level.
+
+#### Line Length:
+- Avoid Text wrap where possible
+
+#### Whitespace:
+- Use blank lines to separate functions, classes, and logical sections.
+
+#### Comments:
+- Avoid descriptive comments where necessary to avoid comment drift. 
+    Code should be easily readable and understandable independent of comments
+
+#### Descriptive Names:
+- Use meaningful names that describe the purpose of the variable, function, or class.
+
+#### NO Magic Numbers:
+- Assign numbers to meaningfully named constants (no using i or j for loops)
+
+### Pull requests
+
+#### Link a ticket being closed
+Each PR shall have in its description "closes #XX" Where #XX is the ticket the PR addresses.
+This links the PR to the issue and automatically closes the issue when the PR is approved
+
+#### PRs require at least two reviewers to close and merge. 
+at least two reviewers must leave comments on a PR before merging
+
+## Setup
+
+### WARNING: USE PYTHON 3.12.X OR NEWER
+1. Clone the repo:
+   git clone <repo-url>
+   cd capstone-project-team-10
+
+2. Create and activate a virtual environment:
+   python3 -m venv venv
+   source venv/bin/activate
+
+3. Install dependencies:
+   pip install -r requirements.txt
+
+4. Run the app or tests as needed.
+
+## Running the app
+
+### With CLI
+``` sh
+python src/main.py --cli 
+
+``` 
+
+### With GUI
+
+``` sh
+python src/main.py
+
+``` 
+## Testing
+
+### Writing Unit tests
+
+All test files shall start with "test_"
+and follow the formatting below
+```python
+import unittest
+
+class test_example(unittest.TestCase):
+    def test_example(self):
+        # Test Content
+    def test_example2(self):
+        # Test Content
+
+if __name__ == '__main__':
+    unittest.main()
+```
+
+Each component under test shall have its own "test_" file to make readability and searching for tests easier
+
+### Running the Unit tests
+
+```sh
+python -m unittest discover tests
 
 ```
-.
-├── docs                    # Documentation files
-│   ├── contract            # Team contract
-│   ├── proposal            # Project proposal 
-│   ├── design              # UI mocks
-│   ├── minutes             # Minutes from team meetings
-│   ├── logs                # Team and individual Logs
-│   └── ...          
-├── src                     # Source files (alternatively `app`)
-├── tests                   # Automated tests 
-├── utils                   # Utility files
-└── README.md
+
+## Building
+
+This Project uses pyinstaller for its build path. This should have been installed if you ran the setup correctly
+
+### Building the app
+
+The following command will need to be run on each operating system the app will be compiled for when releasing
+The resulting app is packaged with the python interpretter making the end user experience very clean. It also makes the file size abnormally large
+
+```sh
+pyinstaller --onefile --add-data "resources:resources" src/main.py --windowed
+
 ```
 
-Please use a branching workflow, and once an item is ready, do remember to issue a PR, review, and merge it into the master branch.
-Be sure to keep your docs and README.md up-to-date.
+
+## Other Notes
