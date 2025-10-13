@@ -74,3 +74,30 @@
 
 ## Reflection/Additional Context
 - For Week 5 we collaborated to create our data flow diagram. After receiving feedback in class we updated our diagram to use verb-noun format for processes and nouns for data flows. Next we will finalize the project design documents with the new requirements list.
+
+# Sprint for 10/06/25 -> 10/12/25
+## Milestone Goals
+- Complete [Core App Development Environment](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/13)
+- Complete [Finalize Project Design Documents](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/12)
+
+## Burnup Chart
+![Burn Up Chart for KanBan Board](Week6/BurnUpW6.png)
+
+## Completed Tasks
+![Completed Tasks on KanBan Board](Week6/CompletedW6.png)
+- [Core App Development Environment](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/13)
+- [Finalized Project Proposal Documents](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/2)
+
+## In-Progress
+![In Progress Tasks on KanBan Board](Week6/InProgressW6.png)
+- [Migrate from unittest to PyTest](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/35)
+- [Draft test cases for milestone 1](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/36)
+- [Create configuration system for user settings](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/39)
+- [Create Module for extracting ZIP folders](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/40)
+- [Create -y flag for command line users](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/42)
+
+## Test Report
+- No Testing Required Yet
+
+## Reflection / Additional Context
+- For week six we deliborated over the choice of coding languages due to the updated system requirement and switched languages to Python. We then updated the coding environment to reflect this as well as completing other requirements for week six with the readme file. Next we plan to break down test cases and configurations to give us a solid starting point for launching the project.

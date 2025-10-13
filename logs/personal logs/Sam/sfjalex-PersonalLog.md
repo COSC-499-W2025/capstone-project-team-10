@@ -1,3 +1,15 @@
+# Week 6 (10/06/2025 - 10/12/2025)
+
+![Week Six Tasks](Week6/WeekSixTasks.png)
+
+# Features
+
+![Week Six Features](Week6/WeekSixIssueOne.png)
+
+# Recap
+
+Deliberated with the group and came to the consensus to switch languages based on the project requirements. Worked to update the repo to accomadte this change and looked into using Python and the libraries that will be required as well as looking into and setting up Docker.
+
 # Week 5 (9/29/2025 - 10/05/2025)
 
 ![Week Five Tasks](Week5/WeekFiveTasks.png)
