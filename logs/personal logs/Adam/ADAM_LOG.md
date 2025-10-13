@@ -61,3 +61,35 @@ Began Work on DFD, System Architecture Diagram, Project proposal, and Requiremen
 ![alt text](Week5/image-2.png)
 ![alt text](Week5/image-3.png)
 ![alt text](Week5/image-4.png)
+
+
+# Week 6 (10/05/2025 - 10/12/2025)
+
+![Week 6 Tasks completed](Week6/image-1.png)
+
+
+## Features
+
+![Week 6 Tasks In-progress](Week6/image.png)
+
+## Recap
+
+I rewrote our application in Python minus the multithreading. Wrote the README with instructions for
+- Running, Packaging, and Testing the Base app
+    - Using PyQt5 for GUI
+    - Using pyinstaller for build process
+    - Using python unittest for testing framework
+- Writing Tests
+- Coding Conventions to be practiced
+- Best Practices for submitting PRs
+- Setting up python virtual environment,
+- Writing unit tests, running the app, and building the app executable
+
+In the next sprint I will primarily be tackling the drafting of test cases as well as reworking the testing library to use PyTest at the recommendation of our team member with lots of python experience
+
+## Additional Context
+
+## Team Survey:
+![alt text](Week6/image-2.png)
+![alt text](Week6/image-3.png)
+![alt text](Week6/image-4.png)
