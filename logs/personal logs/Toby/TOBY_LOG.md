@@ -1,3 +1,26 @@
+# Week 6 (10/05/2025 - 10/12/2025)
+
+![Week 6 - Task Completed](W6/Done.png)
+
+
+## Features
+
+![Week 6 - In Progress](W6/Features.png)
+
+## Recap
+
+- We have decided to use Python for our project now. Therefore the repo is in being rebuilt and currently not usable until the end of next week
+- I am also rechecking every document we made before to match the new requirement
+
+## Additional Context
+## Team Survey:
+
+
+![Week 6 - Team Survey](W6/Team_Survey.png)
+![Week 6 - Team Survey](W6/Team_Survey_(1).png)
+![Week 6 - Team Survey](W6/Team_Survey_(2).png)
+![Week 6 - Team Survey](W6/Team_Survey_(3).png)
+
 # Week 5 (9/28/2025 - 10/05/2025)
 
 ![Week 5 - Task Completed](W5/Done.png)
