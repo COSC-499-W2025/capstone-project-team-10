@@ -8,13 +8,6 @@
 - Samuel Alexander
 - Toby Nguyen
 
-## Project Design Documents
-- [System Architecture Diagram](docs/System%20Architecture%20Diagram.pdf)
-Outlines the structure of our project, highlighting the different services and processes and the relationships between them. The SAD shows how UI, File search, Analysis, and File export services communicate and interact with one another to mine and display file data.
-- [Data Flow Diagram](docs/Data%20Flow%20Diagram.pdf) Illustrates the flow of data throughout the project components and data stores. The DFD shows where information is gathered from and the processes and data stores it flows through. The DFD includes data from user input, data gathered from user selected files, and formated and polished data ready to be displayed to the user.
-
-- [Work Breakdown Structure]()
-
 ## Project Conventions and Guide for Contribution
 
 ### Naming Conventions
