@@ -1,3 +1,15 @@
+# Week 6 (10/06/2025 - 10/12/2025)
+
+![Week 6 Tasks](Week6/Week6Tasks.png)
+
+## Features
+
+![Week 6 KanBan](Week6/Week6KanBan.png)
+
+## Recap
+
+Group discussion about switching from Rust to Python individual tasks have started to be assigned. Updated the README with revised project design documents and explanations. We need to start coding and working on the newly created issues for milestone #1.
+
 # Week 5 (9/29/2025-10/05/2025)
 
 ![Week 5 Tasks](Week5/Week5Tasks.png)
