@@ -111,20 +111,16 @@ python src/main.py
 ## Testing
 
 ### Writing Unit tests
-
+Testing framework is pytest
 All test files shall start with "test_"
 and follow the formatting below
-```python
-import unittest
 
-class test_example(unittest.TestCase):
+```python
+class TestExample:
     def test_example(self):
         # Test Content
     def test_example2(self):
         # Test Content
-
-if __name__ == '__main__':
-    unittest.main()
 ```
 
 Each component under test shall have its own "test_" file to make readability and searching for tests easier
@@ -132,8 +128,7 @@ Each component under test shall have its own "test_" file to make readability an
 ### Running the Unit tests
 
 ```sh
-python -m unittest discover tests
-
+python -m pytest -q
 ```
 
 ## Building
