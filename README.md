@@ -15,6 +15,8 @@ Outlines the structure of our project, highlighting the different services and p
 
 - [Work Breakdown Structure]()
 
+our work breakdown structure is managed by our github issues. We start with our base requirements that are blocked by all tasks required to complete them. when all tasks underneath are completed the requirement may be marked as completed. this also means that when bugs are discovered we can mark the requirement as uncompleted and blocked by the new bug. this lets us clearly mark which bugs affect which requirements, and the steps needed to fulfill the high level requirements. 
+
 ## Project Conventions and Guide for Contribution
 
 ### Naming Conventions
