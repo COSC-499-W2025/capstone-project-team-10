@@ -6,7 +6,7 @@
 
 ### 1.1 Project Planning & Environment Setup
 
-#### 1.1.1 Finalize WBS and initial Gantt chart/schedule.
+#### 1.1.1 Finalize WBS and initial schedule.
 
 #### 1.1.2 Establish code repository (Git) and branching strategy.
 
