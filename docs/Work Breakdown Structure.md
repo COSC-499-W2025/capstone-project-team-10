@@ -76,9 +76,7 @@ This phase focuses on transforming raw scanned data into meaningful metrics and 
 
 #### 3.2.1 Develop algorithm for automatic project grouping based on file clusters (Req 3.2).
 
-#### 3.2.2 Implement user interface to mark files as belonging to a project (Req 3.2).
-
-#### 3.2.3 Implement user interface to mark ambiguous files for later review (Req 3.2).
+#### 3.2.2 Implement user interface to mark ambiguous files as belonging to a project (Req 3.2).
 
 ## 4.0 User Interfaces (GUI & CLI)
 
@@ -157,4 +155,4 @@ These are features to be developed if time and resources allow, acting as stretc
 
 #### 7.2.1 Implement scan entertainment features (mini-game/music playback) (Req 7.2).
 
-#### s7.2.2 Develop basic IDE/Extension integration concept and proof-of-concept (Req 7.3).
+#### 7.2.2 Develop basic IDE/Extension integration concept and proof-of-concept (Req 7.3).
