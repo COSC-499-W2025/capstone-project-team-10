@@ -1,3 +1,15 @@
+# Week 7 (10/13/2025 - 10/19/2025)
+
+![Week 7 Tasks](Week7/Week7Tasks.png)
+
+## Features
+
+![Week 7 KanBan](Week7/Week7KanBan.png)
+
+## Recap
+
+We got started on the code this week. Group members completed test case drafting and the work breakdown structure. I added a permission request before launching the client and a -y flag to bypass the permission request. 
+
 # Week 6 (10/06/2025 - 10/12/2025)
 
 ![Week 6 Tasks](Week6/Week6Tasks.png)
