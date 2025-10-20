@@ -1,0 +1,7 @@
+{
+    "exclude": [
+        "/path/to/excluded/file1.txt",
+        "/path/to/excluded/file2.log",
+        "/path/to/excluded/directory/"
+    ]
+}
