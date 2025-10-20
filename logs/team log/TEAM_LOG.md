@@ -101,3 +101,32 @@
 
 ## Reflection / Additional Context
 - For week six we deliborated over the choice of coding languages due to the updated system requirement and switched languages to Python. We then updated the coding environment to reflect this as well as completing other requirements for week six with the readme file. Next we plan to break down test cases and configurations to give us a solid starting point for launching the project.
+
+
+# Sprint for 10/13/25 -> 10/19/25
+## Milestone Goals
+- Complete [Draft test cases for milestone 1](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/36)
+
+## Burnup Chart
+![Burn Up Chart for KanBan Board](Week7/BurnUpW7.png)
+
+## Completed Tasks
+![Completed Tasks on KanBan Board](Week7/CompletedW7.png)
+- [Migrate from unittest to PyTest](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/35)
+- [Draft test cases for milestone 1 requirements](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/36)
+- [Create required -y flag for the user to agree to when running the app from the command line](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/42)
+- [Update test example and Readme](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/44)
+- [Created Work breakdown structure](https://github.com/COSC-499-W2025/capstone-project-team-10/pull/52)
+
+## In-Progress
+![In Progress Tasks on KanBan Board](Week7/InProgressW7.png)
+
+- [Create configuration system for user settings](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/39)
+- [Create Module for extracting ZIP folders](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/40)
+- [Create parameter in CLI to take in the path to a zip file and scan it](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/46)
+  
+## Test Report
+- No Testing Required Yet
+
+## Reflection / Additional Context
+- For week 7, most tasks are similar to week 6 as we completed the remaining tasks from the README.md started in week 6. We also added a pull request template and created new issues/tickets to divide upcoming tasks among team members for next week’s work.
