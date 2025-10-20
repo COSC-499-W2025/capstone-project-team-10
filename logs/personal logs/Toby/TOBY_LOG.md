@@ -1,3 +1,25 @@
+# Week 7 (10/12/2025 - 10/19/2025)
+
+![Week 7 - Task Completed](W7/Done.png)
+
+
+## Features
+
+![Week 7 - In Progress](W7/Features.png)
+
+## Recap
+
+- For week 7, I review code and changes of our team. I also finalize the readme file. We are trying to finalizing test cases draft before moving to week 8.
+
+## Additional Context
+## Team Survey:
+
+
+![Week 7 - Team Survey](W7/Team_Survey.png)
+![Week 7 - Team Survey](W7/Team_Survey_(1).png)
+![Week 7 - Team Survey](W7/Team_Survey_(2).png)
+![Week 7 - Team Survey](W7/Team_Survey_(3).png)
+
 # Week 6 (10/05/2025 - 10/12/2025)
 
 ![Week 6 - Task Completed](W6/Done.png)
