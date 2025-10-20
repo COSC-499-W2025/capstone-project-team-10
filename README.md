@@ -103,6 +103,11 @@ at least two reviewers must leave comments on a PR before merging
 python src/main.py --cli 
 
 ``` 
+or to bypass permission request
+``` sh
+python src/main.py --cli -y
+
+``` 
 
 ### With GUI
 
