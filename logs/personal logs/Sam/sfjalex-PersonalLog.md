@@ -1,3 +1,15 @@
+# Week 7 (10/13/2025 - 10/19/2025)
+
+![Week Seven Tasks](Week7/WeekSevenTasks.png)
+
+# Features
+
+![Week Seven Features](Week7/WeekSevenIssueOne.png)
+
+# Recap
+
+This week I began work on coding the basic tests to lay out the path for test driven development, I did this collaboratively with Adam. This task puts down the foundation to work from going forwards with other features and aspects of the project. As well, I have continued to look into and somewhat apply the basics of metadata extraction from files and .git folders that will need to be applied in the future within specific tests.
+
 # Week 6 (10/06/2025 - 10/12/2025)
 
 ![Week Six Tasks](Week6/WeekSixTasks.png)
