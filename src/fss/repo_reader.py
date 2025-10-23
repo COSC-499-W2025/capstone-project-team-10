@@ -5,6 +5,54 @@ specifically from a determined Git repository.
 import subprocess
 from pathlib import Path
 
+class Repository:
+    def __init__(self, rpath):
+        self.path = rpath
+        self.authors = {}
+        self.language = {}
+
+    def extrapolate(self):
+        # parse commit log (format: "<hash>|<author>")
+        logs = run_git_cmd(self.path, "logs")
+        for line in logs.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            parts = line.split("|", 1)
+            if len(parts) != 2:
+                continue
+            commit_hash, author = parts[0].strip(), parts[1].strip()
+            self.authors.setdefault(author, []).append(commit_hash)
+
+        # parse tracked files and map extensions to languages
+        files_out = run_git_cmd(self.path, "lang")
+        lang_counts = {}
+        for f in files_out.splitlines():
+            f = f.strip()
+            if not f:
+                continue
+            ext = Path(f).suffix.lower()
+            lang = LANG_MAP.get(ext, "Others")
+            lang_counts[lang] = lang_counts.get(lang, 0) + 1
+
+        self.language = lang_counts
+
+    def get_authors(self):
+        authors_list = []
+        for author_keys in self.authors:
+            authors_list.append(author_keys)
+        return authors_list
+
+    def get_commits_count(self):
+        list_authors_keys = self.get_authors()
+        dict_authors = {}
+        for list_author_key in list_authors_keys:
+            dict_authors[list_author_key] = len(self.authors[list_author_key])
+        return dict_authors
+
+    def get_language_dict(self):
+        return self.language
+
 # Mapping for file type to language extraction - should make this into an updatable public key on GitHub
 LANG_MAP = {
     ".py": "Python",
@@ -55,7 +103,7 @@ def detect_language(filename: str) -> str:
     ext = Path(filename).suffix.lower()
     return LANG_MAP.get(ext, "Other")
 
-"""
+r"""
     Takes in a (str) repo path, runs a delegated command git log --all --numstat --pretty=format:"%H|%an" (<most recent commit>|<GitHub account associated>)
     and extracts all of the files AND modification that was done
     
@@ -89,12 +137,15 @@ def detect_language(filename: str) -> str:
         12	0	logs/personal logs/Sam/sfjalex-PersonalLog.md
         ...
 """
-def run_git_log(repo_path: str):
+def run_git_cmd(repo_path: str, arg) -> str:
 
     repo = Path(repo_path)
 
     # Git command format
-    cmd = ["git", "log", "--all", "--numstat", "--pretty=format:%H|%an"]
+    if arg == 'logs':
+        cmd = ["git", "log", "--pretty=format:%H|%an"]
+    else:
+        cmd = ["git", "ls-files"]
 
     # Creates a subprocess to run the commands for the highest priority
     result = subprocess.run(
@@ -106,7 +157,7 @@ def run_git_log(repo_path: str):
     )
 
     # Split by lines and return
-    return result.stdout.splitlines()
+    return result.stdout.strip()
 
 
 if __name__ == "__main__":
@@ -115,9 +166,8 @@ if __name__ == "__main__":
     repo_path = r"C:\Users\pqbao\GitHub\capstone-project-team-10"
 
     # Run it
-    lines = run_git_log(repo_path)
-
-    # Preview the first 20 lines
-    print("\n".join(lines[:20]))
-    print(f"\n✅ Extracted {len(lines)} lines from {repo_path}")
-
+    testRepo = Repository(repo_path)
+    testRepo.extrapolate()
+    print(testRepo.get_authors())
+    print(testRepo.get_commits_count())
+    print(testRepo.language)
