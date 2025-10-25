@@ -40,4 +40,12 @@ class TestFasKey:
         result = fas.run_fas("tests/testdata/test_fas/nonexistent_file_123.docx")
         assert result is None
 
+    def test_git_folder_placeholder(self, tmp_path):
+        # A .git folder returns a placeholder FileAnalysis object
+        git_dir = tmp_path / ".git"
+        git_dir.mkdir()
+        result = fas.run_fas(str(git_dir))
+        assert result.file_type == "git"
+        assert result.file_name == ".git"
+        assert result.extra_data is None
     
