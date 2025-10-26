@@ -37,3 +37,6 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *.pytest_cache/
+
+# PyCharm settings
+.idea/
