@@ -8,7 +8,7 @@
 
 | Feature/Component | Task | Status | Notes |
 |---|---|---|---|
-|Creating Modules for extracting statistics from local Git repo files|[#49](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/49)|Completed|Features are still in discussion - after conclusion, further features and tests will be added|
+|Creating Modules for extracting statistics from local Git repo files|[#49](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/49)|Completed|Additions of features are still in discussion - after conclusion, further features and tests will be added|
 |Create module for processing analysis results into projects|[#62](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/62)|In-Progress|Next week's task|
 
 ## Additional Notes
