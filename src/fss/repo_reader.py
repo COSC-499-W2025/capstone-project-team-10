@@ -202,18 +202,15 @@ def run_git_cmd(repo_path: str, arg) -> str:
     # Split by lines and return
     return result.stdout.strip()
 
-
-if __name__ == "__main__":
-    print("Welcome to repo reader")
-r'''
-    # Change this to your actual repo path
-    # 👇
-    repo_path = r"C:\Users\pqbao\GitHub\capstone-project-team-10"
-
-    # Run it
-    testRepo = Repository(repo_path)
-    testRepo.extrapolate()
-    print(testRepo.get_authors())
-    print(testRepo.get_commits_count())
-    print(testRepo.get_language_dict())
-'''
+r"""
+    For usage example:
+    
+        repo_path = r"C:\Users\pqbao\GitHub\capstone-project-team-10"
+    
+        # Run it
+        testRepo = Repository(repo_path)
+        testRepo.extrapolate()
+        print(testRepo.get_authors())
+        print(testRepo.get_commits_count())
+        print(testRepo.get_language_dict())
+"""
