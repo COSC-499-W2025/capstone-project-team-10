@@ -54,24 +54,26 @@ def get_file_name(file_path: str) -> str:
 def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
     # This is all placeholder and will be replaced when we have proper handlers
     try:
-        if file_type == "pdf":
-            # from src.fas import fas_pdf
-            # return fas_pdf.extract_pdf_data(file_path)
-            return None
+        match file_type:
+            case "pdf":
+                # from src.fas import fas_pdf
+                # return fas_pdf.extract_pdf_data(file_path)
+                return None
 
-        elif file_type == "docx":
-            # from src.fas import fas_docx
-            # return fas_docx.extract_docx_data(file_path)
-            return None
+            case "docx":
+                # from src.fas import fas_docx
+                # return fas_docx.extract_docx_data(file_path)
+                return None
 
-        elif file_type == "git":
-            # from src.fas import fas_git
-            # return fas_git.extract_git_data(file_path)
-            return None
+            case "git":
+                # from src.fas import fas_git
+                # return fas_git.extract_git_data(file_path)
+                return None
 
-        else:
-            # Generic or unsupported type
-            return None
+            case _:
+                # Generic or unsupported type
+                return None
+
 
     except ModuleNotFoundError:
         # Handler not implemented yet
