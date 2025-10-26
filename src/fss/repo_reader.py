@@ -39,6 +39,7 @@ class Repository:
         """
         # parse commit log (format: "<hash>|<author>")
         logs = run_git_cmd(self.path, "logs")
+        print(logs)
         for line in logs.splitlines():
             line = line.strip()
             if not line:
@@ -148,69 +149,79 @@ def detect_language(filename: str) -> str:
 
 def run_git_cmd(repo_path: str, arg) -> str:
     r"""
-        Takes in a (str) repo path, runs a delegated command git log --all --numstat --pretty=format:"%H|%an" (<most recent commit>|<GitHub account associated>)
-        and extracts all of the files AND modification that was done
+        Takes in a (str) repo path, runs a delegated command git log --pretty=format:"%H|%an" (<most recent commit>|<GitHub account associated>)
+        to tally the commits done by that author
 
         Args:
             repo_path (str): The repo's path
 
         Returns:
-            str: the consolidated repo's contents (see below)
+            str: the consolidated repo's commit in <hashcommit>|<name>(see below)
 
         Example:
-            >> run_git_log(r'...\pqbao\GitHub\capstone-project-team-10')
-            65ce9001cf493115858d9e3614bc7371b8671db6|TobyNguyen710
-            22	0	logs/personal logs/Toby/TOBY_LOG.md
-            -	-	logs/personal logs/Toby/W7/Done.png
-            -	-	logs/personal logs/Toby/W7/Features.png
-            -	-	logs/personal logs/Toby/W7/Team_Survey.png
-            -	-	logs/personal logs/Toby/W7/Team_Survey_(1).png
-            -	-	logs/personal logs/Toby/W7/Team_Survey_(2).png
-            -	-	logs/personal logs/Toby/W7/Team_Survey_(3).png
-
-            186a68f9f5db6245c8fc286cac4e14d4bd5faad8|TobyNguyen710
-            29	0	logs/team log/TEAM_LOG.md
-            -	-	logs/team log/Week7/BurnUpW7.png
-            -	-	logs/team log/Week7/CompletedW7.png
-            -	-	logs/team log/Week7/InProgressW7.png
-
+            >> run_git_log(r"...\pqbao\GitHub\capstone-project-team-10")
+            163c26e767400a52ea7ea42b81a8603ea314610a|notbaopham
+            f43cf54852225925a1aff8c58dcf1f51b9a5385d|notbaopham
+            719667249d7074aec7054f928c625340487cd1ee|notbaopham
+            f746ea3fdb9ce57ef83906e6ed15aa5d77840a00|notbaopham
             da988c320fef2b596a07b7ca444e8015bd711dfb|Toby Nguyen
-            c7aac2b2cda4d2bd2ebd6efb9d1ed11e2979a3a3|sfjalex
-            -	-	logs/personal logs/Sam/Week7/WeekSevenIssueOne.png
-            -	-	logs/personal logs/Sam/Week7/WeekSevenTasks.png
-            12	0	logs/personal logs/Sam/sfjalex-PersonalLog.md
+            6609eec5c16f9cce6cffd3812d6315d36dba4e52|Sk3tch7y
+            e06e8ecab6af4fe26dcfc43fdec331f110fab3aa|Sk3tch7y
+            54def7dc23cb62e0207456a3780acff8000d8590|A-Shrew
+            86a8bb68e9df1ddd7389b67962a975956312931f|Sk3tch7y
+            d999a85ab356824b327251d398aacc93319a7ff2|Adam Badry
+            d144d145c56ee4b7dedcff668f821328bb21576b|Adam Badry
+            c550de4ce29bae687a183d3b9bcd6e06ca562d84|Adam Badry
+            263db2ce242a980aa756855fcfefeabaf13057d9|Adam Badryd
             ...
     """
 
     repo = Path(repo_path)
 
     # Git command format
-    if arg == 'logs':
-        cmd = ["git", "log", "--pretty=format:%H|%an"]
+    if not repo.exists():
+        print("Repo not reachable or found")
+        return ""
+
     else:
-        cmd = ["git", "ls-files"]
+        if arg == 'logs':
+            cmd = ["git", "log", "--pretty=format:%H|%an"]
+        else:
+            cmd = ["git", "ls-files"]
+        try:
+            # Creates a subprocess to run the commands for the highest priority
+            result = subprocess.run(
+                cmd,
+                cwd=repo,
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            return result.stdout.strip()
 
-    # Creates a subprocess to run the commands for the highest priority
-    result = subprocess.run(
-        cmd,
-        cwd=repo,
-        capture_output=True,
-        text=True,
-        check=True
-    )
+        # Subprocess error - catching internally errors
+        except subprocess.CalledProcessError as e:
+            print(f"[Git Error] Command failed with return code {e.returncode}")
+            print(f"[Git Error] stderr: {e.stderr.strip() if e.stderr else 'No error message.'}")
+            return ""
 
-    # Split by lines and return
-    return result.stdout.strip()
+        # Outer program error - file not found or unreachable, on the machine
+        except FileNotFoundError:
+            print("[Error] Git is not installed or not found in system PATH.")
+            return ""
 
-r"""
-    For usage example:
-    
-        repo_path = r"C:\Users\pqbao\GitHub\capstone-project-team-10"
+        # For any other errors
+        except Exception as e:
+            print(f"[Unexpected Error] {type(e).__name__}: {e}")
+            return ""
+
+r'''
+repo_path = r"C:\Users\pqbao\GitHub\capstone-project-team-10"
     
         # Run it
-        testRepo = Repository(repo_path)
-        testRepo.extrapolate()
-        print(testRepo.get_authors())
-        print(testRepo.get_commits_count())
-        print(testRepo.get_language_dict())
-"""
+testRepo = Repository(repo_path)
+testRepo.extrapolate()
+print(testRepo.get_authors())
+print(testRepo.get_commits_count())
+print(testRepo.get_language_dict())
+'''
