@@ -39,7 +39,6 @@ class Repository:
         """
         # parse commit log (format: "<hash>|<author>")
         logs = run_git_cmd(self.path, "logs")
-        print(logs)
         for line in logs.splitlines():
             line = line.strip()
             if not line:
