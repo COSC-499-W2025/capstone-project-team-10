@@ -6,11 +6,11 @@ class TestPDF:
 
     @pytest.fixture
     def sample_pdf(self):
-        return pdfr.PDFReader(r"C:\Users\brett\OneDrive\Desktop\COSC 499\capstone-project-team-10\tests\sample_files\samplePDF1.pdf")
+        return pdfr.PDFReader(r"tests\sample_files\samplePDF1.pdf")
     
     @pytest.fixture
     def sample_pdf2(self):
-        return pdfr.PDFReader(r"C:\Users\brett\OneDrive\Desktop\COSC 499\capstone-project-team-10\tests\sample_files\samplePDF2.pdf")
+        return pdfr.PDFReader(r"tests\sample_files\samplePDF2.pdf")
     
     def test_file_not_found(self):
         with pytest.raises(FileNotFoundError):
@@ -18,10 +18,10 @@ class TestPDF:
     
     def test_invalid_file_type(self):
         with pytest.raises(Exception):
-            pdfr.PDFReader(r"C:\Users\brett\OneDrive\Desktop\COSC 499\capstone-project-team-10\tests\sample_files\sampleText1.txt")
+            pdfr.PDFReader(r"tests\sample_files\sampleText1.txt")
 
     def test_filepath(self, sample_pdf):
-        assert sample_pdf.filepath == r"C:\Users\brett\OneDrive\Desktop\COSC 499\capstone-project-team-10\tests\sample_files\samplePDF1.pdf"
+        assert sample_pdf.filepath == r"tests\sample_files\samplePDF1.pdf"
         assert isinstance(sample_pdf.filepath, str)
 
     def test_file_size(self, sample_pdf):
