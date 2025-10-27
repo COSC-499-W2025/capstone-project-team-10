@@ -1,3 +1,17 @@
+# Week 8 (10/20/2025 - 10/26/2025)
+
+![Week Eight Tasks](Week8/Week8Tasks.png)
+
+# Features
+
+![Week Eight Features](Week8/Week8FeatureOne.png)
+
+# Recap
+
+This week I spent time setting up the initial file search service, that will take in a file or folder path as well as a set of excluded paths and compare against them to count or access only specific files.
+
+Next week I plan to expand upon this and add more functionality to it, possibly by implementing aspects of the analysis service into the file search service or continuing to set up different types of specific file analysis services for currently uncovered file types.
+
 # Week 7 (10/13/2025 - 10/19/2025)
 
 ![Week Seven Tasks](Week7/WeekSevenTasks.png)
