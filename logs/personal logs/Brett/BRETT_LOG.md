@@ -1,3 +1,15 @@
+# Week 8 (10/20/2025 - 10/26/2025)
+
+![Week 8 Tasks](Week8/Week8Tasks.png)
+
+## Features
+
+![Week 8 KanBan](Week8/Week8KanBan.png)
+
+## Recap
+
+This week we each took on a coding task and completed them before the end of the week. We made great progress in terms of adding functionality, but need to ensure the code integrates well with everyones differnt coding styles. I completed the PDF data extraction module which returns an object with many pdf data attributes given a filepath. 
+
 # Week 7 (10/13/2025 - 10/19/2025)
 
 ![Week 7 Tasks](Week7/Week7Tasks.png)

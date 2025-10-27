@@ -130,3 +130,41 @@
 
 ## Reflection / Additional Context
 - For week 7, most tasks are similar to week 6 as we completed the remaining tasks from the README.md started in week 6. We also added a pull request template and created new issues/tickets to divide upcoming tasks among team members for next week’s work.
+
+# Sprint for 10/20/25 -> 10/26/25
+## Milestone Goals
+ - Complete [Basic File Scan Functionality](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/68)
+ - Complete [Create --zip flag and Refactor Flag Code](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/66)
+ - Complete [Basic File Analysis Functionality](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/65)
+ - Complete [Added Module of Tools to Extract Stats from .git projects](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/56)
+ - Complete [Added Module to Extract Stats from PDF files](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/73)
+ - Complete [Added Module to Extract Zip Files](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/67)
+
+## Burnup Chart
+![Burn Up Chart for Kanban Board](Week8/BurnupW8.png)
+
+## Completed Tasks
+![Completed Tasks on KanBan Board](Week8/InReviewW8.png)
+![Completed Tasks on KanBan Board](Week8/CompletedW8.png)
+- [Basic File Scan Functionality](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/68)
+- [Create --zip flag and Refactor Flag Code](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/66)
+- [Basic File Analysis Functionality](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/65)
+- [Added Module of Tools to Extract Stats from .git projects](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/56)
+- [Added Module to Extract Stats from PDF files](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/73)
+- [Added Module to Extract Zip Files](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/67)
+
+## In-Progress
+![In Progress Tasks on KanBan Board](Week8/InProgressW8.png)
+- [Create Module for analysis of Microsoft excel files](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/58)
+- [Create Module for analysis of Microsoft word files](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/59)
+- [Create Module for analysis of image formats](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/64)
+- [Implement time-span filtering for the FSS](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/69)
+- [Create analysis module to identify programming files and extract frameworks/libraries](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/51)
+- [Create Module to manage the storage of log output](https://github.com/COSC-499-W2025/capstone-project-team-10/issues/48)
+
+## Test Report
+![Tests](Week8/TestReportW8.png)
+- Some tests fail as the implementations have not yet been built. Additioanlly other tests are implemented, but not shown in this report as they generate errors when running all tests at once.
+
+## Reflection / Additional Context
+- Week 8 was a very strong week in terms of delivery and individual work from all group members. Each member took on an issue from the GitHub and completed their task before the end of the week. As a team, we were able to knock six items off our issues board and already have tasks lined up for the next week. One thing we will need to review is how we can integrate our respective work with one another. We have added a lot of code from different coders, so it will be necessary to review it together to make sure the code is compatible with each other's code. Overall, it was a solid week and a great start to the coding aspect of this project. 
