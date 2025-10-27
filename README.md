@@ -13,7 +13,9 @@
 Outlines the structure of our project, highlighting the different services and processes and the relationships between them. The SAD shows how UI, File search, Analysis, and File export services communicate and interact with one another to mine and display file data.
 - [Data Flow Diagram](docs/Data%20Flow%20Diagram.pdf) Illustrates the flow of data throughout the project components and data stores. The DFD shows where information is gathered from and the processes and data stores it flows through. The DFD includes data from user input, data gathered from user selected files, and formated and polished data ready to be displayed to the user.
 
-- [Work Breakdown Structure]()
+- [Work Breakdown Structure](docs/Work%20Breakdown%20Structure.md)
+
+our work breakdown structure is managed by our github issues. We start with our base requirements that are blocked by all tasks required to complete them. when all tasks underneath are completed the requirement may be marked as completed. this also means that when bugs are discovered we can mark the requirement as uncompleted and blocked by the new bug. this lets us clearly mark which bugs affect which requirements, and the steps needed to fulfill the high level requirements. 
 
 ## Project Conventions and Guide for Contribution
 
@@ -107,6 +109,25 @@ python src/main.py --cli -y
 
 ``` 
 
+#### Using the --zip flag
+
+``` sh
+python src/main.py --cli -y --zip {Path to zip file}
+```
+the --zip flag shall always be followed by the file path of the zip or it will return an error
+
+#### Using the -q flag
+
+``` sh
+python src/main.py --cli -y --zip {Path to zip file} -q
+```
+#### Setting the starting directory
+
+``` sh
+python src/main.py --cli -y -q {Path to zip file}
+```
+The starting file path must be the last parmeter in the file
+
 ### With GUI
 
 ``` sh
@@ -116,20 +137,16 @@ python src/main.py
 ## Testing
 
 ### Writing Unit tests
-
+Testing framework is pytest
 All test files shall start with "test_"
 and follow the formatting below
-```python
-import unittest
 
-class test_example(unittest.TestCase):
+```python
+class TestExample:
     def test_example(self):
         # Test Content
     def test_example2(self):
         # Test Content
-
-if __name__ == '__main__':
-    unittest.main()
 ```
 
 Each component under test shall have its own "test_" file to make readability and searching for tests easier
@@ -137,8 +154,7 @@ Each component under test shall have its own "test_" file to make readability an
 ### Running the Unit tests
 
 ```sh
-python -m unittest discover tests
-
+python -m pytest -q
 ```
 
 ## Building
