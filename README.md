@@ -109,6 +109,25 @@ python src/main.py --cli -y
 
 ``` 
 
+#### Using the --zip flag
+
+``` sh
+python src/main.py --cli -y --zip {Path to zip file}
+```
+the --zip flag shall always be followed by the file path of the zip or it will return an error
+
+#### Using the -q flag
+
+``` sh
+python src/main.py --cli -y --zip {Path to zip file} -q
+```
+#### Setting the starting directory
+
+``` sh
+python src/main.py --cli -y -q {Path to zip file}
+```
+The starting file path must be the last parmeter in the file
+
 ### With GUI
 
 ``` sh
