@@ -1,4 +1,26 @@
-# Week 7 (10/05/2025 - 10/12/2025)
+# Week 8 (10/19/2025 - 10/26/2025)
+
+![Week 8 Tasks completed](Week8/image-1.png)
+
+## Features
+
+![Week 8 Tasks In-progress](Week8/image.png)
+
+## Recap
+
+I Spent most of my week planning out github tickets and adding flags to the CLI for implemented features
+
+In the next sprint I will primarily be tackling designing and implementing our log output for each file search, as well as various project planning activities and coordinating implementation/integration
+
+## Additional Context
+
+No additional notes
+
+## Team Survey:
+Team survey completed.
+
+
+# Week 7 (10/12/2025 - 10/19/2025)
 
 ![Week 7 Tasks completed](Week7/image-1.png)
 
