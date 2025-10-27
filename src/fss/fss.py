@@ -25,8 +25,12 @@ def search(inputPath, excludedPath):
             return 0
 
     if excludeFlag:
+        #ensures that the excluded paths input is a set
         if isinstance(excludedPath, str):
-            excludedPath = [excludedPath]
+            excludedPath = {excludedPath}
+        else:
+            excludedPath = set(excludedPath)
+
 
         excludedSet = set()
         for ePath in excludedPath:
