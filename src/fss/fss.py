@@ -1,61 +1,61 @@
 import os
 
-def search(inputPath, excludedPath):
+def search(input_path, excluded_path):
 
-    excludeFlag = True
-    numOfFilesScanned = 0
+    exclude_flag = True
+    num_of_files_scanned = 0
 
-    if not excludedPath:
+    if not excluded_path:
         #If there is not included exclusion, the flag will be set to false to skip comparisons
-        excludeFlag = False
+        exclude_flag = False
 
-    if not os.path.exists(inputPath):
+    if not os.path.exists(input_path):
         #invalid returns -1
         return -1
 
-    inputPath = os.path.abspath(inputPath)
-    if os.path.isfile(inputPath):
-        if not excludedPath:
+    input_path = os.path.abspath(input_path)
+    if os.path.isfile(input_path):
+        if not excluded_path:
             #single file with no exclusion
             return 1
-        elif inputPath not in excludedPath:
+        elif input_path not in excluded_path:
             #single file accounting for exclusion
             return 1
         else:
             return 0
 
-    if excludeFlag:
+    if exclude_flag:
         #ensures that the excluded paths input is a set
-        if isinstance(excludedPath, str):
-            excludedPath = {excludedPath}
+        if isinstance(excluded_path, str):
+            excluded_path = {excluded_path}
         else:
-            excludedPath = set(excludedPath)
+            excluded_path = set(excluded_path)
 
 
-        excludedSet = set()
-        for ePath in excludedPath:
-            ePath = os.path.abspath(ePath)
-            excludedSet.add(ePath)
+        excluded_set = set()
+        for e_path in excluded_path:
+            e_path = os.path.abspath(e_path)
+            excluded_set.add(e_path)
 
             #if exculsion includes a dir, it will add all files within the dir to exculsion
-            if os.path.isdir(ePath):
-                for root, dirs, files in os.walk(ePath):
+            if os.path.isdir(e_path):
+                for root, dirs, files in os.walk(e_path):
                     for file in files:
-                        excludedSet.add(os.path.join(root, file))
+                        excluded_set.add(os.path.join(root, file))
         
-        excludedPath = excludedSet
+        excluded_path = excluded_set
 
-    for root, dirs, files in os.walk(inputPath, topdown=True):
+    for root, dirs, files in os.walk(input_path, topdown=True):
 
         for file in files:
-            filePath = os.path.join(root, file)
-            print(filePath)
-            if excludeFlag:
-                if filePath not in excludedPath:
+            file_path = os.path.join(root, file)
+            print(file_path)
+            if exclude_flag:
+                if file_path not in excluded_path:
                     #This is where specifics of files can be extracted.
-                    numOfFilesScanned += 1
+                    num_of_files_scanned += 1
             else:
                 #Given no exclusion this is where details about scanned files can be extracted.
-                numOfFilesScanned += 1
+                num_of_files_scanned += 1
 
-    return numOfFilesScanned
+    return num_of_files_scanned
