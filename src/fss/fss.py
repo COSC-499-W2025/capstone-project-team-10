@@ -14,15 +14,6 @@ def search(input_path, excluded_path):
         return -1
 
     input_path = os.path.abspath(input_path)
-    if os.path.isfile(input_path):
-        if not excluded_path:
-            #single file with no exclusion
-            return 1
-        elif input_path not in excluded_path:
-            #single file accounting for exclusion
-            return 1
-        else:
-            return 0
 
     if exclude_flag:
         #ensures that the excluded paths input is a set
@@ -44,6 +35,16 @@ def search(input_path, excluded_path):
                         excluded_set.add(os.path.join(root, file))
         
         excluded_path = excluded_set
+
+    if os.path.isfile(input_path):
+        if not excluded_path:
+            #single file with no exclusion
+            return 1
+        elif input_path not in excluded_path:
+            #single file accounting for exclusion
+            return 1
+        else:
+            return 0
 
     for root, dirs, files in os.walk(input_path, topdown=True):
 
