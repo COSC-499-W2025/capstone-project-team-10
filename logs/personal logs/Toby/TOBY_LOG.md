@@ -1,3 +1,26 @@
+# Week 8 (10/19/2025 - 10/26/2025)
+
+![Week 8 - Task Completed](W8/Done.png)
+
+
+## Features
+
+![Week 8 - In Progress](W8/Features.png)
+
+## Recap
+
+- For week 8, I create analysis module that can extract key data and test cases for it.
+  - File analysis that receives input (file path) and output an object that contains: file type, file last modified time, file created time, file name, extra file data (file data from specific extension such as pdf, docx, git,...) (currently a placeholder)
+
+## Additional Context
+## Team Survey:
+
+
+![Week 8 - Team Survey](W8/Team_Survey.png)
+![Week 8 - Team Survey](W8/Team_Survey_(1).png)
+![Week 8 - Team Survey](W8/Team_Survey_(2).png)
+![Week 8 - Team Survey](W8/Team_Survey_(3).png)
+
 # Week 7 (10/12/2025 - 10/19/2025)
 
 ![Week 7 - Task Completed](W7/Done.png)
