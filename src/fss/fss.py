@@ -6,16 +6,20 @@ def search(inputPath, excludedPath):
     numOfFilesScanned = 0
 
     if not excludedPath:
+        #If there is not included exclusion, the flag will be set to false to skip comparisons
         excludeFlag = False
 
     if not os.path.exists(inputPath):
+        #invalid returns -1
         return -1
 
     inputPath = os.path.abspath(inputPath)
     if os.path.isfile(inputPath):
         if not excludedPath:
+            #single file with no exclusion
             return 1
         elif inputPath not in excludedPath:
+            #single file accounting for exclusion
             return 1
         else:
             return 0
@@ -29,6 +33,7 @@ def search(inputPath, excludedPath):
             ePath = os.path.abspath(ePath)
             excludedSet.add(ePath)
 
+            #if exculsion includes a dir, it will add all files within the dir to exculsion
             if os.path.isdir(ePath):
                 for root, dirs, files in os.walk(ePath):
                     for file in files:
@@ -38,9 +43,6 @@ def search(inputPath, excludedPath):
 
     for root, dirs, files in os.walk(inputPath, topdown=True):
 
-        if excludeFlag:
-            dirs[:] = [d for d in dirs if os.path.join(root, d) not in excludedPath] #This will exclude any directories included in the excludedPath set to prevent unneeded scans
-
         for file in files:
             filePath = os.path.join(root, file)
             print(filePath)
@@ -49,7 +51,7 @@ def search(inputPath, excludedPath):
                     #This is where specifics of files can be extracted.
                     numOfFilesScanned += 1
             else:
-                #Given no restrictions this is where details about scanned files can be extracted.
+                #Given no exclusion this is where details about scanned files can be extracted.
                 numOfFilesScanned += 1
 
     return numOfFilesScanned
