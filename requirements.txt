@@ -1,2 +1,5 @@
 PyQt5
 pyinstaller
+pytest
+pdfplumber
+pymupdf
