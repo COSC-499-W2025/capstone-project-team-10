@@ -1,5 +1,5 @@
 import os
-import openpyxl
+import openpyxl # type: ignore
 import pytest
 from src.fas.fas_excel import extract_excel_data
 
