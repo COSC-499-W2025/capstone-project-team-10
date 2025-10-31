@@ -4,6 +4,7 @@ import re
 
 import src.param.param as param
 from src.fas.fas import FileAnalysis
+# TODO: if multithreading is needed add locks around file write operations
 
 # Newest Log is always max count after maximum logs are being stored
 current_log_file: str = ""
@@ -116,7 +117,7 @@ def open_log_file() -> None:
 
 def write(fileAnalysis: FileAnalysis) -> None:
     global current_log_file
-    if current_log_file == "":
+    if current_log_file == "" or not Path(current_log_file).exists():
         resume_log_file()
     with open(current_log_file, "a") as log_file:
         print("Logging to filepath" + current_log_file)
@@ -131,3 +132,50 @@ def write(fileAnalysis: FileAnalysis) -> None:
                 fileAnalysis.extra_data,
             ]
         )
+
+
+# This can be optimized by changing how logs are stored, say as a database or serialized object.
+# But because our log files will be relatively small compared to the total number of files on a system, this should be sufficient for now.
+def update(fileAnalysis: FileAnalysis) -> None:
+    global current_log_file
+    if current_log_file == "" or not Path(current_log_file).exists():
+        resume_log_file()
+    temp_path = param.result_log_folder_path + "log.tmp"
+    updated = False
+
+    with (
+        open(current_log_file, "r", newline="") as current_log,
+        open(temp_path, "w", newline="") as temp_log,
+    ):
+        reader = csv.reader(current_log)
+        writer = csv.writer(temp_log)
+
+        header = next(reader)
+        writer.writerow(header)
+
+        for row in reader:
+            if row[0] == fileAnalysis.file_path:
+                # Write updated row
+                writer.writerow(
+                    [
+                        fileAnalysis.file_path,
+                        fileAnalysis.file_name,
+                        fileAnalysis.file_type,
+                        fileAnalysis.last_modified,
+                        fileAnalysis.created_time,
+                        fileAnalysis.extra_data,
+                    ]
+                )
+                updated = True
+            else:
+                # Write original row
+                writer.writerow(row)
+
+    if not updated:
+        # remove temp file if no update was made
+        Path(temp_path).unlink()
+        # write the line to file if no update can be made
+        write(fileAnalysis)
+    else:
+        # Replace original file with updated file
+        Path(temp_path).replace(current_log_file)

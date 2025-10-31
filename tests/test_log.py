@@ -20,6 +20,9 @@ def clean_log_folder():
 
 def setup_log_tests():
     param.init()
+
+
+def clean_up_log_tests():
     clean_log_folder()
 
 
@@ -36,6 +39,7 @@ def checkLogOutput(file_path: str) -> bool:
             if lines[0].strip() == expectedHeader:
                 if lines[1].strip() == expectedBody:
                     return True
+        return False
 
 
 test_file_analysis: FileAnalysis = FileAnalysis(
@@ -61,6 +65,7 @@ class TestLog:
         # Read the produced file, check that the lines are written
         log_file_path = param.result_log_folder_path + "0.log"
         assert checkLogOutput(log_file_path)
+        clean_up_log_tests()
 
     def test_log_append(self):
         setup_log_tests()
@@ -70,6 +75,7 @@ class TestLog:
         # Read the produced file, check that the lines are written
         log_file_path = param.result_log_folder_path + "0.log"
         assert checkLogOutput(log_file_path)
+        clean_up_log_tests()
 
     def test_log_continue(self):
         setup_log_tests()
@@ -83,6 +89,7 @@ class TestLog:
         # Read the produced file, check that the lines are written
         log_file_path = param.result_log_folder_path + "1.log"
         assert checkLogOutput(log_file_path)
+        clean_up_log_tests()
 
     def test_log_no_available_continue(self):
         setup_log_tests()
@@ -93,6 +100,7 @@ class TestLog:
         # Read the produced file, check that the lines are written
         log_file_path = param.result_log_folder_path + "0.log"
         assert checkLogOutput(log_file_path)
+        clean_up_log_tests()
 
     def test_log_max_logs(self):
         setup_log_tests()
@@ -111,3 +119,43 @@ class TestLog:
 
         log_0_path = param.result_log_folder_path + "0.log"
         assert not os.path.exists(log_0_path)
+        clean_up_log_tests()
+
+    def test_log_update_existing(self):
+        setup_log_tests()
+        log.open_log_file()
+        global test_file_analysis
+        log.write(test_file_analysis)
+        # Update the test data
+        modified_test_file_analysis = FileAnalysis(
+            file_path=test_file_analysis.file_path,
+            file_name=test_file_analysis.file_name,
+            file_type=test_file_analysis.file_type,
+            last_modified=test_file_analysis.last_modified,
+            created_time=test_file_analysis.created_time,
+            extra_data="UPDATED EXTRA DATA",
+        )
+        log.update(modified_test_file_analysis)
+        # Read the produced file, check that the last line is updated
+        log_file_path = param.result_log_folder_path + "0.log"
+        with open(log_file_path, "r") as log_file:
+            lines = log_file.readlines()
+            print("Log file contents after update:")
+            for line in lines:
+                print(line, end="")
+
+            assert len(lines) == 2  # Header + one entry
+            assert lines[0].strip() == expectedHeader
+            expected_updated_body = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,UPDATED EXTRA DATA"
+            assert lines[1].strip() == expected_updated_body
+        clean_up_log_tests()
+
+    def test_log_update_no_file(self):
+        setup_log_tests()
+        global test_file_analysis
+        print("Checking: " + param.result_log_folder_path + "0.log")
+        log.update(test_file_analysis)
+        # Read the produced file, check that the lines are written
+        log_file_path = param.result_log_folder_path + "0.log"
+        assert checkLogOutput(log_file_path)
+        clean_up_log_tests()
