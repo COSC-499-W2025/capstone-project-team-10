@@ -3,7 +3,8 @@ import datetime
 import pytest
 from src.fas import fas
 
-TEST_FILE = "tests/testdata/test_fas/fas_test_data.docx"
+TESTDATA_DIR = os.path.join("tests", "testdata", "test_fas")
+TEST_FILE = os.path.join(TESTDATA_DIR, "fas_test_data.docx")  # tests/testdata/test_fas/fas_test_data.docx
 
 class TestFasKey:
 
