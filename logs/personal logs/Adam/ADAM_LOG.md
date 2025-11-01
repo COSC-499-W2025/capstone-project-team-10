@@ -1,3 +1,26 @@
+# Week 9 (10/26/2025 - 11/2/2025)
+
+![Week 9 Tasks completed](Week9/image-1.png)
+
+## Features
+
+![Week 9 Tasks In-progress](Week9/image.png)
+
+## Recap
+
+I spent most of my week implementing the logging functionality for our File analysis to write to. This module manages the log files being written to and handling for log management. 
+
+The desire for this module is that our File Export service and eventually our GUI can extract any key insights about projects and such from the resulting logs in order to display/export them for the user. 
+
+
+## Additional Context
+
+No additional notes
+
+## Team Survey:
+
+Team survey completed.
+
 # Week 8 (10/19/2025 - 10/26/2025)
 
 ![Week 8 Tasks completed](Week8/image-1.png)
@@ -17,8 +40,8 @@ In the next sprint I will primarily be tackling designing and implementing our l
 No additional notes
 
 ## Team Survey:
-Team survey completed.
 
+Team survey completed.
 
 # Week 7 (10/12/2025 - 10/19/2025)
 
@@ -30,23 +53,21 @@ Team survey completed.
 
 ## Recap
 
-I Spent most of my week outlining the path for our group forward, creating tickets, managing requirements, and developing draft test cases for developers to fill in as the features get fully developed, this allows us to have good expectations for what our inputs and outputs for our features should be, and the tests just require adaptation to the developers specific implementation. I also completed our teams WBS. 
+I Spent most of my week outlining the path for our group forward, creating tickets, managing requirements, and developing draft test cases for developers to fill in as the features get fully developed, this allows us to have good expectations for what our inputs and outputs for our features should be, and the tests just require adaptation to the developers specific implementation. I also completed our teams WBS.
 
-In the next sprint I will primarily be tackling project planning and documentation, as well as adding the flags and process to our CLI to allow for zip file processing. 
+In the next sprint I will primarily be tackling project planning and documentation, as well as adding the flags and process to our CLI to allow for zip file processing.
 
 ## Additional Context
 
 No additional notes
 
 ## Team Survey:
+
 Team survey completed.
-
-
 
 # Week 6 (10/05/2025 - 10/12/2025)
 
 ![Week 6 Tasks completed](Week6/image-1.png)
-
 
 ## Features
 
@@ -55,10 +76,11 @@ Team survey completed.
 ## Recap
 
 I rewrote our application in Python minus the multithreading. Wrote the README with instructions for
+
 - Running, Packaging, and Testing the Base app
-    - Using PyQt5 for GUI
-    - Using pyinstaller for build process
-    - Using python unittest for testing framework
+  - Using PyQt5 for GUI
+  - Using pyinstaller for build process
+  - Using python unittest for testing framework
 - Writing Tests
 - Coding Conventions to be practiced
 - Best Practices for submitting PRs
@@ -70,13 +92,10 @@ In the next sprint I will primarily be tackling the drafting of test cases as we
 ## Additional Context
 
 ## Team Survey:
+
 ![alt text](Week6/image-2.png)
 ![alt text](Week6/image-3.png)
 ![alt text](Week6/image-4.png)
-
-
-
-
 
 # Week 5 (9/28/2025 - 10/05/2025)
 
@@ -96,11 +115,10 @@ Began Work on DFD, System Architecture Diagram, Project proposal, and Requiremen
 ## Additional Context
 
 ## Team Survey:
+
 ![alt text](Week5/image-2.png)
 ![alt text](Week5/image-3.png)
 ![alt text](Week5/image-4.png)
-
-
 
 # Week 4 (9/21/2025 - 9/28/2025)
 
@@ -121,7 +139,6 @@ Group collaboration on System Architecture diagram, and Project proposal with no
 ![alt text](Week4/image-2.png)
 ![alt text](Week4/image-3.png)
 ![alt text](Week4/image-4.png)
-
 
 # Week 3 (9/14/2025 - 9/21/2025)
 
