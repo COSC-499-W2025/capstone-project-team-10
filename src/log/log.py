@@ -142,7 +142,7 @@ def update(fileAnalysis: FileAnalysis) -> None:
     global current_log_file
     if current_log_file == "" or not Path(current_log_file).exists():
         resume_log_file()
-    temp_path = param.result_log_folder_path + "log.tmp"
+    temp_path = str(Path(param.result_log_folder_path) / "log.tmp")
     updated = False
 
     with (

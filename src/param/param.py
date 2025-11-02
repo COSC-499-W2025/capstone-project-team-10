@@ -34,8 +34,8 @@ def set_program_constants() -> None:
         case _:
             program_file_path = os.path.join(os.path.expanduser("~"), project_name)
 
-    result_log_folder_path = program_file_path + "/logs/"
-    optional_parameters_path = program_file_path + "/params.json"
+    result_log_folder_path = os.path.join(program_file_path, "logs")
+    optional_parameters_path = os.path.join(program_file_path, "params.json")
 
 
 def load_additional_params() -> None:
