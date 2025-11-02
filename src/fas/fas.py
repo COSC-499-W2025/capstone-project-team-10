@@ -56,6 +56,8 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
     try:
         print(f"Getting extra data for file type: {file_type}")
         match file_type:
+            # The reason why the case of "pdf" is quite big is becuase fas_PDF returns an object therefore we need to map its attributes to a dictionary
+            # so that it is consistent with other file types that return dictionaries.
             case "pdf":
                 import fas_pdf  
                 print("Extracting PDF data...")
@@ -143,6 +145,8 @@ def analyze_path(file_path: str) -> Optional[FileAnalysis]:
 def run_fas(file_path: Optional[str] = None) -> Optional[FileAnalysis]:
     return analyze_path(file_path)
 
+
+# This is just to run code directly for testing purposes 
 if __name__ == "__main__":
     test_path = input("Enter a file path to analyze: ").strip()
     result = run_fas(test_path)

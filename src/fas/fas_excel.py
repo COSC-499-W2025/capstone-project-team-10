@@ -26,6 +26,7 @@ def extract_excel_data(file_path: str) -> Dict[str, Any]:
         })
 
         # Per sheet stats
+        # All the stats we can gather without reading all cell values
         sheet_stats = {}
         for sheet in workbook.worksheets:
             formulas = sum(1 for row in sheet.iter_rows() for cell in row if cell.value and str(cell.value).startswith("="))
