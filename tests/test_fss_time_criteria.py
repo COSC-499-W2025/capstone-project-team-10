@@ -32,6 +32,7 @@ class TestFssTimeCriteria:
         assert isinstance(result, datetime.datetime)
         assert result == fake_time
 
+    # If the mod_time properly extracts the time
     @patch.object(Path, "stat")
     def test_get_mod_time(self, mock_stat):
         fake_time = datetime.datetime(2025, 11, 1, 12, 0, 0)
@@ -43,6 +44,7 @@ class TestFssTimeCriteria:
         assert isinstance(result, datetime.datetime)
         assert result == fake_time
 
+    # Check for when 2 bounds are presented
     @patch.object(fss_helpers, "get_creation_time")
     def test_time_check_both_bounds(self, mock_get_creation):
         mock_get_creation.return_value = datetime.datetime(2025, 11, 1, 12, 0, 0)
@@ -50,12 +52,14 @@ class TestFssTimeCriteria:
         upper = datetime.datetime(2025, 12, 1)
         assert fss_helpers.time_check([lower, upper], "dummy.txt", "create") is True
 
+    # Check for when only upper bounds are presented
     @patch.object(fss_helpers, "get_mod_time")
     def test_time_check_upper_bound_only(self, mock_get_mod):
         mock_get_mod.return_value = datetime.datetime(2025, 11, 1, 12, 0, 0)
         upper = datetime.datetime(2025, 12, 1)
         assert fss_helpers.time_check([None, upper], "dummy.txt", "mod") is True
 
+    # Check for when only lower bounds are presented
     @patch.object(fss_helpers, "get_mod_time")
     def test_time_check_lower_bound_only(self, mock_get_mod):
         mock_get_mod.return_value = datetime.datetime(2025, 11, 1, 12, 0, 0)
@@ -63,6 +67,7 @@ class TestFssTimeCriteria:
         # Should return True since no upper bound
         assert fss_helpers.time_check([lower, None], "dummy.txt", "mod") is True
 
+    # Check for when no bounds are presented
     @patch.object(fss_helpers, "get_creation_time")
     def test_time_check_no_bounds(self, mock_get_creation):
         mock_get_creation.return_value = datetime.datetime(2025, 11, 1)
