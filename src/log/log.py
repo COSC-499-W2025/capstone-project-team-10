@@ -24,9 +24,10 @@ def resume_log_file() -> None:
     if Path(param.result_log_folder_path).exists():
         for file in Path(param.result_log_folder_path).iterdir():
             if file.is_file():
-                log_number: int = int(
-                    re.search(param.log_file_naming_regex, file.name).group(1)
-                )
+                match = re.search(param.log_file_naming_regex, file.name)
+                if not match:
+                    continue
+                log_number: int = int(match.group(1))
                 print(f"Found log file: {file.name} with number: {log_number}")
                 if log_number > newest_log_number:
                     newest_log_number = log_number
@@ -57,9 +58,10 @@ def open_log_file() -> None:
     Path(param.result_log_folder_path).mkdir(parents=True, exist_ok=True)
     for file in Path(param.result_log_folder_path).iterdir():
         if file.is_file:
-            log_number: int = int(
-                re.search(param.log_file_naming_regex, file.name).group(1)
-            )
+            match = re.search(param.log_file_naming_regex, file.name)
+            if not match:
+                continue
+            log_number: int = int(match.group(1))
             if log_number > newest_log_number:
                 newest_log_number = log_number
             if log_number < oldest_log_number:
