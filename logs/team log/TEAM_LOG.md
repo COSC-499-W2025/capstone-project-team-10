@@ -167,4 +167,8 @@
 - Some tests fail as the implementations have not yet been built. Additioanlly other tests are implemented, but not shown in this report as they generate errors when running all tests at once.
 
 ## Reflection / Additional Context
-- Week 8 was a very strong week in terms of delivery and individual work from all group members. Each member took on an issue from the GitHub and completed their task before the end of the week. As a team, we were able to knock six items off our issues board and already have tasks lined up for the next week. One thing we will need to review is how we can integrate our respective work with one another. We have added a lot of code from different coders, so it will be necessary to review it together to make sure the code is compatible with each other's code. Overall, it was a solid week and a great start to the coding aspect of this project. 
+- Week 8 was a very strong week in terms of delivery and individual work from all group members. Each member took on an issue from the GitHub and completed their task before the end of the week. As a team, we were able to knock six items off our issues board and already have tasks lined up for the next week. One thing we will need to review is how we can integrate our respective work with one another. We have added a lot of code from different coders, so it will be necessary to review it together to make sure the code is compatible with each other's code. Overall, it was a solid week and a great start to the coding aspect of this project.
+
+
+# Sprint for 10/27/25 -> 11/02/25
+Please refer to team_log.md within the folder Week 9
