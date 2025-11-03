@@ -7,7 +7,8 @@ import ast
 
 class ProgrammingReader:
     """
-    Extracts type of programming file as well as any imports, frameworks, and libraries used.
+    Detects the file type of programming files and extracts any imported libraries.
+    Supports multiple languages and uses language-specific regex patterns and parsing.
     """
 
     def __init__(self, filepath) -> None:
@@ -15,42 +16,52 @@ class ProgrammingReader:
         self.filetype = None
         self.libraries = []
 
+        # Checks if the filepath exists
         if not os.path.isfile(self.filepath):
             raise FileNotFoundError(f"File not found: {self.filepath}")
 
+        # Calls extract method to populate file type and libraries 
         self.extract()
 
-    def extract_with_pattern(self, pattern):
+    def extract_with_pattern(self, pattern) -> list[str]:
         """
-        Run regex line-by-line and return all captured groups from matches.
-        
-        Args:
-            pattern: Regex pattern to match
+        Finds import and library lines of code using a given regex pattern. 
+        Returns a list of all the matches from the file with the given regex pattern
         """
         matches = []
         try:
             with open(self.filepath, "r", encoding="utf-8", errors="replace") as f:
-                for line in f:
-                    match = re.search(pattern, line)
-                    if match:
-                        groups = match.groups()
-                        for group in groups:
-                            if group:
-                                matches.append(group)
+                content = f.read()
+
+                # Finds all matches to the pattern in the file, including matches across newlines
+                for match in re.finditer(pattern, content, re.MULTILINE | re.DOTALL):
+                    # Stores all the individual groups from the larger match
+                    groups = match.groups()
+                    # Loops through each individual group and adds to the matches if the group is not None
+                    for group in groups:
+                        if group:
+                            matches.append(group)
         except Exception as e:
-                raise Exception(f"Error analyzing file: {str(e)}")
+            raise Exception(f"Error analyzing file: {str(e)}")
         return matches
 
     def extract_file_type(self):
-        """Detect file type from extension or shebang."""
+        """
+        Identifies the file type using file extensions or shebang line as a fallback.
+        Raises a value error if the file can't be identified.
+        """
         _, extension = os.path.splitext(self.filepath)
+        
+        # Maps the extension to the extension_mappings.py dictionary
         self.filetype = em.get(extension.lower())
 
+        # If the extension check fails tries using shebang instead
         if self.filetype is None:
             try:
                 with open(self.filepath, 'r', encoding='utf-8', errors="replace") as f:
                     first_line = f.readline().strip()
-                    
+                
+                # Checks if shebang exists and maps the shebang to the extension_mappings.py dictionary
                 if first_line.startswith('#!'):
                     shebang_lower = first_line.lower()
                     for keyword, filetype in sm.items():
@@ -59,127 +70,109 @@ class ProgrammingReader:
                             break
                             
             except Exception as e:
-                raise Exception(f"Error analyzing file: {str(e)}")
+                raise Exception(f"Error analyzing file '{self.filepath}': {e}")
             
+        # Checks if a file type was found and returns an error if no type could be identified
         if not self.filetype:
             raise ValueError(f"File is not a recognized coding file: {self.filepath}")
 
+    def extract_generic_libraries(self):
+        """
+        Generic extraction for languages that don't need special filtering.
+        """
+        if self.filetype not in LANGUAGE_PATTERNS:
+            return
+        
+        # Maps the regex pattern from programming_regex.py to the file type 
+        patterns = LANGUAGE_PATTERNS[self.filetype]
+
+        # Checks if the filetype has multiple regex patterns or just one
+        if not isinstance(patterns, list):
+            patterns = [patterns]
+        
+        matches = []
+        # Uses all possible regex patterns for a file type and stores them in matches
+        for pattern in patterns:
+            matches.extend(self.extract_with_pattern(pattern))
+        
+        # Assigns the libraries variable to a unique list of the matches
+        self.libraries = list(set(matches))
+
     def extract_python_libraries(self):
-        """Extract imports using AST for accuracy."""
+        """
+        Extract libraries using python's AST for improved accuracy.
+        """
         libraries = set()
         try:
             with open(self.filepath, "r", encoding="utf-8", errors="replace") as f:
                 tree = ast.parse(f.read())
 
+            # Walks through each node in the abstract syntax tree (ast) looking for imports
             for node in ast.walk(tree):
                 if isinstance(node, ast.Import):
+                    # Adds imported modules to libraries
                     for alias in node.names:
                         libraries.add(alias.name)
                 elif isinstance(node, ast.ImportFrom):
+                    # Adds non-relative imports to libraries
                     if node.module and node.level == 0:
                         libraries.add(node.module)
         except SyntaxError:
             pass
+
         self.libraries = list(libraries)
 
-    def extract_java_libraries(self):
-        """Extract libraries and frameworks from Java files."""
-        pattern = LANGUAGE_PATTERNS['java']
-        matches = self.extract_with_pattern(pattern)
-        self.libraries = list(set(matches))
-
-    def extract_javascript_libraries(self):
-        """Extract libraries and frameworks from JavaScript files."""
-        patterns = LANGUAGE_PATTERNS['javascript']
-        matches = []
-        for pattern in patterns:
-            matches.extend(self.extract_with_pattern(pattern))
-        self.libraries = list(set(matches))
-
-    def extract_typescript_libraries(self):
-        """Extract libraries and frameworks from TypeScript files."""
-        patterns = LANGUAGE_PATTERNS['typescript']
-        matches = []
-        for pattern in patterns:
-            matches.extend(self.extract_with_pattern(pattern))
-        self.libraries = list(set(matches))
-
     def extract_rust_libraries(self):
-        """Extract libraries and frameworks from Rust files."""
+        """
+        Extract external crate references from Rust files.
+        """
         pattern = LANGUAGE_PATTERNS['rust']
         matches = self.extract_with_pattern(pattern)
-        # Filter out internal crate references
+        # Excludes rust's internal crate references (crate::, self::, super::)
         cleaned = []
         for m in matches:
             if any(skip in m for skip in ["crate::", "self::", "super::"]):
                 continue
+            # Trims module paths
             cleaned.append(m.split("::{")[0])
         self.libraries = list(set(cleaned))
 
     def extract_go_libraries(self):
-        """Extract libraries and frameworks from Go files."""
+        """
+        Extract imported packages from Go files.
+        """
         pattern = LANGUAGE_PATTERNS['go']
         matches = self.extract_with_pattern(pattern)
-        # Filter out relative imports
+        # Excludes go's relative imports (./utils)
         cleaned = [m for m in matches if not m.startswith(".")]
         self.libraries = list(set(cleaned))
 
-    def extract_csharp_libraries(self):
-        """Extract libraries and frameworks from C# files."""
-        pattern = LANGUAGE_PATTERNS['csharp']
-        matches = self.extract_with_pattern(pattern)
-        self.libraries = list(set(matches))
-
-    def extract_c_libraries(self):
-        """Extract libraries and frameworks from C files."""
-        pattern = LANGUAGE_PATTERNS['c']
-        matches = self.extract_with_pattern(pattern)
-        self.libraries = list(set(matches))
-
-    def extract_cpp_libraries(self):
-        """Extract libraries and frameworks from C++ files."""
-        pattern = LANGUAGE_PATTERNS['cpp']
-        matches = self.extract_with_pattern(pattern)
-        self.libraries = list(set(matches))
-
     def extract_php_libraries(self):
-        """Extract libraries and frameworks from PHP files."""
+        """
+        Extract imported and required modules from PHP files.
+        """
         patterns = LANGUAGE_PATTERNS['php']
         matches = []
         for pattern in patterns:
             matches.extend(self.extract_with_pattern(pattern))
-        # Filter out relative paths
+        # Excludes php's relative imports and requires (./ or ../)
         cleaned = [m for m in matches if not m.startswith(("./", "../"))]
         self.libraries = list(set(cleaned))
 
     def extract_ruby_libraries(self):
-        """Extract libraries and frameworks from Ruby files."""
+        """
+        Extract required libraries from Ruby files.
+        """
         pattern = LANGUAGE_PATTERNS['ruby']
         matches = self.extract_with_pattern(pattern)
         # Filter out relative paths
         cleaned = [m for m in matches if not m.startswith(("./", "../"))]
         self.libraries = list(set(cleaned))
 
-    def extract_swift_libraries(self):
-        """Extract libraries and frameworks from Swift files."""
-        pattern = LANGUAGE_PATTERNS['swift']
-        matches = self.extract_with_pattern(pattern)
-        self.libraries = list(set(matches))
-
-    def extract_r_libraries(self):
-        """Extract libraries and frameworks from R files."""
-        pattern = LANGUAGE_PATTERNS['r']
-        matches = self.extract_with_pattern(pattern)
-        self.libraries = list(set(matches))
-
-    def extract_fortran_libraries(self):
-        """Extract libraries and frameworks from Fortran files."""
-        pattern = LANGUAGE_PATTERNS['fortran']
-        matches = self.extract_with_pattern(pattern)
-        self.libraries = list(set(matches))
-
     def extract_perl_libraries(self):
-        """Extract libraries and frameworks from Perl files."""
+        """
+        Extract modules from Perl files, excluding the built in pragmas.
+        """
         pattern = LANGUAGE_PATTERNS['perl']
         matches = self.extract_with_pattern(pattern)
         # Filter out common pragmas
@@ -187,26 +180,21 @@ class ProgrammingReader:
         self.libraries = list(set(cleaned))
 
     def extract_pascal_libraries(self):
-        """Extract libraries and frameworks from Pascal files."""
+        """
+        Extract imported units from Pascal files.
+        """
         pattern = LANGUAGE_PATTERNS['pascal']
         matches = self.extract_with_pattern(pattern)
-        # Split comma-separated units
+        # Split comma-separated imports into individual imports (use SysUtils, Classes)
         cleaned = []
         for m in matches:
             units = [u.strip() for u in m.split(",") if u.strip()]
             cleaned.extend(units)
         self.libraries = list(set(cleaned))
 
-    def extract_vb_libraries(self):
-        """Extract libraries and frameworks from Visual Basic files."""
-        pattern = LANGUAGE_PATTERNS['vb']
-        matches = self.extract_with_pattern(pattern)
-        self.libraries = list(set(matches))
-
     def extract_libraries(self):
         """
-        Extract libraries based on detected file type.
-        Automatically routes to the appropriate extraction method.
+        Calls the method using the filetype if it exists. Otherwise calls the extract_generic_libraries() method
         """
         if not self.filetype:
             return
@@ -214,11 +202,12 @@ class ProgrammingReader:
         method_name = f"extract_{self.filetype}_libraries"
         if hasattr(self, method_name):
             getattr(self, method_name)()
+        else:
+            self.extract_generic_libraries()
 
     def extract(self):
         """
-        Perform complete analysis: detect file type and extract libraries.
-        This is the main public API method.
+        Performs the extraction of file type and libraries. Is called by the __init__ method.
         """
         self.extract_file_type()
         self.extract_libraries()

@@ -1,6 +1,8 @@
 program TestProgram;
 
-uses SysUtils, Classes, Graphics, Forms, Dialogs, StdCtrls, Controls, ExtCtrls;
+uses 
+  SysUtils, Classes, 
+  Graphics, Forms, Dialogs, StdCtrls, Controls, ExtCtrls;
 
 var
   MyVar: Integer;
