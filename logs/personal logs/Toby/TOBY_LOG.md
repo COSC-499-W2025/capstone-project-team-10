@@ -13,7 +13,7 @@
   - Added Excel Data Extractor that will return a readable object for FAS to use as extra info.
 - Update FAS to take in Excel and PDF (the last week's issue)
 - Refactored old tests. (test_fas_key.py was moved to test_fas.py and some content was refactored)
-- Helped out Adam with a pytest bug that cant run on Window OS
+- Helped out Adam with a pytest bug that makes it failed to pass on Window OS
 
 ## Additional Context
 ## Team Survey:
