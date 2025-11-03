@@ -1,3 +1,29 @@
+# Week 8 (10/26/2025 - 11/02/2025)
+
+![Week 9 - Task Completed](W8/Done.png)
+
+
+## Features
+
+![Week 9 - In Progress](W8/Features.png)
+
+## Recap
+
+- For week 9, I create excel analysis module that can extract extra data for my week 8 analyis module
+  - Added Excel Data Extractor that will return a readable object for FAS to use as extra info.
+- Update FAS to take in Excel and PDF (the last week's issue)
+- Refactored old tests. (test_fas_key.py was moved to test_fas.py and some content was refactored)
+- Helped out Adam with a pytest bug that cant run on Window OS
+
+## Additional Context
+## Team Survey:
+
+
+![Week 9 - Team Survey](W8/Team_Survey.png)
+![Week 9 - Team Survey](W8/Team_Survey_(1).png)
+![Week 9 - Team Survey](W8/Team_Survey_(2).png)
+![Week 9 - Team Survey](W8/Team_Survey_(3).png)
+
 # Week 8 (10/19/2025 - 10/26/2025)
 
 ![Week 8 - Task Completed](W8/Done.png)
