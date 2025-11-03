@@ -21,7 +21,7 @@ LANGUAGE_PATTERNS = {
         r"(?:require|include)(?:_once)?\s*[(\s]+['\"]([^'\"]+)['\"]",
         r'^\s*use\s+([a-zA-Z_\\][\w\\]+)(?:\s+as\s+\w+)?;'
     ],
-    'ruby':r"(?:^|[^\w])require(?!_relative)\s*[(\s]*['\"]([^'\"]+)['\"]",
+    'ruby': r"(?:^|[^\w])require(?!_relative)\s*[(\s]*['\"]([^'\"]+)['\"]",
     'swift': r'^\s*(?:@testable\s+)?import\s+([a-zA-Z_][\w.]*)',
     'r': r'(?:library|require)\s*\(\s*["\']?([a-zA-Z_][\w.]*)["\']?\s*\)',
     'fortran': r'^\s*[Uu][Ss][Ee]\s+([a-zA-Z_][\w]*)',

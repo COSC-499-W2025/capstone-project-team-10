@@ -1,11 +1,11 @@
-program HelloWorld;
-uses Crt;        
-uses SysUtils;  
-uses Strings;   
-uses Math;        
-uses Types;       
+program TestProgram;
+
+uses SysUtils, Classes, Graphics, Forms, Dialogs, StdCtrls, Controls, ExtCtrls;
+
+var
+  MyVar: Integer;
 
 begin
-  writeln('Hello, World!');
-  readln; (* Keep console open until a key is pressed *)
-end.
+  MyVar := 42;
+  WriteLn('Hello, Pascal!');
+end

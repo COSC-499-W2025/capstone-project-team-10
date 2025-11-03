@@ -1,21 +1,11 @@
 use strict;
 use warnings;
-use Carp;
-use File::Basename;
-use IO::Handle;
-use Time::localtime;
-
-# Third-Party (CPAN) Modules (Conceptual)
-# requires 'cpan install JSON::XS LWP::UserAgent DBI Mojo::DOM'
-use JSON::XS qw(decode_json encode_json);
+use vars;
+use constant PI => 3.14159;
 use LWP::UserAgent;
+use JSON;
 use DBI;
-use Mojo::DOM;
-use Test::More;
+use Data::Dumper;
 
-# Main function (simple Hello World)
-sub main {
-    print "Hello, World!\n";
-}
-
-main();
+my $ua = LWP::UserAgent->new();
+print "Hello, Perl!\n";
