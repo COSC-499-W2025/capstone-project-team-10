@@ -1,3 +1,17 @@
+# Week 9 (10/27/2025 - 11/02/2025)
+
+![Week Nine Tasks](Week9/WeekNineTasks.png)
+
+# Features
+
+![Week Nine Features](Week9/WeekNineFeature.png)
+
+# Recap
+
+This week I completed a module to extract data from various Microsoft Word specific files, including docx, rtf, and odt. This takes in a file of that kind and then returns metadata surrounding title, subject, author, creation date, modification date, length of the files, number of characters, words, and paragraphs as well as some specific data extraction for docx that the other files don't support.
+
+Next week I plan to integrate these features into the overall file analysis system as well as expanding upon the actual analysis and generation of insights over the gathered and consolidated data from the previous modules we have set up as a group. I expect to keep working on this over the reading week as well using the time off to my advantage.
+
 # Week 8 (10/20/2025 - 10/26/2025)
 
 ![Week Eight Tasks](Week8/Week8Tasks.png)
