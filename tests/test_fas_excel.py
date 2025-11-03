@@ -55,50 +55,53 @@ def create_invalid_excel_file():
     return INVALID_FILE_PATH
 
 
-def test_sheet_count_and_names():
-    file_path = create_excel_test_file()
-    metadata = extract_excel_data(file_path)
-    assert metadata["sheet_count"] == 3
-    assert set(metadata["sheet_names"]) == {"Summary", "Data", "HelloWorld"}
+# Start of tests------------------------------------------------------
+class TestFasExcel:
+
+    def test_sheet_count_and_names(self):
+        file_path = create_excel_test_file()
+        metadata = extract_excel_data(file_path)
+        assert metadata["sheet_count"] == 3
+        assert set(metadata["sheet_names"]) == {"Summary", "Data", "HelloWorld"}
 
 
-def test_workbook_metadata():
-    metadata = extract_excel_data(TEST_FILE_PATH)
-    assert metadata["creator"] == "Toby"
-    assert metadata["last_modified_by"] == "Nguyen"
-    assert metadata["title"] == "Test Workbook"
-    assert metadata["subject"] == "Testing"
-    assert metadata["keywords"] == "Excel,Test"
-    assert metadata["category"] == "Test Category"
-    assert metadata["description"] == "This is a test workbook"
+    def test_workbook_metadata(self):
+        metadata = extract_excel_data(TEST_FILE_PATH)
+        assert metadata["creator"] == "Toby"
+        assert metadata["last_modified_by"] == "Nguyen"
+        assert metadata["title"] == "Test Workbook"
+        assert metadata["subject"] == "Testing"
+        assert metadata["keywords"] == "Excel,Test"
+        assert metadata["category"] == "Test Category"
+        assert metadata["description"] == "This is a test workbook"
 
 
-def test_sheet_stats():
-    metadata = extract_excel_data(TEST_FILE_PATH)
-    stats = metadata["sheet_stats"]
+    def test_sheet_stats(self):
+        metadata = extract_excel_data(TEST_FILE_PATH)
+        stats = metadata["sheet_stats"]
 
-    # Summary sheet
-    summary = stats["Summary"]
-    assert summary["max_row"] >= 2
-    assert summary["max_column"] >= 3
-    assert summary["formulas"] == 1
-    assert summary["merged_cells"] == 1
+        # Summary sheet
+        summary = stats["Summary"]
+        assert summary["max_row"] >= 2
+        assert summary["max_column"] >= 3
+        assert summary["formulas"] == 1
+        assert summary["merged_cells"] == 1
 
-    # Data sheet
-    data = stats["Data"]
-    assert data["max_row"] >= 2
-    assert data["max_column"] >= 1
-    assert data["formulas"] == 0
-    assert data["merged_cells"] == 0
+        # Data sheet
+        data = stats["Data"]
+        assert data["max_row"] >= 2
+        assert data["max_column"] >= 1
+        assert data["formulas"] == 0
+        assert data["merged_cells"] == 0
 
-    # HelloWorld sheet
-    hello = stats["HelloWorld"]
-    assert hello["max_row"] >= 1
-    assert hello["max_column"] >= 2
+        # HelloWorld sheet
+        hello = stats["HelloWorld"]
+        assert hello["max_row"] >= 1
+        assert hello["max_column"] >= 2
 
 
-def test_invalid_excel_file():
-    bad_file = create_invalid_excel_file()
-    metadata = extract_excel_data(bad_file)
-    assert "error" in metadata
-    assert isinstance(metadata["error"], str)
+    def test_invalid_excel_file(self):
+        bad_file = create_invalid_excel_file()
+        metadata = extract_excel_data(bad_file)
+        assert "error" in metadata
+        assert isinstance(metadata["error"], str)

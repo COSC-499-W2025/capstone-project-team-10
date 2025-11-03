@@ -6,7 +6,7 @@ from src.fas import fas
 TESTDATA_DIR = os.path.join("tests", "testdata", "test_fas")
 TEST_FILE = os.path.join(TESTDATA_DIR, "fas_test_data.docx")  # tests/testdata/test_fas/fas_test_data.docx
 
-class TestFasKey:
+class TestFas:
 
     def test_run_fas_returns_file_analysis(self):
         # run_fas should return a FileAnalysis object for a valid file
