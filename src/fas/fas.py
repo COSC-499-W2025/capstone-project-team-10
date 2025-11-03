@@ -3,15 +3,18 @@ import datetime
 import mimetypes
 from typing import Optional, Any
 
+
 class FileAnalysis:
     def __init__(
         self,
+        file_path: str,
         file_name: str,
         file_type: str,
         last_modified: str,
         created_time: str,
-        extra_data: Optional[Any] = None
+        extra_data: Optional[Any] = None,
     ) -> None:
+        self.file_path: str = file_path
         self.file_name: str = file_name
         self.file_type: str = file_type
         self.last_modified: str = last_modified
@@ -31,7 +34,6 @@ def get_file_type(file_path: str) -> str:
         return mime_type.split("/")[-1]
 
     return "unknown"
-
 
 
 def get_last_modified_time(file_path: str) -> str:
@@ -100,7 +102,6 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                 # Generic or unsupported type
                 return None
 
-
     except ModuleNotFoundError:
         # Handler not implemented yet
         print(f"Error. No handler module found for file type: {file_type}")
@@ -115,11 +116,12 @@ def analyze_file(file_path: str) -> Optional[FileAnalysis]:
     extra_data = get_file_extra_data(file_path, file_type)
 
     return FileAnalysis(
+        file_path=file_path,
         file_name=file_name,
         file_type=file_type,
         last_modified=last_modified,
         created_time=created_time,
-        extra_data=extra_data
+        extra_data=extra_data,
     )
 
 def analyze_path(file_path: str) -> Optional[FileAnalysis]:
@@ -131,11 +133,12 @@ def analyze_path(file_path: str) -> Optional[FileAnalysis]:
         # Placeholder for git analysis
         print("Analyzing .git folder (placeholder).")
         return FileAnalysis(
+            file_path=file_path,
             file_name=".git",
             file_type="git",
             last_modified="N/A",
             created_time="N/A",
-            extra_data=None
+            extra_data=None,
         )
 
     # Otherwise treat as a regular file
