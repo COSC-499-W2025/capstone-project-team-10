@@ -171,4 +171,4 @@
 
 
 # Sprint for 10/27/25 -> 11/02/25
-Please refer to team_log.md within the folder Week 9
+Please refer to [team_log.md](https://github.com/COSC-499-W2025/capstone-project-team-10/blob/02-logs/logs/team%20log/Week%209/team_log.md) (or team_log.md within the Week 9 folder)
