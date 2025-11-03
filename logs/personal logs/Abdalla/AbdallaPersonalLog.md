@@ -41,3 +41,13 @@ This week we decided on the coding tasks for each person and reviewed documentat
 
 ## Recap
 This week we started the bulk of coding, I implemented the zip extract module along with tests. The module extracts zip folders into a designated folder within our app, and always keeps a maximum of 5.
+
+# Week 9 (10/26/2025 - 11/2/2025)
+<img width="1081" height="642" alt="image" src="https://github.com/user-attachments/assets/dbb3e6cf-57c9-40d3-b61d-e7bafe161447" />
+
+## Tasks
+<img width="323" height="84" alt="image" src="https://github.com/user-attachments/assets/a5b80fac-3b91-4e79-86c8-2fc304c530f1" />
+
+## Recap
+I finished the image analysis module this week, our work is getting a little more complicated and I think I'm going to have to spend some extra time looking through my peers' code and reviewing them over again as the program gets bigger so that I refresh my understanding of how everything is working. 
+
