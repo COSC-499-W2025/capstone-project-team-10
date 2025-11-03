@@ -35,8 +35,9 @@ Completed:
 </details>
 
 ## Reflection / Additional Context
-- Week 9 is another active week for the group members - as before, every member was assigned equally of tasks, and pluck away alot of issues directly related to core functionality.
-- The progress will continue to be so, focusing on pluck away from the core functionalities, filling out more of the core functionality that is listed with Milestone 1.
-- Now, to address test reports - we suspect that the test errors arises from the fact that our testing library (pytest) is having troubles synchronizing between src paths, when being ran in a global environment (as it can't recognize src/ where the main program functionality lies - refer to Initialization) but it can correctly executes many of the tests if ran individually (also refer to Runnable Tests section above) - therefore, a team meeting will be arranged for next week in order to:
+- Week 9 was another active week for the group. As before, every member was assigned an equal share of tasks and resolved many issues directly related to the core functionality.
+- The progress will continue in this manner, focusing on resolving remaining core functionality issues and completing more of the core features listed under Milestone 1.
+- Regarding the test reports, we suspect that the test errors arise from our testing library (pytest) having trouble synchronizing with the src paths when run in a global environment. Specifically, it cannot recognize the src/ directory, where the main program functionality resides (see Initialization), but it can correctly execute many tests when run individually (see Runnable Tests section above). Therefore, a team meeting will be arranged for next week to:
   - __Update standardnization__ and
-  - __Refactor the tests and the testing module__ to properly recognize paths (an issue will be added within the Kanban to reflect this within the team meetings)
+  - __Refactor the tests and the testing module__ to properly recognize paths.
+(An issue will be added to the Kanban board to reflect this for the upcoming team meeting.)
