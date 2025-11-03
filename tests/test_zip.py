@@ -1,7 +1,7 @@
 from pathlib import Path
 import pytest
 import src.zip.zip_app as zip
-import src.fss.fss as fss
+# import src.fss.fss as fss
 from unittest.mock import patch
 
 path_to_test_zip = "tests/testdata/test_zip/testScanFolder.zip"
