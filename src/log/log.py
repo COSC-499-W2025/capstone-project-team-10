@@ -101,7 +101,7 @@ def open_log_file() -> None:
     )
 
     # create the log file, overwriting if it exists
-    with open(current_log_file, "w") as log_file:
+    with open(current_log_file, "w", newline="") as log_file:
         writer = csv.writer(log_file)
         writer.writerows(
             [
@@ -121,7 +121,7 @@ def write(fileAnalysis: FileAnalysis) -> None:
     global current_log_file
     if current_log_file == "" or not Path(current_log_file).exists():
         resume_log_file()
-    with open(current_log_file, "a") as log_file:
+    with open(current_log_file, "a", newline="") as log_file:
         print("Logging to filepath" + current_log_file)
         writer = csv.writer(log_file)
         writer.writerow(

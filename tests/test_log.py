@@ -11,7 +11,7 @@ path_to_test_folder = "tests/testdata/test_cli/testScanFolder"
 def clean_log_folder():
     import shutil
 
-    log_folder = str(os.path.join(param.program_file_path, "logs"))
+    log_folder = str(param.result_log_folder_path)
     if os.path.exists(log_folder):
         shutil.rmtree(log_folder)
     os.makedirs(log_folder)
