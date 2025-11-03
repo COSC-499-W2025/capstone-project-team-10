@@ -17,7 +17,7 @@ def extract_odt_data(path):
             "author": meta.initial_creator,
             "subject": meta.subject,
             "created": meta.creation_date,
-            "modified": meta.get_modification_date,
+            "modified": meta.date,
             "num_paragraphs": len(paras),
             "num_chars": len(text),
             "num_words": len(text.split()),

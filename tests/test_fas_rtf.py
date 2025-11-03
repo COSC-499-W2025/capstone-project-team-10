@@ -1,6 +1,6 @@
 import datetime
 import pytest
-import fas.fas_rtf as fas
+import src.fas.fas_rtf as fas
 
 rtf_file_path = "tests/testdata/test_fas/fas_rtf_data.rtf"
 
@@ -25,7 +25,7 @@ class TestFasRtf:
         value = fas.extract_specific_data(rtf, "title")
         assert value is None
 
-    def test_docx_content(self):
+    def test_rtf_content(self):
         result = fas.extract_rtf_data(rtf_file_path)
         assert result["author"] == "testAuthor"
         assert result["title"] == "rtfData"
@@ -37,6 +37,6 @@ class TestFasRtf:
         assert result["num_paragraphs"] == 3
 
     def test_invalid_rtf_file(self):
-        result = fas.extract_rtf_data("tests/testdata/test_fas/fas_docx_test.docx")
+        result = fas.extract_rtf_data("notaRealpath")
         assert "error" in result
         assert isinstance(result["error"], str)
