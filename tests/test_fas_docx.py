@@ -1,7 +1,6 @@
 import pytest
 import datetime
 import src.fas.fas_docx as fas
-from unittest.mock import patch
 
 docx_file_path = "tests/testdata/test_fas/fas_docx_test.docx"
 
@@ -16,5 +15,10 @@ class TestFasDocx:
         assert result["num_paragraphs"] == 6
         assert result["num_chars"] == 25
         assert result["num_words"] == 9
+
+    def test_invalid_docx_file(self):
+        result = fas.extract_docx_data("tests/testdata/test_fas/fas_rtf_data.rtf")
+        assert "error" in result
+        assert isinstance(result["error"], str)
            
 

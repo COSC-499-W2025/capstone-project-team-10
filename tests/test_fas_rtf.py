@@ -35,3 +35,8 @@ class TestFasRtf:
         assert result["num_chars"] == 43
         assert result["num_words"] == 9
         assert result["num_paragraphs"] == 3
+
+    def test_invalid_rtf_file(self):
+        result = fas.extract_rtf_data("tests/testdata/test_fas/fas_docx_test.docx")
+        assert "error" in result
+        assert isinstance(result["error"], str)

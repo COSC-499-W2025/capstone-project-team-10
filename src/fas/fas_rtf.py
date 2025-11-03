@@ -3,31 +3,34 @@ import re
 from striprtf.striprtf import rtf_to_text
 
 def extract_rtf_data(path):
-    with open(path, "r", encoding="utf-8", errors="ignore") as f:
-        rtf = f.read()
+    try:
+        with open(path, "r", encoding="utf-8", errors="ignore") as f:
+            rtf = f.read()
 
-    text = rtf_to_text(rtf)
+        text = rtf_to_text(rtf)
 
-    title = extract_specific_data(rtf, "title")
-    author = extract_specific_data(rtf, "author")
-    subject = extract_specific_data(rtf, "subject")
+        title = extract_specific_data(rtf, "title")
+        author = extract_specific_data(rtf, "author")
+        subject = extract_specific_data(rtf, "subject")
 
-    c_date = extract_datetime(rtf, "creatim")
-    r_date = extract_datetime(rtf, "revtim")
+        c_date = extract_datetime(rtf, "creatim")
+        r_date = extract_datetime(rtf, "revtim")
 
-    # RTF files do not have standardized metadata and sometimes they dont have any at all, extraction of title, author, and subject is only possible if the RTF was made in Word.
-    content = {
-        "author": author,
-        "title": title,
-        "subject": subject,
-        "created": c_date,
-        "modified": r_date,
-        "num_chars": len(text),
-        "num_words": len(text.split()),
-        "num_paragraphs": len(text.split('\n\n')),
-    }
+        # RTF files do not have standardized metadata and sometimes they dont have any at all, extraction of title, author, and subject is only possible if the RTF was made in Word.
+        content = {
+            "author": author,
+            "title": title,
+            "subject": subject,
+            "created": c_date,
+            "modified": r_date,
+            "num_chars": len(text),
+            "num_words": len(text.split()),
+            "num_paragraphs": len(text.split('\n\n')),
+        }
 
-    return content
+        return content
+    except Exception as e:
+        return {"error": str(e)}
 
 def extract_datetime(rtf, str):
     # As the creatim and revtim are stored in the RTF they must be extracted, this ocmbines the plain text to form a datetime object for consistency with other file types.
