@@ -11,7 +11,7 @@ path_to_test_folder = "tests/testdata/test_cli/testScanFolder"
 def clean_log_folder():
     import shutil
 
-    log_folder = os.path.join(param.program_file_path, "logs")
+    log_folder = str(os.path.join(param.program_file_path, "logs"))
     if os.path.exists(log_folder):
         shutil.rmtree(log_folder)
     os.makedirs(log_folder)
@@ -59,10 +59,10 @@ class TestLog:
     def test_log_start(self):
         setup_log_tests()
         global test_file_analysis
-        print("Checking: " + param.program_file_path + "/logs/0.log")
         log.write(test_file_analysis)
         # Read the produced file, check that the lines are written
-        log_file_path = os.path.join(param.result_log_folder_path, "0.log")
+        log_file_path = str(os.path.join(param.result_log_folder_path, "0.log"))
+        print("Checking: " + log_file_path)
         assert checkLogOutput(log_file_path)
         clean_up_log_tests()
 
@@ -72,7 +72,7 @@ class TestLog:
         global test_file_analysis
         log.write(test_file_analysis)
         # Read the produced file, check that the lines are written
-        log_file_path = os.path.join(param.result_log_folder_path, "0.log")
+        log_file_path = str(os.path.join(param.result_log_folder_path, "0.log"))
         assert checkLogOutput(log_file_path)
         clean_up_log_tests()
 
@@ -86,7 +86,7 @@ class TestLog:
         global test_file_analysis
         log.write(test_file_analysis)
         # Read the produced file, check that the lines are written
-        log_file_path = os.path.join(param.result_log_folder_path, "1.log")
+        log_file_path = str(os.path.join(param.result_log_folder_path, "1.log"))
         assert checkLogOutput(log_file_path)
         clean_up_log_tests()
 
@@ -97,7 +97,7 @@ class TestLog:
         global test_file_analysis
         log.write(test_file_analysis)
         # Read the produced file, check that the lines are written
-        log_file_path = os.path.join(param.result_log_folder_path, "0.log")
+        log_file_path = str(os.path.join(param.result_log_folder_path, "0.log"))
         assert checkLogOutput(log_file_path)
         clean_up_log_tests()
 
@@ -111,13 +111,13 @@ class TestLog:
         global test_file_analysis
         log.write(test_file_analysis)
         # Read the produced file, check that the lines are written
-        log_file_path = os.path.join(
-            param.result_log_folder_path, f"{param.log_max_count}.log"
+        log_file_path = str(
+            os.path.join(param.result_log_folder_path, f"{param.log_max_count}.log")
         )
 
         assert checkLogOutput(log_file_path)
         # Check that 0.log has been deleted
-        log_0_path = os.path.join(param.result_log_folder_path, "0.log")
+        log_0_path = str(os.path.join(param.result_log_folder_path, "0.log"))
         assert not os.path.exists(log_0_path)
         clean_up_log_tests()
 
@@ -137,7 +137,7 @@ class TestLog:
         )
         log.update(modified_test_file_analysis)
         # Read the produced file, check that the last line is updated
-        log_file_path = os.path.join(param.result_log_folder_path, "0.log")
+        log_file_path = str(os.path.join(param.result_log_folder_path, "0.log"))
         with open(log_file_path, "r") as log_file:
             lines = log_file.readlines()
             print("Log file contents after update:")
@@ -155,7 +155,7 @@ class TestLog:
         global test_file_analysis
         log.update(test_file_analysis)
         # Read the produced file, check that the lines are written
-        log_file_path = os.path.join(param.result_log_folder_path, "0.log")
+        log_file_path = str(os.path.join(param.result_log_folder_path, "0.log"))
         print("Checking: " + log_file_path)
         assert checkLogOutput(log_file_path)
         clean_up_log_tests()
