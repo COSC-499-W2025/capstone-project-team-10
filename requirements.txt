@@ -3,6 +3,7 @@ pyinstaller
 pytest
 pdfplumber
 pymupdf
+openpyxl
 python-docx
 striprtf
 odfpy

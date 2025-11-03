@@ -1,4 +1,10 @@
 import os
+from fss_helper import *
+
+# User's settings for modification + creation time - for now, dummies variable
+# It should be the fss intaker responsibility to control if these values are valid (lower << upper, only 2 values in a list, etc.)
+create_time_crit = [None, None]
+mod_time_crit = [None, None]
 
 def search(input_path, excluded_path):
 
@@ -28,7 +34,7 @@ def search(input_path, excluded_path):
             e_path = os.path.abspath(e_path)
             excluded_set.add(e_path)
 
-            #if exculsion includes a dir, it will add all files within the dir to exculsion
+            #if exclusion includes a dir, it will add all files within the dir to exclusion
             if os.path.isdir(e_path):
                 for root, dirs, files in os.walk(e_path):
                     for file in files:
@@ -52,7 +58,7 @@ def search(input_path, excluded_path):
             file_path = os.path.join(root, file)
             print(file_path)
             if exclude_flag:
-                if file_path not in excluded_path:
+                if file_path not in excluded_path and time_check(create_time_crit, file_path, "create") and time_check(mod_time_crit, file_path, "mod"): # Added time checkers to abide criteria here
                     #This is where specifics of files can be extracted.
                     num_of_files_scanned += 1
             else:
