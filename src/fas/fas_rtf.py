@@ -33,7 +33,7 @@ def extract_rtf_data(path):
         return {"error": str(e)}
 
 def extract_datetime(rtf, str):
-    # As the creatim and revtim are stored in the RTF they must be extracted, this ocmbines the plain text to form a datetime object for consistency with other file types.
+    # As the creatim and revtim are stored in the RTF they must be extracted, this combines the plain text to form a datetime object for consistency with other file types.
     block = re.search(r'{\\'+str+'([^}]*)}', rtf)
     if not block:
         return None
@@ -48,6 +48,7 @@ def extract_datetime(rtf, str):
     return datetime.datetime(yr, mo, dy, hr, minute)
 
 def extract_specific_data(rtf, str):
+    # As RTF only has specific metadata if created via Word, this will fill the value with "None" if it isnt present to stop errors
     block = re.search(r'{\\'+str+'+([^}]*)}', rtf)
     if not block:
         return None
