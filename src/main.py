@@ -1,6 +1,8 @@
 import sys
-from gui.gui_app import run_gui
+#from gui.gui_app import run_gui
 from cli.cli_app import run_cli
+from fas.fas_docx import extract_docx_data
+from fas.fas_rtf import extract_rtf_data
 
 def main():
 
@@ -10,4 +12,5 @@ def main():
         run_gui()
 
 if __name__ == "__main__":
-    main()
+    #main()
+    extract_rtf_data("/Users/sfjalexander/Desktop/COSC 499/capstone-project-team-10/tests/testdata/test_fas/fas_rtf_data.rtf")

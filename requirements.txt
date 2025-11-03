@@ -4,3 +4,5 @@ pytest
 pdfplumber
 pymupdf
 python-docx
+striprtf
+odfpy

@@ -3,7 +3,6 @@ from docx import Document
 def extract_docx_data(path):
     doc = Document(path)
 
-    # Text extraction
     # This can be used when finding keywords for summary, analysis, and or ranking depending on implememntation
     text = "\n".join(p.text for p in doc.paragraphs)
 
