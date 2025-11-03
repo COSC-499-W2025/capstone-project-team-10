@@ -1,3 +1,14 @@
+# Week 9 (10/27/2025 - 11/2/2025)
+
+![Week 9 Tasks](Week9/Week9Tasks.png)
+
+## Features
+
+![Week 9 KanBan](Week9/Week9KanBan.png)
+
+## Recap
+We continued coding work expanding the type of files that we extract data from and improving the modules which connect eveything. I worked on the programming file extraction module and implemented file type identifying for coding files. I also implemented library extraction for several popular coding languages.
+
 # Week 8 (10/20/2025 - 10/26/2025)
 
 ![Week 8 Tasks](Week8/Week8Tasks.png)
