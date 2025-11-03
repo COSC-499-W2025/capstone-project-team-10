@@ -1,8 +1,5 @@
 from __future__ import annotations
-import os
-from typing import Dict, Any
 import pytest
-from PIL import features
 from src.fas.fas_image_format import analyze_image
 
 def test_jpeg_metadata():
