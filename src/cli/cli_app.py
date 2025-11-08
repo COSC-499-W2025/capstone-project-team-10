@@ -1,7 +1,9 @@
-import sys
-import src.zip.zip_app as zip
-import src.fss.fss as fss
 import builtins
+import sys
+
+import src.fss.fss as fss
+import src.param.param as param
+import src.zip.zip_app as zip
 
 
 def prompt_file_perms():
@@ -26,16 +28,29 @@ def get_param_body(args: list[str], indx: int) -> str:
         return ""
 
 
+def get_multi_argument(args: list[str], indx: int) -> set[str]:
+    multi_argument_set: set[str] = set()
+    indx += 1  # Start after the flag itself
+    while indx < len(args):
+        arg = args[indx]
+        multi_argument_set.add(arg.rstrip(","))
+        if not args[indx].endswith(","):
+            break
+        indx += 1
+    return multi_argument_set
+
+
 def run_cli(cli_args: list[str]):
     quiet: bool = ("--quiet" in cli_args) or ("-q" in cli_args)
+    _original_print = builtins.print
     if quiet:
-        _original_print = builtins.print
         builtins.print = lambda *a, **k: None
 
     if "-y" not in cli_args:
         prompt_file_perms()
 
     path_exclusions: set = set()
+    file_types: set = set()
     file_path: str = ""
 
     if "--zip" in cli_args:
@@ -51,6 +66,34 @@ def run_cli(cli_args: list[str]):
     if file_path == "":
         print("No starting file_path")
         sys.exit(1)
+    if "--exclude-paths" in cli_args:
+        path_exclusions.clear()
+        path_exclusions.update(
+            get_multi_argument(cli_args, cli_args.index("--exclude-paths"))
+        )
+        param.set(
+            "excluded_paths",
+            list(path_exclusions),
+        )
+    else:
+        temp = param.get("excluded_paths")
+        if temp is not None and isinstance(temp, list):
+            path_exclusions.clear()
+            path_exclusions.update(temp)
+
+    if "--file-types" in cli_args:
+        file_types.clear()
+        file_types.update(get_multi_argument(cli_args, cli_args.index("--file-types")))
+        param.set(
+            "supported_file_types",
+            list(file_types),
+        )
+    else:
+        temp = param.get("supported_file_types")
+        if temp is not None and isinstance(temp, list):
+            file_types.clear()
+            file_types.update(temp)
+
     print("Scanning file path: " + file_path)
     # TODO: Link fss call here with completed path
     fss.search(file_path, path_exclusions)
