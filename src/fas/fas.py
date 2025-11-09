@@ -96,6 +96,10 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             case "git":
                 # from src.fas import fas_git
                 # return fas_git.extract_git_data(file_path)
+                import fas_git_grouping
+                git_group = fas_git_grouping.GitGrouping()
+                git_group.add_repository(file_path)
+                #return git_group.get_repo_files()
                 return None
 
             case _:
