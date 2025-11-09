@@ -1,3 +1,36 @@
+# Week 10 (11/2/2025 - 11/9/2025)
+
+![Week 10 Tasks completed](Week10/image-1.png)
+
+## Features
+
+![Week 10 Tasks In-progress](Week10/image.png)
+
+## Recap
+
+I spent most of my week implementing the parameter functionality for our different modules to use. This module will manage the parameters being passed to different modules and ensure that they are persistent and globally available.
+
+- Created param module
+- Created param parsing for new parameters
+- Created tests for param module
+- Updated Readme with Param usage guide
+- Created param_defaults.json with default parameter values to be loaded at runtime, or as a backup when user parameters are corrupted/missing
+
+I also updated the CLI to be able to accept these parameters from the user in multi part parameters.
+
+- Created tests for cli param parsing
+- Updated Readme with new CLI flags
+
+PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/85
+
+## Additional Context
+
+The Team is working great together, the next phase of our project is the itegration of all our features into our commandline interface, as doing robust manual testing to iron out how we can improve product usability and functionality. as well as implementing the Resume and web portfolio exports
+
+## Team Survey:
+
+Team survey completed.
+
 # Week 9 (10/26/2025 - 11/2/2025)
 
 ![Week 9 Tasks completed](Week9/image-1.png)
@@ -8,10 +41,9 @@
 
 ## Recap
 
-I spent most of my week implementing the logging functionality for our File analysis to write to. This module manages the log files being written to and handling for log management. 
+I spent most of my week implementing the logging functionality for our File analysis to write to. This module manages the log files being written to and handling for log management.
 
-The desire for this module is that our File Export service and eventually our GUI can extract any key insights about projects and such from the resulting logs in order to display/export them for the user. 
-
+The desire for this module is that our File Export service and eventually our GUI can extract any key insights about projects and such from the resulting logs in order to display/export them for the user.
 
 ## Additional Context
 
