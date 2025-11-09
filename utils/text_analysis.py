@@ -32,17 +32,11 @@ class TextSummary:
                     if word_lower not in stop_words:
                         self.words.append(word_lower)
 
-    def getCommonWord(self):
-        # Returns the most common word and the number of times it appears
+    def getCommonWords(self, amount):
+        # Creates a distribution with the count of occurences of each word 
         word_frequency = nltk.FreqDist(self.words)
-        most_common = word_frequency.most_common(1)
-        print(most_common)
-
-    def getCommonWords(self, number):
-        # Finds the top most common 
-        word_frequency = nltk.FreqDist(self.words)
-        most_common = word_frequency.most_common(number)
-        print(most_common)
+        common_words = word_frequency.most_common(amount)
+        return common_words
 
     
 def main():
