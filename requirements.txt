@@ -10,3 +10,4 @@ odfpy
 odfdo
 Pillow
 nltk
+numpy
