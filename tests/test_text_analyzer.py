@@ -33,27 +33,27 @@ class TestTextAnalyzer:
         assert stats['sentence_count'] == 0
         assert stats['lexical_diversity'] == 0
 
-    def test_common_words_basic(self):
+    def test_common_words(self):
         text = "Cat dog cat bird."
         ts = ta.TextSummary(text)
         top_words = ts.getCommonWords(2)
         assert top_words[0][0] == "cat"
         assert top_words[0][1] == 2
     
-    def test_sentiment_basic(self):
+    def test_sentiment(self):
         text = "I love sunny days. I hate rain."
         ts = ta.TextSummary(text)
         sentiment = ts.getSentiment()
         assert sentiment['sentiment'] in {"positive", "negative", "neutral"}
 
-    def test_summary_basic(self):
+    def test_summary(self):
         text = "Hello world. This is a test sentence. Another sentence."
         ts = ta.TextSummary(text)
         summary = ts.getSummary(2)
         assert isinstance(summary, str)
         assert len(summary) > 0
 
-    def test_named_entities_basic(self):
+    def test_named_entities(self):
         text = "Barry went to Waxville."
         ts = ta.TextSummary(text)
         entities = ts.getNamedEntities()
