@@ -1,3 +1,16 @@
+# Week 10 (11/03/2025 - 11/09/2025)
+
+![Week Ten Tasks](Week10/WeekTenTasks.png)
+
+# Features
+
+![Week Ten Feature](Week10/WeekTenFeature.png)
+
+# Recap
+
+This week I worked through how to group files by git repo association by associating them with a unique repo id that can later be used to aggregate them when outputting the analysis and logging it. However in doing so I had discovered an issue with an earlier module and its importing into other files, specifically the repo_reader.py file, which will block either the tests from running, or the code from running. As this was an undiscovered issue until now I will be fixing it within the next sprint as well as completing some refactoring and further work on the analysis of the data now that we have the majority of file types covered.
+
+
 # Week 9 (10/27/2025 - 11/02/2025)
 
 ![Week Nine Tasks](Week9/WeekNineTasks.png)
