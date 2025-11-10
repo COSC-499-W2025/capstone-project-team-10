@@ -1,11 +1,37 @@
-# Week 9 (10/26/2025 - 11/02/2025)
+# Week 10 (11/02/2025 - 11/09/2025)
 
-![Week 9 - Task Completed](W8/Done.png)
+![Week 10 - Task Completed](W10/Done.png)
 
 
 ## Features
 
-![Week 9 - In Progress](W8/Features.png)
+![Week 10 - In Progress](W10/Features.png)
+
+## Recap
+
+- For week 10, I create excel analysis module that can extract extra data for my week 8 analyis module
+  - This time I work on Photoshop data
+- Update FAS to take in DOCX and Images (the last week's issue)
+- Fully complete FAS and make it a fully working component
+- For the next week I plan to work on the ranking system for FAS
+
+## Additional Context
+## Team Survey:
+
+
+![Week 10 - Team Survey](W10/Team_Survey.png)
+![Week 10 - Team Survey](W10/Team_Survey_(1).png)
+![Week 10 - Team Survey](W10/Team_Survey_(2).png)
+![Week 10 - Team Survey](W10/Team_Survey_(3).png)
+
+# Week 9 (10/26/2025 - 11/02/2025)
+
+![Week 9 - Task Completed](W9/Done.png)
+
+
+## Features
+
+![Week 9 - In Progress](W9/Features.png)
 
 ## Recap
 
@@ -19,10 +45,10 @@
 ## Team Survey:
 
 
-![Week 9 - Team Survey](W8/Team_Survey.png)
-![Week 9 - Team Survey](W8/Team_Survey_(1).png)
-![Week 9 - Team Survey](W8/Team_Survey_(2).png)
-![Week 9 - Team Survey](W8/Team_Survey_(3).png)
+![Week 9 - Team Survey](W9/Team_Survey.png)
+![Week 9 - Team Survey](W9/Team_Survey_(1).png)
+![Week 9 - Team Survey](W9/Team_Survey_(2).png)
+![Week 9 - Team Survey](W9/Team_Survey_(3).png)
 
 # Week 8 (10/19/2025 - 10/26/2025)
 
