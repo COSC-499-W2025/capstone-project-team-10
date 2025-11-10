@@ -1,30 +1,79 @@
-import pytest
+from pathlib import Path
+
 import src.param.param as param
-from unittest.mock import patch
-test_param_file = "tests/testdata/test_param/testconfig.json"
-invalid_param_file = "tests/testdata/test_param/invalidconfig.json"
-path_to_invalid_folder = "/DUMMMMMMMMMY/DUMMY/DUMB/DUMMY"
+
+
+def param_setup():
+    param.init()
+    param.clear()
+
 
 class TestParam:
+    def test_param_defaults(self):
+        param_setup()
+        with open("src/param/param_defaults.json", "r") as default_params:
+            default_data = param.json.load(default_params)
+        for key in default_data:
+            assert param.get(key) == default_data[key]
+
     def test_param_invalid_parse(self):
-        with patch('builtins.print') as mock_print:
-            param.parse_param(invalid_param_file)
-            #TODO: update with param response
-            # response shall be invalid params or a failed parse. 
-            mock_print.assert_called_with("Hello from param!")
+        # Created Corrupted param file for this test
+        param_setup()
+        invalid_param_file = param.optional_parameters_path
+        open(invalid_param_file, "w").write('{"invalid_json": true,,}')
+        param.load_additional_params()
+        assert param.get("config") == {
+            "project_name": param.project_name,
+            "config_info": param.project_version,
+        }
 
     def test_param_parse(self):
-        with patch('builtins.print') as mock_print:
-            param.parse_param(test_param_file)
-            #TODO: update with param response
-            #response shall indicate success
-            mock_print.assert_called_with("Hello from param!")
+        param_setup()
+        # Set a test param to ensure load/save works
+        param.set("test_key", "test_value")
+        param.load_additional_params()
+        assert param.get("config") == {
+            "project_name": param.project_name,
+            "config_info": param.project_version,
+        }
 
     def test_param_save(self):
-        with patch('builtins.print') as mock_print:
-            param.save_param(test_param_file)
-            #TODO: update with param response
-            #Param save shall create a file identical to test_param_file
-            mock_print.assert_called_with("Hello from param!")
+        param_setup()
+        param.save_additional_params()
+        param.set("testing.test_key", "test_value")
+        param.load_additional_params()
+        assert param.get("testing.test_key") == "test_value"
 
-    
+    def test_param_not_found(self):
+        param_setup()
+        Path(param.optional_parameters_path).unlink(missing_ok=True)
+        param.load_additional_params()
+        assert param.get("config") == {
+            "project_name": param.project_name,
+            "config_info": param.project_version,
+        }
+
+    def test_param_clear(self):
+        param_setup()
+        param.set("testing.test_key", "test_value")
+        param.clear()
+        assert param.get("testing.test_key") is None
+
+    def test_param_invalid_get(self):
+        param_setup()
+        assert param.get("testing.invalid_key") is None
+
+    def test_param_invalid_set(self):
+        param_setup()
+        assert param.set("testing.invalid_key", "invalid_value") is False
+
+    def test_param_invalid_remove(self):
+        param_setup()
+        assert param.remove("testing.invalid_key") is False
+
+    def test_param_remove(self):
+        param_setup()
+        param.set("testing.test_key", "remove_value")
+        param.remove("testing.test_key")
+        param.load_additional_params()
+        assert param.get("testing.test_key") is None
