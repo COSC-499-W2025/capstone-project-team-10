@@ -1,5 +1,8 @@
 from pathlib import Path
-from fss.repo_reader import Repository, run_git_cmd
+#There is an issue here when running tests, for the code to run properly the import path must be "fss.repo_reader" and for the tests to run it must be "src.fss.repo_reader" one or the other does not work depending on the import path and I cannot figure out why.
+#Attempting to run the code with src it will return "ModuleNotFoundError: No module named 'src'"
+#Attempting to run the tests without src, it will fail and return "ModuleNotFoundError: No module named 'fss'"
+from src.fss.repo_reader import Repository, run_git_cmd
 #import src.fss.fss as fss
 from typing import Optional
 
@@ -14,8 +17,7 @@ class GitGrouping:
         
         # once a repo has been added, if it does not currently have a repo id, it will use the path of the repo as its identifier
         if repo_id is None:
-            repo_id = repo_path
-        
+            repo_id = str(repo_path)
         # use repo_reader to create a repo object
         repo = Repository(str(repo_path))
         repo.extrapolate()
