@@ -1,7 +1,18 @@
 import mrkdwn_analysis
 
 class Markdown:
+    """
+        A class that holds a MarkdownAnalyzer instance, that converts some of its output to readily processing formats,
+        and as a base to add more that is needed by the program, that MarkdownAnalysis does not provides.
+    """
+
     def __init__(self, path):
+        """
+            Holds
+
+            (MarkdownAnalyzer) instance
+            (Path) string Path of the .md
+        """
         self.analyzer = mrkdwn_analysis.MarkdownAnalyzer(path)
         self.md_path = path
 
