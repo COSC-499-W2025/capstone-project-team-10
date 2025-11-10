@@ -11,3 +11,4 @@ odfdo
 Pillow
 nltk
 numpy
+psd-tools
