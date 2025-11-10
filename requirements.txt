@@ -10,3 +10,4 @@ odfpy
 odfdo
 mrkdwn-analysis
 Pillow
+psd-tools
