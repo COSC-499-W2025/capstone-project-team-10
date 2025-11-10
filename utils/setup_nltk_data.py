@@ -21,8 +21,8 @@ def setup_nltk_data():
     required_packages = [
         "punkt",                       # Sentence + word tokenization
         "stopwords",                   # Stop word filtering
-        "averaged_perceptron_tagger",  # POS tagging
-        "maxent_ne_chunker",           # Named entity recognition
+        "averaged_perceptron_tagger_eng",  # POS tagging
+        "maxent_ne_chunker_tab",           # Named entity recognition
         "words",                       # NE recognition dependency
         "vader_lexicon"                # Sentiment analysis
     ]

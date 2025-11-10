@@ -45,7 +45,11 @@ class TextSummary:
             for words in sentence_word_lists
         ]
 
-        self.pos_tags = pos_tag(self.words)
+        if self.words:
+            self.pos_tags = pos_tag(self.words)
+        else:
+            self.pos_tags = []
+        
         self.sentiment_analyzer = SentimentIntensityAnalyzer()
 
     def getCommonWords(self, amount: int) -> list[tuple[str, int]]:
@@ -65,6 +69,10 @@ class TextSummary:
         If no list is provided, returns all entity types.
         Returns a set of (entity_name, entity_type) tuples.
         """
+        # Check if text is empty
+        if not self.pos_tags:
+            return set()
+
         # Apply named entity chunking to the POS tagged words
         chunked = ne_chunk(self.pos_tags, binary = False)
         entities = set()
@@ -88,6 +96,7 @@ class TextSummary:
         Values between 0 to +- the threshold are considered neutral (-0.03 or 0.02).
         Returns a dictionary with sentiment classification and compound score.
         """
+        
         # Handle empty text edge case
         if not self.sentences:
             return {'sentiment': 'neutral', 'compound_score': 0.0}
