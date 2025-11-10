@@ -61,7 +61,7 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             # The reason why the case of "pdf" is quite big is becuase fas_PDF returns an object therefore we need to map its attributes to a dictionary
             # so that it is consistent with other file types that return dictionaries.
             case "pdf":
-                import fas_pdf  
+                from src.fas import fas_pdf  
                 print("Extracting PDF data...")
                 pdf_reader = fas_pdf.PDFReader(file_path)
                 # Return a dictionary of relevant PDF info
@@ -85,13 +85,28 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                 }
 
             case "docx":
-                # from src.fas import fas_docx
-                # return fas_docx.extract_docx_data(file_path)
-                return None
+                from src.fas import fas_docx
+                return fas_docx.extract_docx_data(file_path)
+            
+            case "odt":
+                from src.fas import fas_odt
+                return fas_odt.extract_odt_data(file_path)
+            
+            case "rtf":
+                from src.fas import fas_rtf
+                return fas_rtf.extract_rtf_data(file_path)
             
             case "xlsx" | "xls":
-                import fas_excel
+                from src.fas import fas_excel
                 return fas_excel.extract_excel_data(file_path)
+
+            case "psd" | "photoshop":
+                from src.fas import fas_photoshop
+                return fas_photoshop.extract_photoshop_data(file_path)
+            
+            case "jpeg" | "jpg" | "png" | "gif" | "webp" | "tiff" | "bmp" | "heif" | "heic" | "avif":
+                from src.fas import fas_image_format
+                return fas_image_format.analyze_image(file_path)
 
             case "git":
                 # from src.fas import fas_git
@@ -150,6 +165,8 @@ def run_fas(file_path: Optional[str] = None) -> Optional[FileAnalysis]:
 
 
 # This is just to run code directly for testing purposes 
+# To run fas from command line
+# python -m src.fas.fas
 if __name__ == "__main__":
     test_path = input("Enter a file path to analyze: ").strip()
     result = run_fas(test_path)
@@ -157,3 +174,13 @@ if __name__ == "__main__":
         print(result.__dict__)
     else:
         print("Analysis failed or file not found.")
+
+
+# File Path for testing:
+# PDF: tests\testdata\test_fas\fas_pdf_test.pdf
+# Word: tests\testdata\test_fas\fas_docx_test.docx
+# ODT: tests\testdata\test_fas\fas_odt_data.odt
+# RTF: tests\testdata\test_fas\fas_rtf_data.rtf
+# Excel: tests\testdata\test_fas\fas_excel_test.xlsx
+# Photoshop: tests\testdata\test_fas\fas_photoshop_test.psd
+# Image: tests\testdata\test_fas\fas_image_test.jpg
