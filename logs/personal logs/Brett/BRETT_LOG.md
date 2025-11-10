@@ -1,3 +1,14 @@
+# Week 10 (11/3/2025 - 11/9/2025)
+
+![Week 10 Tasks](Week10/Week10Tasks.png)
+
+## Features
+
+![Week 10 KanBan](Week10/Week10KanBan.png)
+
+## Recap
+We continued coding work expanding the type of files that we extract data from and improving the modules which connect eveything. I worked on a module for analyzing blocks of text and extracting key information such as keywords, summary, named entities, sentiment, and basic information (word count, sentence count, etc.). I revised some of my previous code and planning on doing more revisions over reading week.
+
 # Week 9 (10/27/2025 - 11/2/2025)
 
 ![Week 9 Tasks](Week9/Week9Tasks.png)
