@@ -8,5 +8,6 @@ python-docx
 striprtf
 odfpy
 odfdo
+mrkdwn-analysis
 Pillow
 psd-tools
