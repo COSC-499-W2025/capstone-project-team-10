@@ -9,5 +9,5 @@ striprtf
 odfpy
 odfdo
 Pillow
-nltk
+nltk==3.9.1
 numpy
