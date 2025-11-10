@@ -9,7 +9,7 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 class TextSummary:
     """Analyzes and Summarizes text using NLTK."""
     
-    def __init__(self, text):
+    def __init__(self, text: str) -> None:
         """
         Initialize the TextSummary with text and perform initial processing.
         Takes a text string as input
@@ -48,7 +48,7 @@ class TextSummary:
         self.pos_tags = pos_tag(self.words)
         self.sentiment_analyzer = SentimentIntensityAnalyzer()
 
-    def getCommonWords(self, amount):
+    def getCommonWords(self, amount: int) -> list[tuple[str, int]]:
         """
         Get the most common words in the text.
         Takes an integer for the number of words to return.
@@ -58,7 +58,7 @@ class TextSummary:
         word_frequency = FreqDist(self.words_lower)
         return word_frequency.most_common(amount)
 
-    def getNamedEntities(self, entity_types = None):
+    def getNamedEntities(self, entity_types = None) -> set[tuple[str,str]] :
         """
         Extract named entities from the text.
         Takes an optional list of entity types to filter for (e.g., ['PERSON', 'ORGANIZATION']).
@@ -81,7 +81,7 @@ class TextSummary:
 
         return entities
     
-    def getSentiment(self, threshold = 0.05):
+    def getSentiment(self, threshold: float = 0.05) -> dict[str, float | str]:
         """
         Analyze overall sentiment using sentence-level analysis.
         Takes an optional threshold (default 0.05) for classifying sentiment.
@@ -113,7 +113,7 @@ class TextSummary:
             'compound_score': round(avg_compound, 3)
         }
 
-    def getSummary(self, num_sentences = 5):
+    def getSummary(self, num_sentences: int = 5) -> str:
         """
         Generate an extractive summary based on word frequencies.
         Takes an integer for the number of sentences to include (default 5).
@@ -129,16 +129,12 @@ class TextSummary:
             sentence_scores[idx] = score
 
         # Get top scoring sentences and sort by original order
-        top_indices = sorted(
-            sentence_scores.keys(), 
-            key=lambda i: sentence_scores[i], 
-            reverse=True
-        )[:num_sentences]
+        top_indices = sorted(sentence_scores.keys(), key=lambda i: sentence_scores[i], reverse=True)[:num_sentences]
         top_indices.sort()
         
         return ' '.join(self.sentences[i] for i in top_indices)
     
-    def getStatistics(self):
+    def getStatistics(self) -> dict[str, int | float]:
         """
         Calculate basic text statistics.
         Returns a dictionary containing word count, unique words, sentence count, and lexical diversity.
