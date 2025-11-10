@@ -15,6 +15,8 @@ Completed:
 
 ## Completed Tasks
 ![Completed](screenshots/done_w10.png)
+<img width="982" height="149" alt="things" src="https://github.com/user-attachments/assets/7212f6fd-698c-41af-87ca-5a7eec7bbda1" />
+> Below are the issues that were being in-review
 
 ## In-Progress
 ![In-Progress](screenshots/in_progress_w10.png)
