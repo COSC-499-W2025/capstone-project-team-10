@@ -9,3 +9,4 @@ striprtf
 odfpy
 odfdo
 mrkdwn-analysis
+Pillow
