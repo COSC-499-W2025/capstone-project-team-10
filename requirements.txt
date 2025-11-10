@@ -10,5 +10,5 @@ odfpy
 odfdo
 Pillow
 nltk
-numpy
+numpy==3.9.1
 psd-tools
