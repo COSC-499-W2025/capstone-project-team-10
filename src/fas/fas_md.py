@@ -3,7 +3,7 @@ import mrkdwn_analysis
 class Markdown:
     """
         A class that holds a MarkdownAnalyzer instance, that converts some of its output to readily processing formats,
-        and as a base to add more that is needed by the program, that MarkdownAnalysis does not provides.
+        and as a base to add more that is needed by the program, that MarkdownAnalysis does not provide.
     """
 
     def __init__(self, path):

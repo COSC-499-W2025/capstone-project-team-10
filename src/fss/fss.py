@@ -1,5 +1,5 @@
 import os
-from fss_helper import *
+from src.fss.fss_helper import *
 
 # User's settings for modification + creation time - for now, dummies variable
 # It should be the fss intaker responsibility to control if these values are valid (lower << upper, only 2 values in a list, etc.)
