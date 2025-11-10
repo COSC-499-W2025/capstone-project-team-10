@@ -1,6 +1,6 @@
 import pytest
 import os
-import utils.text_analysis as ta
+import src.fas.fas_text_analysis as ta
 from unittest.mock import patch
 
 TESTFILE1 = os.path.join("tests", "testdata", "test_utils", "Report.pdf")

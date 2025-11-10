@@ -15,7 +15,8 @@ class TextSummary:
         Takes a text string as input
         """
         # Point NLTK to the data folder in utils for downloaded files
-        project_nltk_data = os.path.join(os.path.dirname(__file__), "nltk_data")
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+        project_nltk_data = os.path.join(project_root, "utils", "nltk_data")
         nltk.data.path.append(project_nltk_data)
 
         self.text = text
