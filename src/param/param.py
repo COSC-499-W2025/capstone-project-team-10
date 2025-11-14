@@ -10,6 +10,7 @@ program_file_path: str = ""
 log_max_count: int = 10
 log_file_naming_regex: str = r"(\d+)\.log$"
 result_log_folder_path: str = ""
+export_folder_path: str = ""
 optional_parameters_path: str = ""
 
 params = {}
@@ -18,8 +19,13 @@ params = {}
 # Use this function to set system configuration specific values
 def set_program_constants() -> None:
     # Detect Operating System to set program file path
-    global program_file_path, result_log_folder_path, optional_parameters_path
+    global \
+        program_file_path, \
+        result_log_folder_path, \
+        optional_parameters_path, \
+        export_folder_path
     os_name = platform.system()
+    export_folder_path = os.path.join(os.path.expanduser("~"), "Downloads")
     match os_name:
         case "Windows":
             appdata = os.getenv("APPDATA")
