@@ -11,10 +11,12 @@ import src.log.log as log
 import src.param.param as param
 from src.fas.fas import FileAnalysis
 
+# Template for resume entry in PDF
 resume_entry_template = """
 {project_name} - {project_type}
 Date: {created_time} to {last_modified}"""
 
+# Template for each portfolio entry in HTML
 portfolio_entry_template = """
 <div class='{file_type}'>
   <h2><a href={new_file_path} >{file_name}</a> - {file_type_upper}</h2>
@@ -24,6 +26,7 @@ portfolio_entry_template = """
 <hr/>
 """
 
+# Supported image file types
 image_types = [
     "jpeg",
     "jpg",
@@ -37,36 +40,47 @@ image_types = [
     "avif",
 ]
 
+# Supported collaborative file types
 collaborative_types = ["git"]
 
 
 def format_last_modified(file_analysis: FileAnalysis) -> str:
+    """
+    Returns 'Current' if the file was modified in the last month, else formatted date.
+    """
     last_modified = datetime.fromisoformat(file_analysis.last_modified)
     now = datetime.now()
     one_month_ago = now - timedelta(days=30)
-
     if last_modified > one_month_ago:
         return "Current"
     else:
-        # Format as you like, e.g., "YYYY-MM-DD"
         return last_modified.strftime("%Y-%m-%d")
 
 
 def format_created_time(file_analysis: FileAnalysis) -> str:
+    """
+    Returns the created time formatted as YYYY-MM-DD.
+    """
     created_time = datetime.fromisoformat(file_analysis.created_time)
     return created_time.strftime("%Y-%m-%d")
 
 
 def generate_all():
+    """
+    Generates both the resume and the portfolio.
+    """
     generate_resume()
     generate_portfolio()
 
 
 def generate_resume():
+    """
+    Generates a PDF resume from the log file.
+    """
     todays_date: str = datetime.now().strftime("%m-%d-%y")
     export_path: Path = Path(param.export_folder_path) / (todays_date + "-resume.pdf")
     file_number: int = 0
-    # Ensure unique file name
+    # Ensure unique file name by incrementing if file exists
     while export_path.exists():
         file_number += 1
         export_path = Path(param.export_folder_path) / (
@@ -74,6 +88,7 @@ def generate_resume():
         )
 
     log_file: Path = Path(log.current_log_file)
+    # Check if export directory exists
     if not export_path.parent.exists():
         print(f"Export folder does not exist: {export_path}")
         return
@@ -83,13 +98,13 @@ def generate_resume():
             pdf_output = FPDF()
             pdf_output.add_page()
             pdf_output.set_font("Times", size=14)
-            # For each row in the log file, create an entry in the resume
-            # Skip the first row as it is a header
-            next(reader)  # Skip header
+            next(reader)  # Skip header row
             for row in reader:
+                # Create FileAnalysis object from CSV row
                 file_analysis: FileAnalysis = FileAnalysis(
                     row[0], row[1], row[2], row[3], row[4], row[5]
                 )
+                # Format entry header for this file
                 entry_headers: str = (
                     resume_entry_template.format(
                         project_name=file_analysis.file_name,
@@ -100,16 +115,17 @@ def generate_resume():
                     + "\n"
                 )
                 header_font_size: int = 18
+                # Write each line of the entry header with decreasing font size
                 for line in entry_headers.splitlines():
                     pdf_output.set_font("Times", size=header_font_size, style="B")
                     pdf_output.cell(0, 10, line, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
                     header_font_size -= 2
 
                 pdf_output.set_font("Times", size=14)
-                # Change additional details based on file type
+                # Add details based on file type
                 match file_analysis.file_type:
                     case file_type if file_type in image_types:
-                        # The Square brackets are used to denote the path for inclusion in pdf and web formats
+                        # Add image project description and image
                         pdf_output.cell(
                             0,
                             10,
@@ -117,11 +133,9 @@ def generate_resume():
                             new_x=XPos.LMARGIN,
                             new_y=YPos.NEXT,
                         )
-                        pdf_output.image(
-                            file_analysis.file_path, w=100
-                        )  # x, y = position; w = width in mm
-
+                        pdf_output.image(file_analysis.file_path, w=100)
                     case file_type if file_type in collaborative_types:
+                        # Add collaborative project details
                         pdf_output.cell(
                             0,
                             10,
@@ -131,7 +145,7 @@ def generate_resume():
                         )
                         # TODO: Expand to include more details about the files in the git project
                     case _:
-                        # Assume this is the text file and the extra data is the key skills used
+                        # Add key skills for text files
                         pdf_output.cell(
                             0,
                             10,
@@ -140,6 +154,7 @@ def generate_resume():
                             new_y=YPos.NEXT,
                         )
                 pdf_output.ln(10)  # Add a line break between entries
+            # Save the PDF to disk
             pdf_output.output(str(export_path))
     except Exception as e:
         print(f"Something went wrong: {e}")
@@ -147,6 +162,9 @@ def generate_resume():
 
 
 def generate_portfolio():
+    """
+    Generates an HTML portfolio and zips it, copying resources as needed.
+    """
     todays_date: str = datetime.now().strftime("%m-%d-%y")
     portfolio_export_path_dir: Path = Path(param.export_folder_path) / (
         todays_date + "-portfolio"
@@ -156,6 +174,7 @@ def generate_portfolio():
     )
     file_number: int = 0
 
+    # Ensure unique folder and zip file names
     while portfolio_export_path_dir.exists() or portfolio_export_zip_path_dir.exists():
         file_number += 1
         portfolio_export_path_dir = Path(param.export_folder_path) / (
@@ -165,8 +184,8 @@ def generate_portfolio():
             todays_date + f"-portfolio-{file_number}.zip"
         )
 
+    # Create portfolio and resources directories
     portfolio_export_path_dir.mkdir(parents=True, exist_ok=True)
-
     portfolio_export_resource_path: Path = portfolio_export_path_dir / ("resources")
     portfolio_export_resource_path.mkdir(parents=True, exist_ok=True)
 
@@ -174,28 +193,28 @@ def generate_portfolio():
         todays_date + "-portfolio.html"
     )
     log_file: Path = Path(log.current_log_file)
+    # Check if export directory exists
     if not portfolio_export_path_dir.exists():
         print(f"Export folder does not exist: {portfolio_export_path}")
         return
     try:
         with open(log_file, "r") as lf:
             with open(portfolio_export_path, "w") as portfolio:
+                # Write HTML header
                 portfolio.write("<html><head><title>Portfolio</title></head><body>\n")
                 portfolio.write("<h1>Project Portfolio</h1>\n")
                 reader = csv.reader(lf)
-                # Create an entry for each row in the log file
-                #  # Skip the first row as it is a header
-                next(reader)  # Skip header
+                next(reader)  # Skip header row
                 for row in reader:
                     file_analysis = FileAnalysis(*row)
-                    # Move all files to resources folder
+                    # Copy file to resources folder with correct extension
                     file_analysis_source = Path(file_analysis.file_path)
                     shutil.copy(
                         file_analysis_source,
                         portfolio_export_resource_path
                         / (file_analysis.file_name + "." + file_analysis.file_type),
                     )
-                    # Change details based on file type
+                    # Prepare details based on file type
                     if file_analysis.file_type in image_types:
                         details = f"<p>Artistic Project:</p><img src='resources/{file_analysis.file_name}.{file_analysis.file_type}' alt='{file_analysis.file_name}' width='300'/>"
                     elif file_analysis.file_type in collaborative_types:
@@ -204,7 +223,7 @@ def generate_portfolio():
                         )
                     else:
                         details = f"<p>Key Skills demonstrated in this project: {file_analysis.extra_data}</p>"
-                    # write details to portfolio
+                    # Write entry to HTML
                     portfolio.write(
                         portfolio_entry_template.format(
                             new_file_path=f"resources/{file_analysis.file_name}.{file_analysis.file_type}",
@@ -217,12 +236,11 @@ def generate_portfolio():
                         )
                     )
                 portfolio.write("</body></html>\n")
-        # Create ZIP Archive, and delete the unzipped folder
+        # Zip the portfolio directory and remove the unzipped folder
         shutil.make_archive(
             str(portfolio_export_path_dir), "zip", root_dir=portfolio_export_path_dir
         )
         shutil.rmtree(portfolio_export_path_dir)
-
     except Exception as e:
         print(f"Failed to read log file: {e}")
         return
