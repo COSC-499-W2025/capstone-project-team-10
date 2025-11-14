@@ -3,6 +3,7 @@ import os
 import shutil
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import src.showcase.showcase as showcase
@@ -36,6 +37,41 @@ def make_file_analysis(
     )
 
 
+# Pass in a CSV Writer
+def make_test_file(writer: Any) -> None:
+    writer.writerow(
+        [
+            "File path analyzed",
+            "File name",
+            "File type",
+            "Last modified",
+            "Created time",
+            "Extra data",
+        ]
+    )
+    writer.writerow(
+        [
+            "tests/testdata/test_showcase/file1.txt",
+            "file1",
+            "txt",
+            "2023-01-02T00:00:00",
+            "2023-01-01T00:00:00",
+            "skills",
+        ],
+    )
+    # file_name, file_type, file_path, last_modified, created_time, extra_data
+    writer.writerow(
+        [
+            "tests/testdata/test_showcase/bob.png",
+            "bob",
+            "jpg",
+            "2023-01-03T00:00:00",
+            "2023-01-01T00:00:00",
+            "artistic project",
+        ],
+    )
+
+
 def test_format_last_modified_current():
     now = datetime.now().isoformat()
     fa = make_file_analysis(last_modified=now)
@@ -63,26 +99,7 @@ def test_generate_resume():
         # Write a test CSV row
         with open(log_file, "w", newline="") as f:
             writer = csv.writer(f)
-            writer.writerow(
-                [
-                    "tests/testdata/test_showcase/file1.txt",
-                    "file1",
-                    "txt",
-                    "2023-01-02T00:00:00",
-                    "2023-01-01T00:00:00",
-                    "skills",
-                ]
-            )
-            writer.writerow(
-                [
-                    "tests/testdata/test_showcase/bob.png",
-                    "bob",
-                    "jpg",
-                    "2023-01-03T00:00:00",
-                    "2023-01-01T00:00:00",
-                    "artistic project",
-                ],
-            )
+            make_test_file(writer)
         with (
             patch("src.showcase.showcase.param") as mock_param,
             patch("src.showcase.showcase.log") as mock_log,
@@ -106,27 +123,7 @@ def test_generate_portfolio():
         # Write a test CSV row
         with open(log_file, "w", newline="") as f:
             writer = csv.writer(f)
-            writer.writerow(
-                [
-                    "tests/testdata/test_showcase/file1.txt",
-                    "file1",
-                    "txt",
-                    "2023-01-02T00:00:00",
-                    "2023-01-01T00:00:00",
-                    "skills",
-                ],
-            )
-            # file_name, file_type, file_path, last_modified, created_time, extra_data
-            writer.writerow(
-                [
-                    "tests/testdata/test_showcase/bob.png",
-                    "bob",
-                    "jpg",
-                    "2023-01-03T00:00:00",
-                    "2023-01-01T00:00:00",
-                    "artistic project",
-                ],
-            )
+            make_test_file(writer)
         with (
             patch("src.showcase.showcase.param") as mock_param,
             patch("src.showcase.showcase.log") as mock_log,

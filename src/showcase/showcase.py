@@ -84,6 +84,8 @@ def generate_resume():
             pdf_output.add_page()
             pdf_output.set_font("Times", size=14)
             # For each row in the log file, create an entry in the resume
+            # Skip the first row as it is a header
+            next(reader)  # Skip header
             for row in reader:
                 file_analysis: FileAnalysis = FileAnalysis(
                     row[0], row[1], row[2], row[3], row[4], row[5]
@@ -138,7 +140,7 @@ def generate_resume():
                             new_y=YPos.NEXT,
                         )
                 pdf_output.ln(10)  # Add a line break between entries
-                pdf_output.output(str(export_path))
+            pdf_output.output(str(export_path))
     except Exception as e:
         print(f"Something went wrong: {e}")
         return
@@ -149,12 +151,18 @@ def generate_portfolio():
     portfolio_export_path_dir: Path = Path(param.export_folder_path) / (
         todays_date + "-portfolio"
     )
+    portfolio_export_zip_path_dir: Path = Path(param.export_folder_path) / (
+        todays_date + "-portfolio.zip"
+    )
     file_number: int = 0
 
-    while portfolio_export_path_dir.exists():
+    while portfolio_export_path_dir.exists() or portfolio_export_zip_path_dir.exists():
         file_number += 1
         portfolio_export_path_dir = Path(param.export_folder_path) / (
             todays_date + f"-portfolio-{file_number}"
+        )
+        portfolio_export_zip_path_dir = Path(param.export_folder_path) / (
+            todays_date + f"-portfolio-{file_number}.zip"
         )
 
     portfolio_export_path_dir.mkdir(parents=True, exist_ok=True)
@@ -176,6 +184,8 @@ def generate_portfolio():
                 portfolio.write("<h1>Project Portfolio</h1>\n")
                 reader = csv.reader(lf)
                 # Create an entry for each row in the log file
+                #  # Skip the first row as it is a header
+                next(reader)  # Skip header
                 for row in reader:
                     file_analysis = FileAnalysis(*row)
                     # Move all files to resources folder
