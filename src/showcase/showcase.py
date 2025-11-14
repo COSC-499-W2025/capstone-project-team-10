@@ -66,7 +66,7 @@ def generate_resume():
     todays_date: str = datetime.now().strftime("%m-%d-%y")
     export_path: Path = Path(param.export_folder_path) / (todays_date + "-resume.pdf")
     file_number: int = 0
-
+    # Ensure unique file name
     while export_path.exists():
         file_number += 1
         export_path = Path(param.export_folder_path) / (
@@ -83,6 +83,7 @@ def generate_resume():
             pdf_output = FPDF()
             pdf_output.add_page()
             pdf_output.set_font("Times", size=14)
+            # For each row in the log file, create an entry in the resume
             for row in reader:
                 file_analysis: FileAnalysis = FileAnalysis(
                     row[0], row[1], row[2], row[3], row[4], row[5]
@@ -103,6 +104,7 @@ def generate_resume():
                     header_font_size -= 2
 
                 pdf_output.set_font("Times", size=14)
+                # Change additional details based on file type
                 match file_analysis.file_type:
                     case file_type if file_type in image_types:
                         # The Square brackets are used to denote the path for inclusion in pdf and web formats
@@ -173,26 +175,29 @@ def generate_portfolio():
                 portfolio.write("<html><head><title>Portfolio</title></head><body>\n")
                 portfolio.write("<h1>Project Portfolio</h1>\n")
                 reader = csv.reader(lf)
+                # Create an entry for each row in the log file
                 for row in reader:
                     file_analysis = FileAnalysis(*row)
                     # Move all files to resources folder
                     file_analysis_source = Path(file_analysis.file_path)
                     shutil.copy(
                         file_analysis_source,
-                        portfolio_export_resource_path / file_analysis.file_name,
+                        portfolio_export_resource_path
+                        / (file_analysis.file_name + "." + file_analysis.file_type),
                     )
+                    # Change details based on file type
                     if file_analysis.file_type in image_types:
-                        details = f"<p>Artistic Project: <img src='resources/{file_analysis.file_name}' alt='{file_analysis.file_name}' width='300'/></p>"
+                        details = f"<p>Artistic Project:</p><img src='resources/{file_analysis.file_name}.{file_analysis.file_type}' alt='{file_analysis.file_name}' width='300'/>"
                     elif file_analysis.file_type in collaborative_types:
                         details = (
                             f"<p>Project Contributions: {file_analysis.extra_data}</p>"
                         )
                     else:
                         details = f"<p>Key Skills demonstrated in this project: {file_analysis.extra_data}</p>"
-
+                    # write details to portfolio
                     portfolio.write(
                         portfolio_entry_template.format(
-                            new_file_path=f"resources/{file_analysis.file_name}",
+                            new_file_path=f"resources/{file_analysis.file_name}.{file_analysis.file_type}",
                             file_type=file_analysis.file_type,
                             file_name=file_analysis.file_name,
                             file_type_upper=file_analysis.file_type.upper(),
@@ -202,7 +207,7 @@ def generate_portfolio():
                         )
                     )
                 portfolio.write("</body></html>\n")
-
+        # Create ZIP Archive, and delete the unzipped folder
         shutil.make_archive(
             str(portfolio_export_path_dir), "zip", root_dir=portfolio_export_path_dir
         )

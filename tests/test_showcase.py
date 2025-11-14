@@ -26,7 +26,7 @@ def cleanup_test_dir():
 def make_file_analysis(
     file_name="file1",
     file_type="txt",
-    file_path="path1",
+    file_path="testdata/test_showcase/file1.txt",
     last_modified="2023-01-02T00:00:00",
     created_time="2023-01-01T00:00:00",
     extra_data="skills",
@@ -65,13 +65,23 @@ def test_generate_resume():
             writer = csv.writer(f)
             writer.writerow(
                 [
+                    "tests/testdata/test_showcase/file1.txt",
                     "file1",
                     "txt",
-                    "path1",
                     "2023-01-02T00:00:00",
                     "2023-01-01T00:00:00",
                     "skills",
                 ]
+            )
+            writer.writerow(
+                [
+                    "tests/testdata/test_showcase/bob.png",
+                    "bob",
+                    "jpg",
+                    "2023-01-03T00:00:00",
+                    "2023-01-01T00:00:00",
+                    "artistic project",
+                ],
             )
         with (
             patch("src.showcase.showcase.param") as mock_param,
@@ -88,8 +98,7 @@ def test_generate_resume():
         cleanup_test_dir()
 
 
-@patch("src.showcase.showcase.shutil.copy")
-def test_generate_portfolio(mock_copy):
+def test_generate_portfolio():
     setup_test_dir()
     try:
         export_folder = TEST_DIR
@@ -99,13 +108,24 @@ def test_generate_portfolio(mock_copy):
             writer = csv.writer(f)
             writer.writerow(
                 [
+                    "tests/testdata/test_showcase/file1.txt",
                     "file1",
                     "txt",
-                    "path1",
                     "2023-01-02T00:00:00",
                     "2023-01-01T00:00:00",
                     "skills",
-                ]
+                ],
+            )
+            # file_name, file_type, file_path, last_modified, created_time, extra_data
+            writer.writerow(
+                [
+                    "tests/testdata/test_showcase/bob.png",
+                    "bob",
+                    "jpg",
+                    "2023-01-03T00:00:00",
+                    "2023-01-01T00:00:00",
+                    "artistic project",
+                ],
             )
         with (
             patch("src.showcase.showcase.param") as mock_param,
