@@ -1,3 +1,44 @@
+# Week 11 (11/9/2025 - 11/16/2025) -> Reading Week
+## Completed tasks
+#### In Review will be moved to completed after team review. I am writing this log ahead of time
+![Week 11 Tasks completed](Week11/image-1.png)
+## Features
+
+![Week 11 Tasks In-progress](Week11/image.png)
+## Recap
+
+#### PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/96
+
+- Created Functions for printing harvested file context
+- Created Functions for creating a PDF with possible resume entries for a scan log
+- Created Functions for creating a ZIP file containing a web portfolio for a scan log
+- Created Param for default output location in the users Downloads folder. This is not a persistent param but is modifiable if the GUI would like to add the functionality
+- Updated Readme with documentation for how to use the showcase module
+
+### Planned Future Expansion Opportunities:
+- Make more specific file type parsing to create more unique sections.
+- Possible parsing of Photoshop files to produce an image to be included
+- Split .git file extra data to be parsed more deeply, outlining outputs in a much cleaner way (The git parse is currently being rewritten)
+
+
+### For next week:
+
+For the next few weeks I will be coordinating our full implementation and tying together all the teams work into a final presentation as well as doing manual integration testing. I am trying to coordinate rewrites in the file analysis modules as lots of them dont produce very usable outputs, especially the .git analysis. I may be doing this rewrite myself if the team requires help. 
+
+My Primary task will be the consolidation of the CLI and related modules
+
+#### Tickets
+- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/97
+
+
+## Additional Context
+
+No problems with my work, however attempting to direct the team in the right direction is difficult and consumes most of my time. 
+
+## Team Survey:
+
+Team survey completed.
+
 # Week 10 (11/2/2025 - 11/9/2025)
 
 ![Week 10 Tasks completed](Week10/image-1.png)
@@ -22,6 +63,8 @@ I also updated the CLI to be able to accept these parameters from the user in mu
 - Updated Readme with new CLI flags
 
 PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/85
+
+For the next week I will be working on the Portfolio and Resume exports for scan results
 
 ## Additional Context
 
