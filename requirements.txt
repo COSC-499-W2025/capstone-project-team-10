@@ -11,3 +11,4 @@ odfdo
 mrkdwn-analysis
 Pillow
 psd-tools
+fpdf2
