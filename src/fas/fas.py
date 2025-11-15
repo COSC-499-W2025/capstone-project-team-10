@@ -63,26 +63,7 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             case "pdf":
                 from src.fas import fas_pdf  
                 print("Extracting PDF data...")
-                pdf_reader = fas_pdf.PDFReader(file_path)
-                # Return a dictionary of relevant PDF info
-                return {
-                    "author": pdf_reader.author,
-                    "creator": pdf_reader.creator,
-                    "producer": pdf_reader.producer,
-                    "title": pdf_reader.title,
-                    "subject": pdf_reader.subject,
-                    "keywords": pdf_reader.keywords,
-                    "page_count": pdf_reader.page_count,
-                    "word_count": pdf_reader.word_count,
-                    "line_count": pdf_reader.line_count,
-                    "char_count": pdf_reader.char_count,
-                    "table_count": pdf_reader.table_count,
-                    "tables": pdf_reader.tables,
-                    "image_count": pdf_reader.image_count,
-                    # "images": pdf_reader.images,
-                    "link_count": pdf_reader.link_count,
-                    "links": pdf_reader.links,
-                }
+                return fas_pdf.extract_pdf_data(file_path)
 
             case "docx":
                 from src.fas import fas_docx
@@ -107,6 +88,17 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             case "jpeg" | "jpg" | "png" | "gif" | "webp" | "tiff" | "bmp" | "heif" | "heic" | "avif":
                 from src.fas import fas_image_format
                 return fas_image_format.analyze_image(file_path)
+            
+            case "md" | "markdown":
+                from src.fas.fas_md import Markdown  # import your Markdown wrapper
+                md = Markdown(file_path)
+                return {
+                    "headers": md.get_headers(),
+                    "header_hierarchy": md.get_header_hierarchy(),
+                    "word_count": md.get_word_counts(),
+                    "code_blocks": md.get_code_blocks(),
+                    "paragraphs": md.get_paragraphs(),
+                }
 
             case "git":
                 # from src.fas import fas_git
@@ -184,3 +176,4 @@ if __name__ == "__main__":
 # Excel: tests\testdata\test_fas\fas_excel_test.xlsx
 # Photoshop: tests\testdata\test_fas\fas_photoshop_test.psd
 # Image: tests\testdata\test_fas\fas_image_test.jpg
+# Markdown: tests\testdata\test_md\test_markdown.md
