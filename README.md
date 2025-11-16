@@ -234,3 +234,5 @@ pyinstaller --onefile --add-data "resources:resources" src/main.py --windowed
 ```
 
 ## Other Notes
+
+To run the text_analysis.py make sure you run setup_nltk_data.py first.
