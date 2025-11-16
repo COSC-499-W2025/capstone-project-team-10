@@ -1,6 +1,7 @@
 import os
 from src.fss.fss_helper import *
 
+
 # User's settings for modification + creation time - for now, dummies variable
 # It should be the fss intaker responsibility to control if these values are valid (lower << upper, only 2 values in a list, etc.)
 create_time_crit = [None, None]
@@ -44,9 +45,11 @@ def search(input_path, excluded_path):
 
     if os.path.isfile(input_path):
         if not excluded_path:
+            #TODO add in FAS and return value, pass in file and set of repo paths for grouping
             #single file with no exclusion
             return 1
         elif input_path not in excluded_path:
+            #TODO add in FAS and return value, pass in file and set of repo paths for grouping
             #single file accounting for exclusion
             return 1
         else:
@@ -59,9 +62,11 @@ def search(input_path, excluded_path):
             print(file_path)
             if exclude_flag:
                 if file_path not in excluded_path and time_check(create_time_crit, file_path, "create") and time_check(mod_time_crit, file_path, "mod"): # Added time checkers to abide criteria here
+                    #TODO add in FAS and return value, pass in file and set of repo paths for grouping
                     #This is where specifics of files can be extracted.
                     num_of_files_scanned += 1
             else:
+                #TODO add in FAS and return value, pass in file and set of repo paths for grouping
                 #Given no exclusion this is where details about scanned files can be extracted.
                 num_of_files_scanned += 1
 
