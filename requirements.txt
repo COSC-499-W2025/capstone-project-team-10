@@ -11,5 +11,4 @@ odfdo
 mrkdwn-analysis
 Pillow
 psd-tools
-
 PyDriller
