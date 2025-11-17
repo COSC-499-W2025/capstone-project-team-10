@@ -10,5 +10,7 @@ odfpy
 odfdo
 mrkdwn-analysis
 Pillow
+nltk
+numpy==3.9.1
 psd-tools
 fpdf2

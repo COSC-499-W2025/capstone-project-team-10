@@ -40,3 +40,6 @@ coverage.xml
 
 # PyCharm settings
 .idea/
+
+# NLTK data files
+utils/nltk_data/*
