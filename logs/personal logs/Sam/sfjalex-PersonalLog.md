@@ -1,3 +1,22 @@
+# Week 11 (11/10/2025 - 11/16/2025)
+
+There is no week 11 (reading break) peer evaluation, so tasks image cannot be obtained.
+Tasks:
+- Coding
+- Code Reviews
+- Testing
+- Researching
+
+Worked on Refactoring and updating to use PyDriller over subprocesses.
+
+# Features
+
+![Week Eleven Feature](Week11/WeekElevenFeature.png)
+
+# Recap
+
+This week I fixed the Pytest import issue that I found last week, as well I refactored the repo_reader.py module to use PyDriller rather than subprocesses. In doing so I also refactored the git grouping to work with PyDriller as well to maintain consistency. As I had redone both the git grouping and repo reader modules I have also completely overhauled all of the respective tests. Next week I will be expanding on the reporting section of our analysis, as we can now extract details and output logs of different kinds, the information to be analyzed via the text analysis must be more focused, which is my next focus.
+
 # Week 10 (11/03/2025 - 11/09/2025)
 
 ![Week Ten Tasks](Week10/WeekTenTasks.png)
