@@ -1,6 +1,8 @@
-import pytest
-import src.cli.cli_app as cli
 from unittest.mock import patch
+
+import pytest
+
+import src.cli.cli_app as cli
 
 path_to_test_zip = "tests/testdata/test_cli/testScanFolder.zip"
 path_to_test_folder = "tests/testdata/test_cli/testScanFolder"
@@ -43,3 +45,17 @@ class TestCli:
             pos_test_args, pos_test_args.index("--zip") + 1
         )
         assert result != path_to_test_zip
+
+    def test_cli_multi_argument(self):
+        pos_test_args = [
+            "--cli",
+            "-y",
+            "--exclude-paths",
+            "path1,",
+            "path2,",
+            "path3",
+        ]
+        result: set[str] = cli.get_multi_argument(
+            pos_test_args, pos_test_args.index("--exclude-paths")
+        )
+        assert result == {"path1", "path2", "path3"}
