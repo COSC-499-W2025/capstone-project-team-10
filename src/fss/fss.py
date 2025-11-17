@@ -1,8 +1,11 @@
 import os
 from src.fss.fss_helper import *
+import pickle
+from typing import Dict, Tuple
 
 # User's settings for modification + creation time - for now, dummies variable
 # It should be the fss intaker responsibility to control if these values are valid (lower << upper, only 2 values in a list, etc.)
+CACHE_PATH = os.path.join("src", "fss", "fss_cache.pkl")
 create_time_crit = [None, None]
 mod_time_crit = [None, None]
 
@@ -42,13 +45,27 @@ def search(input_path, excluded_path):
         
         excluded_path = excluded_set
 
+    prev_cache = {} if clean else load_cache()
+    new_cache: Dict[str, Tuple[float, int]] = {}
+
+    def should_process(file_path_abs: str) -> bool:
+        if not os.path.isfile(file_path_abs):
+            return False
+        
+        sig = file_signature(file_path_abs)
+        new_cache[file_path_abs] = sig
+
+        if clean:
+            return True
+        return prev_cache.get(file_path_abs) != sig
+
     if os.path.isfile(input_path):
-        if not excluded_path:
+        if not excluded_path or input_path not in excluded_path:
             #single file with no exclusion
-            return 1
-        elif input_path not in excluded_path:
-            #single file accounting for exclusion
-            return 1
+            if should_process(input_path):
+                #This is where specifics of files can be extracted.
+                save_cache(new_cache)
+                return 1
         else:
             return 0
 
@@ -56,13 +73,18 @@ def search(input_path, excluded_path):
 
         for file in files:
             file_path = os.path.join(root, file)
+            file_path = os.path.abspath(file_path)
             print(file_path)
+
             if exclude_flag:
                 if file_path not in excluded_path and time_check(create_time_crit, file_path, "create") and time_check(mod_time_crit, file_path, "mod"): # Added time checkers to abide criteria here
+                    if should_process(file_path):
                     #This is where specifics of files can be extracted.
-                    num_of_files_scanned += 1
+                        num_of_files_scanned += 1
             else:
+                if should_process(file_path):
                 #Given no exclusion this is where details about scanned files can be extracted.
-                num_of_files_scanned += 1
+                    num_of_files_scanned += 1
 
+    save_cache(new_cache)
     return num_of_files_scanned
