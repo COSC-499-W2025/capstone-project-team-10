@@ -12,6 +12,8 @@ mod_time_crit = [None, None]
 # Cache Helpers
 
 def load_cache() -> Dict[str, Tuple[float, int]]:
+    # Loads and reads the cache file
+    # It returns a dictionary of  [absolute file path: (modified time, size)]
     try:
         with open(CACHE_PATH, "rb") as cache:
             data = pickle.load(cache)
@@ -33,6 +35,7 @@ def file_signature(path: str) -> Tuple[float, int]:
     return (stat.st_mtime, stat.st_size) # Returns file modification time and byte size, to be used as signature to detect changes
 
 def clear_cache() -> None:
+    # Nukes cache
     try:
         os.remove(CACHE_PATH)
     except FileNotFoundError:
@@ -80,6 +83,9 @@ def search(input_path, excluded_path, clean: bool = False):
     new_cache: Dict[str, Tuple[float, int]] = {}
 
     def should_process(file_path_abs: str) -> bool:
+        # Checks if file should be processed or not
+        # by checking if signature matches with the one in the cache (if the file is in cache)
+        # or if clean flag has been passed
         if not os.path.isfile(file_path_abs):
             return False
         
