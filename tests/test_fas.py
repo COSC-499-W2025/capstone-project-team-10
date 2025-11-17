@@ -49,4 +49,14 @@ class TestFas:
         assert result.file_type == "git"
         assert result.file_name == ".git"
         assert result.extra_data is None
+
+    def test_importance_exists(self):
+        # Ensure importance attribute exists and is populated.
+        result = fas.run_fas(TEST_FILE)
+        assert hasattr(result, "importance")
+
+    def test_importance_is_numeric(self):
+        # Importance should be int/float.
+        result = fas.run_fas(TEST_FILE)
+        assert isinstance(result.importance, (int, float))
     
