@@ -49,5 +49,20 @@ This week we started the bulk of coding, I implemented the zip extract module al
 <img width="323" height="84" alt="image" src="https://github.com/user-attachments/assets/a5b80fac-3b91-4e79-86c8-2fc304c530f1" />
 
 ## Recap
-I finished the image analysis module this week, our work is getting a little more complicated and I think I'm going to have to spend some extra time looking through my peers' code and reviewing them over again as the program gets bigger so that I refresh my understanding of how everything is working. 
+I finished the image analysis module this week, our work is getting a little more complicated and I think I'm going to have to spend some extra time looking through my peers' code and reviewing them over again as the program gets bigger so that I refresh my understanding of how everything is working.
 
+# Week 10 (11/9/2025 - 11/16/2025)
+
+I got confused and thought the peer evaluation for November 9th were on November 16th because of reading week, but this is what I worked on:
+- Researching / learning new things
+- Coding
+- Reviewing teammates' code
+- Testing my code
+- Team meetings
+- Figuring out problems on my own
+
+  ## Tasks
+  <img width="426" height="129" alt="image" src="https://github.com/user-attachments/assets/5307c1b5-dd9c-4184-9ee4-8c1956f7c292" />
+
+  ## Recap
+  I worked on the functionality for delta scans of previous results and implemented a simple cache system. I was told that it would be better to connect my implementation with Log.py instead of a cache, so I will have to make major tweaks to my pull request. I had some difficulty implementing it but I have a better idea of how it works right now so hopefully changing it won't be too difficult. So for this upcoming week I will work on that and also work on refining skill extraction for modules I've previously worked on (wherever it applies). The project is going well.
