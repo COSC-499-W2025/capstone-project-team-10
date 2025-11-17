@@ -58,3 +58,4 @@ class TestFSS:
 
         result3 = fss.search(path_to_test_file, None)
         assert result3 == 1
+        fss.clear_cache()
