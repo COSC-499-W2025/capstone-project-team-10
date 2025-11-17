@@ -24,16 +24,16 @@ class Repository:
             # Get files from the latest commit
             for commit in PyDrillerRepo(self.path, only_in_branch='HEAD').traverse_commits():
                 for modified_file in commit.modified_files:
-                    if modified_file.new_path:  # File exists (not deleted)
+                    if modified_file.new_path:
                         ext = Path(modified_file.new_path).suffix.lower()
                         lang = LANG_MAP.get(ext, "Others")
                         lang_counts[lang] += 1
-                break  # Only process the latest commit for current files
+                break
 
             self.language = dict(lang_counts)
 
         except Exception as e:
-            print(f"[Error] Failed to analyze repository: {type(e).__name__}: {e}")
+            print(f"Failed to analyze repository: {type(e).__name__}: {e}")
             self.authors = {}
             self.language = {}
 

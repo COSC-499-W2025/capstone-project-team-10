@@ -34,8 +34,8 @@ class GitGrouping:
             # Filter out empty strings and strip whitespace
             repo_files = [f.strip() for f in repo_files if f and f.strip()]
             
-            output = set()  # A set of the files present within the git repo 
-                           # so there are no repeated or wasted analysis/searches
+            output = set()  
+            # A set of the files present within the git repo so there are no repeated or wasted analysis/searches
             
             for file in repo_files:
                 # TODO: implements file search/file analysis to get the files 

@@ -1,113 +1,117 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from pathlib import Path
-from src.fss.repo_reader import detect_language, LANG_MAP, run_git_cmd, Repository
+from src.fss.repo_reader import detect_language, LANG_MAP, Repository
 
-class TestRepoReader:
+class MockAuthor:
+    # Mocks the author object from pydriller
+    def __init__(self, name):
+        self.name = name
 
-    # If the method properly maps the language to the suffix
-    def test_detect_language_known(self):
-        assert detect_language("script.py") == "Python"
-        assert detect_language("index.html") == "HTML"
+class MockModifiedFile:
+    # Mocks the ModifiedFile object from pydriller
+    def __init__(self, new_path):
+        self.new_path = new_path
 
+class MockCommit:
+    # Mock commits for the PyDriller object
+    def __init__(self, commit_hash, author_name, modified_files_list):
+        self.hash = commit_hash
+        self.author = MockAuthor(author_name)
+        self.modified_files = [MockModifiedFile(p) for p in modified_files_list]
 
-    # If the method properly maps the language to the suffix - other cases
-    def test_detect_language_unknown(self):
-        assert detect_language("archive.xyz") == "Other"
+# Set up commit data to be used later in tests.
+MOCK_COMMITS_DATA = [
+    MockCommit('c_hash1', 'Author A', ['src/file1.py', 'src/app.js']),
+    MockCommit('c_hash2', 'Author B', ['index.html']),
+    MockCommit('c_hash3', 'Author A', ['api/core.ts', 'tests/test_2.py', 'data/config.xyz']),
+    MockCommit('c_hash4', 'Author C', ['old_file.java']),
+]
+MOCK_LATEST_COMMIT = MOCK_COMMITS_DATA[-2]
 
+# Used to mock the PyDrillerRepo class for the tests
+@pytest.fixture
+def mock_pydriller_repo():
+    def factory(path, only_in_branch=None):
+        mock_repo_instance = MagicMock()
+        
+        if only_in_branch == 'HEAD':
+            # This is the call for language detection, only the latest commit is returned.
+            mock_repo_instance.traverse_commits.return_value = [MOCK_LATEST_COMMIT]
+        else:
+            # This is the call for author/commit counting, all commits are returned.
+            mock_repo_instance.traverse_commits.return_value = MOCK_COMMITS_DATA
+        
+        return mock_repo_instance
+    return factory
 
-    # If the method properly runs the git command line - testing for "logs" arguments (<commit_hash>|<author>)
-    @patch("src.fss.repo_reader.subprocess.run")
-    def test_run_git_cmd_logs(self, mock_run, tmp_path):
-        mock_result = MagicMock()
-        mock_result.stdout = "abc123|Author One\ndef456|Author Two"
-        mock_run.return_value = mock_result
+# Tests that the content of the repo (author, commits, file extensions) is correct
+@patch('src.fss.repo_reader.PyDrillerRepo')
+def test_repository_extrapolate_success(mock_repo_class, mock_pydriller_repo):
 
-        repo = tmp_path
-        result = run_git_cmd(repo, "logs")
+    mock_repo_class.side_effect = mock_pydriller_repo
 
-        mock_run.assert_called_once_with(
-            ["git", "log", "--pretty=format:%H|%an"],
-            cwd=repo,
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        assert "Author One" in result
-        assert "abc123" in result
+    repo = Repository("/mock/path")
+    repo.extrapolate()
 
-    # If the method properly runs the git command line - testing for "langs" arguments (<repo_path{.suffix_lang}>)
-    @patch("src.fss.repo_reader.subprocess.run")
-    def test_run_git_cmd_lang(self, mock_run, tmp_path):
-        mock_result = MagicMock()
-        mock_result.stdout = "main.py\nindex.html"
-        mock_run.return_value = mock_result
+    # Test Authors and Commits
+    expected_commit_counts = {
+        'Author A': 2,
+        'Author B': 1,
+        'Author C': 1, 
+    }
+    assert repo.get_authors() == sorted(list(expected_commit_counts.keys()))
+    assert repo.get_commits_count() == expected_commit_counts
 
-        repo = tmp_path
-        result = run_git_cmd(repo, "lang")
+    # Test Language Detection
+    expected_languages = {
+        "TypeScript": 1,
+        "Python": 1,
+        "Others": 1,
+    }
+    assert repo.get_language_dict() == expected_languages
 
-        mock_run.assert_called_once_with(
-            ["git", "ls-files"],
-            cwd=repo,
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        assert "main.py" in result
-        assert "index.html" in result
+# Tests that it handles exceptions properly and clears data so no info gets 'cross-contaminated'
+@patch('src.fss.repo_reader.PyDrillerRepo')
+def test_repository_extrapolate_handles_exception(mock_repo_class):
 
-    # If the git command properly detects a faulty Path to the repo - revise repo_reader.py line 202
-    def test_run_git_cmd_repo_not_exist(self, tmp_path):
-        fake_path = tmp_path / "nonexistent"
-        result = run_git_cmd(fake_path, "logs")
-        assert result == ""
+    # Mock an exception during call
+    mock_repo_instance = MagicMock()
+    mock_repo_instance.traverse_commits.side_effect = Exception("Simulated Git error")
+    mock_repo_class.return_value = mock_repo_instance
 
-    # If the git command properly detects a FileNotFoundError - revise repo_reader.py line 208
-    @patch("src.fss.repo_reader.subprocess.run", side_effect=FileNotFoundError)
-    def test_run_git_cmd_git_not_found(self, mock_run, tmp_path):
-        result = run_git_cmd(tmp_path, "logs") #TODO: adding a type checker here - it is displaying potential type pollution
-        assert result == ""
+    repo = Repository("/mock/path")
 
-    # If the extrapolate() method on a Repository class object works - a general results
-    @patch("src.fss.repo_reader.run_git_cmd")
-    def test_extrapolate_parsing(self, mock_run_git_cmd, tmp_path):
-        # Mock results:
-        mock_run_git_cmd.side_effect = [
-            "abc123|Author1\ndef456|Author1\nxyz789|Author2",
-            "main.py\nindex.html\nutils.cpp\nnotes.txt"
-        ]
+    repo.authors = {"Test": ["hash"]}
+    repo.language = {"C++": 1}
+    
+    repo.extrapolate()
+    
+    # Check that data was cleared upon exception
+    assert repo.authors == {}
+    assert repo.language == {}
 
-        repo = Repository(tmp_path)
-        repo.extrapolate()
+# Tests methods to get repo data upon initialization (empty)
+def test_repository_get_methods_initial():
+    repo = Repository("/mock/path")
+    assert repo.get_authors() == []
+    assert repo.get_commits_count() == {}
+    assert repo.get_language_dict() == {}
 
-        # Authors
-        assert "Author1" in repo.authors
-        assert len(repo.authors["Author1"]) == 2
-        assert "Author2" in repo.authors
+# Tests language detection of files with a known extension
+def test_detect_language_known_extensions():
+    assert detect_language("script.py") == "Python"
+    assert detect_language("/src/index.js") == "JavaScript"
+    assert detect_language("header.HPP") == "C++ Header"
+    assert detect_language("styles.css") == "CSS"
+    assert detect_language("server.go") == "Go"
+    
+# Tests language detection of files with an unknown extenstion
+def test_detect_language_unknown_extension():
+    assert detect_language("document.docx") == "Other"
+    assert detect_language("archive.zip") == "Other"
 
-        # Language dictionary
-        langs = repo.get_language_dict()
-        assert langs["Python"] == 1 # main.py
-        assert langs["HTML"] == 1 # index.html
-        assert langs["C++"] == 1 # utils.cpp
-        assert langs["Others"] == 1  # notes.txt
-
-    # Authors attribute
-    def test_get_authors(self):
-        repo = Repository("dummy")
-        repo.authors = {"Alice": ["a1"], "Bob": ["b1", "b2"]}
-        result = repo.get_authors()
-        assert sorted(result) == ["Alice", "Bob"]
-
-    # Commit counts attribute
-    def test_get_commits_count(self):
-        repo = Repository("dummy")
-        repo.authors = {"Alice": ["a1"], "Bob": ["b1", "b2", "b3"]}
-        result = repo.get_commits_count()
-        assert result == {"Alice": 1, "Bob": 3}
-
-    # Language dict attribute
-    def test_get_language_dict(self):
-        repo = Repository("dummy")
-        repo.language = {"Python": 10, "C++": 3}
-        assert repo.get_language_dict() == {"Python": 10, "C++": 3}
+# Tests language detection of files with no extensiom
+def test_detect_language_no_extension():
+    assert detect_language("README") == "Other"
+    assert detect_language(".gitignore") == "Other"
