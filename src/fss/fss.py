@@ -9,7 +9,38 @@ CACHE_PATH = os.path.join("src", "fss", "fss_cache.pkl")
 create_time_crit = [None, None]
 mod_time_crit = [None, None]
 
-def search(input_path, excluded_path):
+# Cache Helpers
+
+def load_cache() -> Dict[str, Tuple[float, int]]:
+    try:
+        with open(CACHE_PATH, "rb") as cache:
+            data = pickle.load(cache)
+        if isinstance(data, dict):
+            return data
+    except Exception:
+        pass
+    return {}
+
+def save_cache(data: Dict[str, Tuple[float, int]]) -> None:
+    cache_dir = os.path.dirname(CACHE_PATH) #Ensure directory exists
+    os.makedirs(cache_dir, exist_ok=True)
+
+    with open(CACHE_PATH, "wb") as cache:
+        pickle.dump(data, cache, protocol=pickle.HIGHEST_PROTOCOL)
+
+def file_signature(path: str) -> Tuple[float, int]:
+    stat = os.stat(path)
+    return (stat.st_mtime, stat.st_size) # Returns file modification time and byte size, to be used as signature to detect changes
+
+def clear_cache() -> None:
+    try:
+        os.remove(CACHE_PATH)
+    except FileNotFoundError:
+        pass
+
+# Main search
+
+def search(input_path, excluded_path, clean: bool = False):
 
     exclude_flag = True
     num_of_files_scanned = 0
