@@ -13,6 +13,7 @@ class FileAnalysis:
         last_modified: str,
         created_time: str,
         extra_data: Optional[Any] = None,
+        importance: float = 0.0,
     ) -> None:
         self.file_path: str = file_path
         self.file_name: str = file_name
@@ -20,6 +21,7 @@ class FileAnalysis:
         self.last_modified: str = last_modified
         self.created_time: str = created_time
         self.extra_data: Optional[Any] = extra_data
+        self.importance = importance
 
 
 def get_file_type(file_path: str) -> str:
@@ -63,26 +65,7 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             case "pdf":
                 from src.fas import fas_pdf  
                 print("Extracting PDF data...")
-                pdf_reader = fas_pdf.PDFReader(file_path)
-                # Return a dictionary of relevant PDF info
-                return {
-                    "author": pdf_reader.author,
-                    "creator": pdf_reader.creator,
-                    "producer": pdf_reader.producer,
-                    "title": pdf_reader.title,
-                    "subject": pdf_reader.subject,
-                    "keywords": pdf_reader.keywords,
-                    "page_count": pdf_reader.page_count,
-                    "word_count": pdf_reader.word_count,
-                    "line_count": pdf_reader.line_count,
-                    "char_count": pdf_reader.char_count,
-                    "table_count": pdf_reader.table_count,
-                    "tables": pdf_reader.tables,
-                    "image_count": pdf_reader.image_count,
-                    # "images": pdf_reader.images,
-                    "link_count": pdf_reader.link_count,
-                    "links": pdf_reader.links,
-                }
+                return fas_pdf.extract_pdf_data(file_path)
 
             case "docx":
                 from src.fas import fas_docx
@@ -107,6 +90,17 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             case "jpeg" | "jpg" | "png" | "gif" | "webp" | "tiff" | "bmp" | "heif" | "heic" | "avif":
                 from src.fas import fas_image_format
                 return fas_image_format.analyze_image(file_path)
+            
+            case "md" | "markdown":
+                from src.fas.fas_md import Markdown  # import your Markdown wrapper
+                md = Markdown(file_path)
+                return {
+                    "headers": md.get_headers(),
+                    "header_hierarchy": md.get_header_hierarchy(),
+                    "word_count": md.get_word_counts(),
+                    "code_blocks": md.get_code_blocks(),
+                    "paragraphs": md.get_paragraphs(),
+                }
 
             case "git":
                 # from src.fas import fas_git
@@ -121,6 +115,42 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
         # Handler not implemented yet
         print(f"Error. No handler module found for file type: {file_type}")
         return None
+    
+def compute_importance(file_type: str, extra_data: Optional[Any]) -> float:
+    """
+    Returns an importance score for the file.
+    Higher score = more important.
+    """
+    base_scores = {
+        "git": 10,
+        "pdf": 6,
+        "docx": 5,
+        "odt": 5,
+        "rtf": 4,
+        "xlsx": 6,
+        "xls": 6,
+        "md": 7,  # markdown is often documentation, high importance
+        "jpg": 2, "jpeg": 2, "png": 2, "gif": 2,
+        "psd": 3,
+    }
+
+    # Start with base importance from type
+    importance = base_scores.get(file_type.lower(), 1)
+
+    # Boost importance if file contains meaningful content
+    try:
+        if isinstance(extra_data, dict):
+            # Example boosting logic:
+            # This need to be changed based on what metrics we use
+            importance += extra_data.get("word_count", 0) / 1000
+            importance += extra_data.get("page_count", 0) * 0.2
+            importance += extra_data.get("table_count", 0) * 0.5
+            importance += extra_data.get("image_count", 0) * 0.1
+    except:
+        pass  # extra_data might not be structured
+
+    return round(float(importance), 2)
+
 
 
 def analyze_file(file_path: str) -> Optional[FileAnalysis]:
@@ -129,6 +159,7 @@ def analyze_file(file_path: str) -> Optional[FileAnalysis]:
     last_modified = get_last_modified_time(file_path)
     created_time = get_created_time(file_path)
     extra_data = get_file_extra_data(file_path, file_type)
+    importance = compute_importance(file_type, extra_data)
 
     return FileAnalysis(
         file_path=file_path,
@@ -137,6 +168,7 @@ def analyze_file(file_path: str) -> Optional[FileAnalysis]:
         last_modified=last_modified,
         created_time=created_time,
         extra_data=extra_data,
+        importance=importance,
     )
 
 def analyze_path(file_path: str) -> Optional[FileAnalysis]:
@@ -184,3 +216,4 @@ if __name__ == "__main__":
 # Excel: tests\testdata\test_fas\fas_excel_test.xlsx
 # Photoshop: tests\testdata\test_fas\fas_photoshop_test.psd
 # Image: tests\testdata\test_fas\fas_image_test.jpg
+# Markdown: tests\testdata\test_md\test_markdown.md
