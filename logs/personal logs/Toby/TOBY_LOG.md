@@ -1,3 +1,23 @@
+# Week 11 (11/09/2025 - 11/16/2025)
+
+![Week 11 - Task Completed](W11/Done.png)
+
+## Features
+
+![Week 11 - In Progress](W11/Features.png)
+
+## Recap
+
+- For week 11, I make a simple ranking/scoring system
+  - It has come to my attention that log.py need to be changed in conjunction with the new scoring system.
+- For next week, I plan to change the log.py and work on a new issue (not yet decided)
+
+## Additional Context
+## Team Survey:
+
+There is no team survey on Reading Break
+
+
 # Week 10 (11/02/2025 - 11/09/2025)
 
 ![Week 10 - Task Completed](W10/Done.png)
