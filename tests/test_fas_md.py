@@ -8,7 +8,7 @@ class TestMarkdown:
     def md(self):
         return Markdown("../tests/testdata/test_md/test_markdown.md")
 
-
+    # Test for headers
     def test_headers(self, md):
         headers = md.get_headers()["Header"]
         # should find all headers (#, ##, ###, ####)
@@ -17,7 +17,7 @@ class TestMarkdown:
         assert any(h["text"] == "Data Description" for h in headers)
         assert any(h["level"] == 4 for h in headers)  # Preprocessing Steps is ####
 
-
+    # Test for hierarchies
     def test_header_hierarchy(self, md):
         hierarchy = md.get_header_hierarchy()
         assert isinstance(hierarchy, list)
@@ -28,13 +28,13 @@ class TestMarkdown:
         background = next(child for child in intro["children"] if child["title"] == "Background")
         assert background["children"] == []
 
-
+    # Test for word counts
     def test_word_counts(self, md):
         count = md.get_word_counts()
         assert isinstance(count, int)
         assert count > 100  # reasonable sanity check
 
-
+    # Test for code blocks
     def test_code_blocks(self, md):
         blocks = md.get_code_blocks()["Code block"]
         assert isinstance(blocks, list)
@@ -44,14 +44,14 @@ class TestMarkdown:
         python_block = next(b for b in blocks if b["language"] == "python")
         assert "pd.read_csv" in python_block["content"]
 
-
+    # Test for paragraphs
     def test_paragraphs(self, md):
         paras = md.get_paragraphs()["Paragraph"]
         assert isinstance(paras, list)
         assert any("**mrkdown-analysis**" in p for p in paras)
         assert any("![Chart Example]" in p for p in paras)
 
-
+    # Test for structures
     def test_integration_structure(self, md):
         # full integration: all parts return valid structured data
         assert isinstance(md.get_headers(), dict)
