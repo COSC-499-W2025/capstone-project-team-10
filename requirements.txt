@@ -11,7 +11,8 @@ odfdo
 mrkdwn-analysis
 Pillow
 nltk
-numpy==3.9.1
+numpy
 psd-tools
 PyDriller
 fpdf2
+pandas
