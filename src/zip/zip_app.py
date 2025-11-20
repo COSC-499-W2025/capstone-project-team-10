@@ -9,7 +9,7 @@ import src.param.param as param
 
 def extract_zip(origin_path: str | Path):
     origin_path = Path(origin_path)
-    base_destination_path = param.program_file_path / Path("src/zip/zipfolders")
+    base_destination_path = Path(param.program_file_path) / "zip"
 
     if not origin_path.exists():
         print("Error: File not found")
