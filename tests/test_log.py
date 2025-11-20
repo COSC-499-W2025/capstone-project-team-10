@@ -50,9 +50,9 @@ test_file_analysis: FileAnalysis = FileAnalysis(
     extra_data="EXTRA EXTRA DATA",
 )
 expectedHeader: str = (
-    "File path analyzed,File name,File type,Last modified,Created time,Extra data"
+    "File path analyzed,File name,File type,Last modified,Created time,Extra data,Importance"
 )
-expectedBody: str = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,EXTRA EXTRA DATA"
+expectedBody: str = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,EXTRA EXTRA DATA,0.0"
 
 
 class TestLog:
@@ -146,7 +146,7 @@ class TestLog:
 
             assert len(lines) == 2  # Header + one entry
             assert lines[0].strip() == expectedHeader
-            expected_updated_body = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,UPDATED EXTRA DATA"
+            expected_updated_body = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,UPDATED EXTRA DATA,0.0"
             assert lines[1].strip() == expected_updated_body
         clean_up_log_tests()
 
