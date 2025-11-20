@@ -3,7 +3,7 @@ import pytest
 import src.zip.zip_app as zip
 from unittest.mock import patch
 
-path_to_test_zip = "tests/testdata/test_zip/testScanFolder.zip"
+path_to_test_zip = Path("tests/testdata/test_zip/testScanFolder.zip")
 
 
 class TestZip:
