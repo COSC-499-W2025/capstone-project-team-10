@@ -1,15 +1,20 @@
-import pytest
-import src.fss.fss as fss
+from pathlib import Path
 from unittest.mock import patch
 
-path_to_test_folder = "tests/testdata/test_fss/testScanFolder"
-path_to_entire_test_folder = "tests/testdata/test_fss/"
-path_to_test_file = "tests/testdata/test_fss/testScanFile"
-path_to_excluded_file = (
-    "tests/testdata/test_fss/testScanFolder/nestedFolder/nestedFile2"
+import pytest
+
+import src.fss.fss as fss
+
+path_to_test_folder = str(Path("tests/testdata/test_fss/testScanFolder"))
+path_to_entire_test_folder = str(Path("tests/testdata/test_fss/"))
+path_to_test_file = str(Path("tests/testdata/test_fss/testScanFile"))
+path_to_excluded_file = str(
+    Path("tests/testdata/test_fss/testScanFolder/nestedFolder/nestedFile2")
 )
-path_to_excluded_folder = "tests/testdata/test_fss/testScanFolder/nestedFolder"
-path_to_invalid_folder = "/DUMMMMMMMMMY/DUMMY/DUMB/DUMMY"
+path_to_excluded_folder = str(
+    Path("tests/testdata/test_fss/testScanFolder/nestedFolder")
+)
+path_to_invalid_folder = str(Path("/DUMMMMMMMMMY/DUMMY/DUMB/DUMMY"))
 
 
 class TestFSS:

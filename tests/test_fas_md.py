@@ -1,12 +1,15 @@
-import pytest
-from src.fas.fas_md import Markdown
-from unittest.mock import patch, MagicMock
 from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+from src.fas.fas_md import Markdown
+
 
 class TestMarkdown:
     @pytest.fixture(scope="module")
     def md(self):
-        return Markdown("../tests/testdata/test_md/test_markdown.md")
+        return Markdown(Path("tests/testdata/test_md/test_markdown.md"))
 
     # Test for headers
     def test_headers(self, md):
@@ -24,8 +27,12 @@ class TestMarkdown:
         # top-level header
         assert hierarchy[0]["title"] == "Project Overview"
         # nested under Introduction → Background
-        intro = next(node for node in hierarchy[0]["children"] if node["title"] == "Introduction")
-        background = next(child for child in intro["children"] if child["title"] == "Background")
+        intro = next(
+            node for node in hierarchy[0]["children"] if node["title"] == "Introduction"
+        )
+        background = next(
+            child for child in intro["children"] if child["title"] == "Background"
+        )
         assert background["children"] == []
 
     # Test for word counts
