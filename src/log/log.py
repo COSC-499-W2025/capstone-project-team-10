@@ -1,9 +1,10 @@
-from pathlib import Path
 import csv
 import re
+from pathlib import Path
 
 import src.param.param as param
 from src.fas.fas import FileAnalysis
+
 # TODO: if multithreading is needed add locks around file write operations
 
 # Newest Log is always max count after maximum logs are being stored
@@ -44,6 +45,7 @@ def resume_log_file() -> None:
             open_log_file()
     else:
         open_log_file()
+    param.set("logging.current_log_file", current_log_file)
 
 
 # Oldest log file is the

@@ -64,6 +64,7 @@ class TestFas:
     def test_importance_exists(self):
         # Ensure importance attribute exists and is populated.
         result = fas.run_fas(TEST_FILE)
+        assert result is not None
         assert hasattr(result, "importance")
 
     def test_importance_is_numeric(self):

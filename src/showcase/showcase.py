@@ -73,7 +73,7 @@ def generate_all():
     generate_portfolio()
 
 
-def generate_resume():
+def generate_resume() -> Path | None:
     """
     Generates a PDF resume from the log file.
     """
@@ -156,12 +156,12 @@ def generate_resume():
                 pdf_output.ln(10)  # Add a line break between entries
             # Save the PDF to disk
             pdf_output.output(str(export_path))
+            return export_path
     except Exception as e:
         print(f"Something went wrong: {e}")
-        return
 
 
-def generate_portfolio():
+def generate_portfolio() -> Path | None:
     """
     Generates an HTML portfolio and zips it, copying resources as needed.
     """
@@ -241,6 +241,7 @@ def generate_portfolio():
             str(portfolio_export_path_dir), "zip", root_dir=portfolio_export_path_dir
         )
         shutil.rmtree(portfolio_export_path_dir)
+        return Path(f"{str(portfolio_export_path_dir)}.zip")
     except Exception as e:
         print(f"Failed to read log file: {e}")
         return

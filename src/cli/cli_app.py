@@ -1,105 +1,151 @@
+import argparse
 import builtins
 import sys
+from pathlib import Path
 
 import src.fss.fss as fss
+import src.log.log as log
 import src.param.param as param
 import src.zip.zip_app as zip
+from src.showcase.showcase import generate_portfolio, generate_resume
 
 
 def prompt_file_perms():
-    # Request User Permission to Access Files
     print("This application requires access to system files")
-    response = input("Do wish to continue? (Y/N): ")
+    response = input("Do you wish to continue? (Y/N): ")
     if response.lower() != "y":
+        print("Permission denied. Exiting.")
         sys.exit(1)
 
 
-def extract_chosen_zip(zip_file_path: str):
-    # TODO: Link fss call here to assign the result to file_path
+def extract_chosen_zip(zip_file_path: str) -> Path | None:
     file_path = zip.extract_zip(zip_file_path)
-    print("File unzipped at: " + str(file_path))
+    print(f"File unzipped at: {file_path}")
     return file_path
 
 
-def get_param_body(args: list[str], indx: int) -> str:
-    if indx < len(args) and not args[indx].startswith("-"):
-        return args[indx]
-    else:
-        return ""
+def add_cli_args(parser: argparse.ArgumentParser):
+    parser.add_argument(
+        "file_path", nargs="?", help="Path to start search at or zip file to extract."
+    )
+    parser.add_argument("--zip", help="Extract the specified zip file.")
+    parser.add_argument(
+        "--exclude-paths",
+        nargs="+",
+        help="Paths to exclude from search (space separated).",
+    )
+    parser.add_argument(
+        "--file-types", nargs="+", help="File types to include (space separated)."
+    )
+    parser.add_argument(
+        "-y",
+        "--yes",
+        action="store_true",
+        help="Automatically grant file access permission.",
+    )
+    parser.add_argument(
+        "-r",
+        "--resume_entries",
+        nargs="?",
+        const=True,
+        default=None,
+        help="Output a pdf with resume project insights. Optional: Include a directory path to change where the result is saved",
+    )
+    parser.add_argument(
+        "-p",
+        "--portfolio_entries",
+        nargs="?",
+        const=True,
+        default=None,
+        help="Output a web portfolio with project descriptions. Optional: Include a directory path to change where the result is saved",
+    )
+    parser.add_argument(
+        "-c",
+        "--clean",
+        action="store_true",
+        help="Start a new log file instead of resuming the last one.",
+    )
+    # Flags
+    parser.add_argument("-q", "--quiet", action="store_true", help="Suppress output.")
 
 
-def get_multi_argument(args: list[str], indx: int) -> set[str]:
-    multi_argument_set: set[str] = set()
-    indx += 1  # Start after the flag itself
-    while indx < len(args):
-        arg = args[indx]
-        multi_argument_set.add(arg.rstrip(","))
-        if not args[indx].endswith(","):
-            break
-        indx += 1
-    return multi_argument_set
+def run_cli():
+    # Setup supported CLI args
+    parser = argparse.ArgumentParser(
+        description="CLI for file system scanning and zip extraction."
+    )
+    add_cli_args(parser)
 
+    args = parser.parse_args()
 
-def run_cli(cli_args: list[str]):
-    quiet: bool = ("--quiet" in cli_args) or ("-q" in cli_args)
-    _original_print = builtins.print
-    if quiet:
-        builtins.print = lambda *a, **k: None
-
-    if "-y" not in cli_args:
+    if not args.yes:
         prompt_file_perms()
 
-    path_exclusions: set = set()
-    file_types: set = set()
-    file_path: str = ""
+    _original_print = builtins.print
+    if args.quiet:
+        builtins.print = lambda *a, **k: None
 
-    if "--zip" in cli_args:
+    file_path = ""
+    if args.zip:
         print("Processing Zip File")
-        zip_file: str = get_param_body(cli_args, cli_args.index("--zip") + 1)
-        if zip_file == "":
-            print("Expected File path following --zip")
-            sys.exit(1)
-        file_path = str(zip.extract_zip(zip_file))
+        file_path = extract_chosen_zip(args.zip)
+    elif args.file_path:
+        file_path = args.file_path
     else:
-        # TODO: Get folder to start search at.
-        file_path = get_param_body(cli_args, len(cli_args) - 1)
-    if file_path == "":
-        print("No starting file_path")
+        print("No starting file_path provided.")
+        parser.print_help()
         sys.exit(1)
-    if "--exclude-paths" in cli_args:
-        path_exclusions.clear()
-        path_exclusions.update(
-            get_multi_argument(cli_args, cli_args.index("--exclude-paths"))
-        )
-        param.set(
-            "excluded_paths",
-            list(path_exclusions),
-        )
+    # Start a new log if clean flag is set
+    if args.clean:
+        log.open_log_file()
     else:
-        temp = param.get("excluded_paths")
-        if temp is not None and isinstance(temp, list):
-            path_exclusions.clear()
-            path_exclusions.update(temp)
+        log.resume_log_file()
 
-    if "--file-types" in cli_args:
-        file_types.clear()
-        file_types.update(get_multi_argument(cli_args, cli_args.index("--file-types")))
-        param.set(
-            "supported_file_types",
-            list(file_types),
-        )
-    else:
-        temp = param.get("supported_file_types")
-        if temp is not None and isinstance(temp, list):
-            file_types.clear()
-            file_types.update(temp)
+    path_exclusions = set(args.exclude_paths or param.get("excluded_paths") or [])
+    file_types = set(args.file_types or param.get("supported_file_types") or [])
+    param.set("excluded_paths", list(path_exclusions))
+    param.set("supported_file_types", list(file_types))
 
-    print("Scanning file path: " + file_path)
-    # TODO: Link fss call here with completed path
+    print(f"Scanning file path: {file_path}")
+    print(f"Excluding paths: {path_exclusions}")
+    print(f"Supported file types: {file_types}")
+
     fss.search(file_path, path_exclusions)
 
-    # Reactivate prints if turned off
-    if quiet:
-        builtins.print = _original_print
+    print("Scan complete.")
+    print(f"Log file located at:{param.get('logging.current_log_file')}")
 
-    # TODO: get most recent log file and print it for consumption
+    if args.resume_entries:
+        # check that the included path is valid
+        if (
+            isinstance(args.resume_entries, str)
+            and Path(args.resume_entries).exists()
+            and Path(args.resume_entries).is_dir()
+        ):
+            param.export_folder_path = args.resume_entries
+        print("Generating Resume PDF...")
+        file_path = generate_resume()
+        if file_path:
+            print(f"Resume generated at: {file_path}")
+        else:
+            print("Resume generation failed.")
+
+    if args.portfolio_entries:
+        # check that the included path is valid
+        if (
+            isinstance(args.portfolio_entries, str)
+            and Path(args.portfolio_entries).exists()
+            and Path(args.portfolio_entries).is_dir()
+        ):
+            param.export_folder_path = args.portfolio_entries
+        print("Generating Portfolio Website...")
+        file_path = generate_portfolio()
+        if file_path:
+            print(f"Portfolio generated at: {file_path}")
+        else:
+            print("Portfolio generation failed.")
+
+    if args.quiet:
+        builtins.print = _original_print
+        print(param.get("logging.current_log_file"))
+    print("Processing Complete!")
