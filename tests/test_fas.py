@@ -60,7 +60,7 @@ class TestFas:
         print(result.file_type)
         print(result.file_name)
         assert result.file_type == "git"
-        assert result.file_name == ".git"
+        assert result.file_name == "test_git_folder_placeholder0"
         assert result.extra_data is None
 
     def test_importance_exists(self):
