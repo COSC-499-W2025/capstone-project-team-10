@@ -1,10 +1,6 @@
 import os
 import pandas as pd
 from tabulate import tabulate
-from reportlab.lib.pagesizes import letter, landscape
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib import colors
 from fpdf import FPDF
 
 class LogConverter:
@@ -72,8 +68,17 @@ class LogConverter:
         """
             Convert to PDF (requires additional libraries)
             Note: This is an experimental method using reportlab - libraries are not imported and method is hidden (for reference)
+            Only try to install libraries if triggered - otherwise not needed
+            Experimental due to previous issues / libraries being janky
         """
-
+        try:
+            from reportlab.lib.pagesizes import letter, landscape
+            from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+            from reportlab.lib.styles import getSampleStyleSheet
+            from reportlab.lib import colors
+        except ImportError:
+            print("Please install reportlab: pip install reportlab")
+            return None
         if output_path is None:
             base, _ = os.path.splitext(self.__log_path)
             output_path = f"{base}_converted.pdf"
