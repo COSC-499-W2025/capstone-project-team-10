@@ -8,4 +8,11 @@ python-docx
 striprtf
 odfpy
 odfdo
+mrkdwn-analysis
 Pillow
+nltk==3.9.1
+numpy
+psd-tools
+PyDriller
+fpdf2
+pandas

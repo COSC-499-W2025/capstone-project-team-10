@@ -1,4 +1,5 @@
 import os
+
 from src.fss.fss_helper import *
 import pickle
 from typing import Dict, Tuple
@@ -45,38 +46,38 @@ def clear_cache() -> None:
 
 def search(input_path, excluded_path, clean: bool = False):
 
+def search(input_path, excluded_path):
     exclude_flag = True
     num_of_files_scanned = 0
 
     if not excluded_path:
-        #If there is not included exclusion, the flag will be set to false to skip comparisons
+        # If there is not included exclusion, the flag will be set to false to skip comparisons
         exclude_flag = False
 
     if not os.path.exists(input_path):
-        #invalid returns -1
+        # invalid returns -1
         return -1
 
     input_path = os.path.abspath(input_path)
 
     if exclude_flag:
-        #ensures that the excluded paths input is a set
+        # ensures that the excluded paths input is a set
         if isinstance(excluded_path, str):
             excluded_path = {excluded_path}
         else:
             excluded_path = set(excluded_path)
-
 
         excluded_set = set()
         for e_path in excluded_path:
             e_path = os.path.abspath(e_path)
             excluded_set.add(e_path)
 
-            #if exclusion includes a dir, it will add all files within the dir to exclusion
+            # if exclusion includes a dir, it will add all files within the dir to exclusion
             if os.path.isdir(e_path):
                 for root, dirs, files in os.walk(e_path):
                     for file in files:
                         excluded_set.add(os.path.join(root, file))
-        
+
         excluded_path = excluded_set
 
     prev_cache = {} if clean else load_cache()
@@ -107,8 +108,9 @@ def search(input_path, excluded_path, clean: bool = False):
             return 0
 
     for root, dirs, files in os.walk(input_path, topdown=True):
-
         for file in files:
+            if file.startswith(".") and file != ".gitignore":
+                continue  # Skip hidden files
             file_path = os.path.join(root, file)
             file_path = os.path.abspath(file_path)
             print(file_path)
