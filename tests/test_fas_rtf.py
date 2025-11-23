@@ -35,6 +35,15 @@ class TestFasRtf:
         assert result["num_chars"] == 43
         assert result["num_words"] == 9
         assert result["num_paragraphs"] == 3
+        assert result["filtered_word_count"] == 5
+        assert result["unique_words"] == 5
+        assert result["sentence_count"] == 1
+        assert result["lexical_diversity"] == 1.0
+        assert result["top_keywords"] == [("rtf", 1), ("file", 1), ("thumbs", 1), ("cat", 1), ("emoji", 1)]
+        assert result["sentiment"] == "neutral"
+        assert result["sentiment_score"] == 0.0
+        assert result["named_entities"] == [('Cat', 'ORGANIZATION'), ('RTF', 'ORGANIZATION')]
+        assert result["summary"] == "This is an RTF file\n\nThumbs up\n\nCat emoji."
 
     def test_invalid_rtf_file(self):
         result = fas.extract_rtf_data("notaRealpath")
