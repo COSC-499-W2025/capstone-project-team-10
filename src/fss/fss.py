@@ -1,14 +1,10 @@
 import os
 from datetime import date, datetime
+from pathlib import Path
 
 import src.fas.fas as fas
 import src.log.log as log
 from src.fss.fss_helper import file_type_check, time_check
-
-# User's settings for modification + creation time - for now, dummies variable
-# It should be the fss intaker responsibility to control if these values are valid (lower << upper, only 2 values in a list, etc.)
-create_time_crit = [None, None]
-mod_time_crit = [None, None]
 
 
 class FSS_Search:
@@ -68,21 +64,34 @@ def search(search: FSS_Search):
             return 0
 
     for root, dirs, files in os.walk(search.input_path, topdown=True):
+        # Remove excluded dirs
+        dirs[:] = [d for d in dirs if os.path.join(root, d) not in search.excluded_path]
+
+        for dir in dirs[:]:
+            dir_path = os.path.join(root, dir)
+            if exclude_flag and dir_path in search.excluded_path:
+                continue
+            if dir == ".git":
+                git_file_result: fas.FileAnalysis | None = fas.run_fas(dir_path)
+                print(f"Scanning .git directory at: {dir_path}")
+                if git_file_result:
+                    log.write(git_file_result)
+                    num_of_files_scanned += 1
+                dirs.remove(dir)
+
         for file in files:
             if file.startswith(".") and file != ".gitignore":
                 continue  # Skip hidden files
             file_path = os.path.join(root, file)
-            print(file_path)
+            # Check conditions
             if exclude_flag and file_path in search.excluded_path:
-                # TODO add in FAS and return value, pass in file and set of repo paths for grouping
-                # This is where specifics of files can be extracted.
                 continue
-            if not file_type_check(file_path, search.file_types):
+            if search.file_types and not file_type_check(file_path, search.file_types):
                 continue
 
-            if not time_check(
-                [search.time_lower_bound, search.time_upper_bound],
-                file_path,
+            if (search.time_lower_bound or search.time_upper_bound) and not time_check(
+                list([search.time_lower_bound, search.time_upper_bound]),
+                Path(file_path),
                 "create",
             ):
                 continue
@@ -93,7 +102,7 @@ def search(search: FSS_Search):
             # Pass file result to log module for logging
             if file_result:
                 log.write(file_result)
-            # Pass file result to GUI/CLI if necessary
+                # Pass file result to GUI/CLI if necessary
             num_of_files_scanned += 1
 
     return num_of_files_scanned

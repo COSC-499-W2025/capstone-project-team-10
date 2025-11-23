@@ -1,6 +1,7 @@
 import argparse
 import builtins
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import src.fss.fss as fss
@@ -65,6 +66,18 @@ def add_cli_args(parser: argparse.ArgumentParser):
         action="store_true",
         help="Start a new log file instead of resuming the last one.",
     )
+    parser.add_argument(
+        "-b",
+        "--before",
+        type=str,
+        help="Only include files created before the specified date (YYYY-MM-DD).",
+    )
+    parser.add_argument(
+        "-a",
+        "--after",
+        type=str,
+        help="Only include files created after the specified date (YYYY-MM-DD).",
+    )
     # Flags
     parser.add_argument("-q", "--quiet", action="store_true", help="Suppress output.")
 
@@ -76,7 +89,7 @@ def run_cli():
     )
     add_cli_args(parser)
 
-    args = parser.parse_args()
+    args = parser.parse_known_args()[0]
 
     if not args.yes:
         prompt_file_perms()
@@ -100,17 +113,55 @@ def run_cli():
         log.open_log_file()
     else:
         log.resume_log_file()
+    # Set time bounds if provided
+    lower_bound = None
+    upper_bound = None
+    if args.before or args.after:
+        from datetime import datetime
 
-    path_exclusions = set(args.exclude_paths or param.get("excluded_paths") or [])
-    file_types = set(args.file_types or param.get("supported_file_types") or [])
-    param.set("excluded_paths", list(path_exclusions))
-    param.set("supported_file_types", list(file_types))
+        lower_bound: datetime | None = (
+            datetime.strptime(args.after, "%Y-%m-%d") if args.after else None
+        )
+        upper_bound: datetime | None = (
+            datetime.strptime(args.before, "%Y-%m-%d") if args.before else None
+        )
+    path_exclusions: set = set()
+    if not args.exclude_paths:
+        path_exclusions = set(param.get("excluded_paths") or [])
+    else:
+        path_exclusions = set([path.replace(",", "") for path in args.exclude_paths])
+    file_types: set = set()
+    if not args.file_types:
+        file_types = set(param.get("supported_file_types") or [])
+    else:
+        file_types = set([type.replace(",", "") for type in args.file_types])
 
+    if path_exclusions:
+        param.set("excluded_paths", list(path_exclusions))
+        print(f"Excluding paths: {path_exclusions}")
     print(f"Scanning file path: {file_path}")
-    print(f"Excluding paths: {path_exclusions}")
-    print(f"Supported file types: {file_types}")
 
-    fss.search(file_path, path_exclusions)
+    if file_types:
+        param.set("supported_file_types", list(file_types))
+        print(f"Filtering by file types: {file_types}")
+
+    bound_str: str = "Files created between:"
+    if lower_bound:
+        bound_str += f" after {lower_bound.strftime('%Y-%m-%d')}"
+    if upper_bound:
+        if lower_bound:
+            bound_str += " and"
+        bound_str += f" before {upper_bound.strftime('%Y-%m-%d')}"
+    print(bound_str)
+    fss.search(
+        fss.FSS_Search(
+            file_path,
+            path_exclusions,
+            file_types,
+            lower_bound,
+            upper_bound,
+        )
+    )
 
     print("Scan complete.")
     print(f"Log file located at:{param.get('logging.current_log_file')}")
@@ -148,4 +199,5 @@ def run_cli():
     if args.quiet:
         builtins.print = _original_print
         print(param.get("logging.current_log_file"))
-    print("Processing Complete!")
+    else:
+        print("Processing Complete!")

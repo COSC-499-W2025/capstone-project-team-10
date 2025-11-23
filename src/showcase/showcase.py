@@ -1,5 +1,7 @@
 import csv
+import logging
 import os
+import re
 import shutil
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -45,9 +47,8 @@ collaborative_types = ["git"]
 
 
 def format_last_modified(file_analysis: FileAnalysis) -> str:
-    """
-    Returns 'Current' if the file was modified in the last month, else formatted date.
-    """
+    if file_analysis.last_modified == "N/A":
+        return "Current"
     last_modified = datetime.fromisoformat(file_analysis.last_modified)
     now = datetime.now()
     one_month_ago = now - timedelta(days=30)
@@ -58,11 +59,16 @@ def format_last_modified(file_analysis: FileAnalysis) -> str:
 
 
 def format_created_time(file_analysis: FileAnalysis) -> str:
-    """
-    Returns the created time formatted as YYYY-MM-DD.
-    """
+    if file_analysis.created_time == "N/A":
+        return "N/A"
     created_time = datetime.fromisoformat(file_analysis.created_time)
     return created_time.strftime("%Y-%m-%d")
+
+
+def clean_text(text):
+    text = " ".join(text.split())  # Remove extra spaces
+    text = text.replace("\u00a0", " ")  # Replace non-breaking spaces
+    return text
 
 
 def generate_all():
@@ -77,6 +83,8 @@ def generate_resume() -> Path | None:
     """
     Generates a PDF resume from the log file.
     """
+    logging.getLogger("fpdf").setLevel(logging.ERROR)
+    logging.getLogger("fontTools").setLevel(logging.ERROR)
     todays_date: str = datetime.now().strftime("%m-%d-%y")
     export_path: Path = Path(param.export_folder_path) / (todays_date + "-resume.pdf")
     file_number: int = 0
@@ -93,11 +101,16 @@ def generate_resume() -> Path | None:
         print(f"Export folder does not exist: {export_path}")
         return
     try:
-        with open(log_file, "r") as lf:
+        with open(log_file, "r", encoding="utf-8") as lf:
             reader = csv.reader(lf)
             pdf_output = FPDF()
             pdf_output.add_page()
-            pdf_output.set_font("Times", size=14)
+            pdf_output.add_font("Noto", "", "src/showcase/fonts/noto.ttf", uni=True)
+            pdf_output.add_font("Noto", "B", "src/showcase/fonts/notob.ttf", uni=True)
+            pdf_output.add_font("Noto", "I", "src/showcase/fonts/notoi.ttf", uni=True)
+            pdf_output.add_font("Noto", "BI", "src/showcase/fonts/notobi.ttf", uni=True)
+
+            pdf_output.set_font("Noto", "BI", size=14)
             next(reader)  # Skip header row
             for row in reader:
                 # Create FileAnalysis object from CSV row
@@ -117,16 +130,19 @@ def generate_resume() -> Path | None:
                 header_font_size: int = 18
                 # Write each line of the entry header with decreasing font size
                 for line in entry_headers.splitlines():
-                    pdf_output.set_font("Times", size=header_font_size, style="B")
-                    pdf_output.cell(0, 10, line, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+                    pdf_output.set_font("Noto", size=header_font_size, style="B")
+                    pdf_output.multi_cell(
+                        0, 10, line, new_x=XPos.LMARGIN, new_y=YPos.NEXT
+                    )
                     header_font_size -= 2
 
-                pdf_output.set_font("Times", size=14)
+                pdf_output.set_font("Noto", size=12)
                 # Add details based on file type
+                file_analysis.extra_data = clean_text(file_analysis.extra_data)
                 match file_analysis.file_type:
                     case file_type if file_type in image_types:
                         # Add image project description and image
-                        pdf_output.cell(
+                        pdf_output.multi_cell(
                             0,
                             10,
                             f"Artistic Project: [Insert Description]",
@@ -136,7 +152,7 @@ def generate_resume() -> Path | None:
                         pdf_output.image(file_analysis.file_path, w=100)
                     case file_type if file_type in collaborative_types:
                         # Add collaborative project details
-                        pdf_output.cell(
+                        pdf_output.multi_cell(
                             0,
                             10,
                             f"Project Contributions: {file_analysis.extra_data}",
@@ -146,7 +162,7 @@ def generate_resume() -> Path | None:
                         # TODO: Expand to include more details about the files in the git project
                     case _:
                         # Add key skills for text files
-                        pdf_output.cell(
+                        pdf_output.multi_cell(
                             0,
                             10,
                             f"Key Skills demonstrated in this project: {file_analysis.extra_data}",
@@ -198,7 +214,7 @@ def generate_portfolio() -> Path | None:
         print(f"Export folder does not exist: {portfolio_export_path}")
         return
     try:
-        with open(log_file, "r") as lf:
+        with open(log_file, "r", encoding="utf-8") as lf:
             with open(portfolio_export_path, "w") as portfolio:
                 # Write HTML header
                 portfolio.write("<html><head><title>Portfolio</title></head><body>\n")
@@ -209,11 +225,12 @@ def generate_portfolio() -> Path | None:
                     file_analysis = FileAnalysis(*row)
                     # Copy file to resources folder with correct extension
                     file_analysis_source = Path(file_analysis.file_path)
-                    shutil.copy(
-                        file_analysis_source,
-                        portfolio_export_resource_path
-                        / (file_analysis.file_name + "." + file_analysis.file_type),
-                    )
+                    if not file_analysis_source.is_dir():
+                        shutil.copy(
+                            file_analysis_source,
+                            portfolio_export_resource_path
+                            / (file_analysis.file_name + "." + file_analysis.file_type),
+                        )
                     # Prepare details based on file type
                     if file_analysis.file_type in image_types:
                         details = f"<p>Artistic Project:</p><img src='resources/{file_analysis.file_name}.{file_analysis.file_type}' alt='{file_analysis.file_name}' width='300'/>"

@@ -57,6 +57,8 @@ class TestFas:
         git_dir.mkdir()
         result = fas.run_fas(str(git_dir))
         assert result is not None
+        print(result.file_type)
+        print(result.file_name)
         assert result.file_type == "git"
         assert result.file_name == ".git"
         assert result.extra_data is None

@@ -3,6 +3,8 @@ import mimetypes
 import os
 from typing import Any, Optional
 
+from src.fss.repo_reader import Repository
+
 
 class FileAnalysis:
     def __init__(
@@ -26,7 +28,9 @@ class FileAnalysis:
 
 def get_file_type(file_path: str) -> str:
     # First, try to get the file extension
-    ext = os.path.splitext(file_path)[1].lower().lstrip(".")
+    # file_path should be a string
+    file_name = file_path.split(os.path.sep)[-1]
+    ext = file_name.split(".")[-1].lower()
     if ext:
         return ext
 
@@ -58,7 +62,7 @@ def get_file_name(file_path: str) -> str:
 def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
     # This is all placeholder and will be replaced when we have proper handlers
     try:
-        print(f"Getting extra data for file type: {file_type}")
+        print(f"Scanning: {file_path}")
         match file_type:
             # The reason why the case of "pdf" is quite big is becuase fas_PDF returns an object therefore we need to map its attributes to a dictionary
             # so that it is consistent with other file types that return dictionaries.
@@ -206,15 +210,7 @@ def analyze_path(file_path: str) -> Optional[FileAnalysis]:
 
     if os.path.isdir(file_path) and file_path.endswith(".git"):
         # Placeholder for git analysis
-        print("Analyzing .git folder (placeholder).")
-        return FileAnalysis(
-            file_path=file_path,
-            file_name=".git",
-            file_type="git",
-            last_modified="N/A",
-            created_time="N/A",
-            extra_data=None,
-        )
+        return analyze_file(file_path)
 
     # Otherwise treat as a regular file
     return analyze_file(file_path)
