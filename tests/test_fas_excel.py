@@ -64,7 +64,6 @@ class TestFasExcel:
         assert metadata["sheet_count"] == 3
         assert set(metadata["sheet_names"]) == {"Summary", "Data", "HelloWorld"}
 
-
     def test_workbook_metadata(self):
         metadata = extract_excel_data(TEST_FILE_PATH)
         assert metadata["creator"] == "Toby"
@@ -74,7 +73,6 @@ class TestFasExcel:
         assert metadata["keywords"] == "Excel,Test"
         assert metadata["category"] == "Test Category"
         assert metadata["description"] == "This is a test workbook"
-
 
     def test_sheet_stats(self):
         metadata = extract_excel_data(TEST_FILE_PATH)
@@ -99,6 +97,16 @@ class TestFasExcel:
         assert hello["max_row"] >= 1
         assert hello["max_column"] >= 2
 
+    def test_key_skills(self):
+        file_path = create_excel_test_file()
+        metadata = extract_excel_data(file_path)
+        assert "key_skills" in metadata
+        skills = metadata["key_skills"]
+        # For this test file, we expect at least Analytical Skills and Excel Proficiency
+        assert "Analytical Skills" in skills
+        assert "Excel Proficiency" in skills
+        # Data Visualization may not appear because no charts exist
+        # Financial Modeling may not appear because no financial formulas exist
 
     def test_invalid_excel_file(self):
         bad_file = create_invalid_excel_file()
