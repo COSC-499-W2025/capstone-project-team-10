@@ -37,3 +37,9 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *.pytest_cache/
+
+# PyCharm settings
+.idea/
+
+# NLTK data files
+utils/nltk_data/*
