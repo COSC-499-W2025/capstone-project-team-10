@@ -1,12 +1,50 @@
 import os
 
 from src.fss.fss_helper import *
+import pickle
+from typing import Dict, Tuple
 
 # User's settings for modification + creation time - for now, dummies variable
 # It should be the fss intaker responsibility to control if these values are valid (lower << upper, only 2 values in a list, etc.)
+CACHE_PATH = os.path.join("src", "fss", "fss_cache.pkl")
 create_time_crit = [None, None]
 mod_time_crit = [None, None]
 
+# Cache Helpers
+
+def load_cache() -> Dict[str, Tuple[float, int]]:
+    # Loads and reads the cache file
+    # It returns a dictionary of  [absolute file path: (modified time, size)]
+    try:
+        with open(CACHE_PATH, "rb") as cache:
+            data = pickle.load(cache)
+        if isinstance(data, dict):
+            return data
+    except Exception:
+        pass
+    return {}
+
+def save_cache(data: Dict[str, Tuple[float, int]]) -> None:
+    cache_dir = os.path.dirname(CACHE_PATH) #Ensure directory exists
+    os.makedirs(cache_dir, exist_ok=True)
+
+    with open(CACHE_PATH, "wb") as cache:
+        pickle.dump(data, cache, protocol=pickle.HIGHEST_PROTOCOL)
+
+def file_signature(path: str) -> Tuple[float, int]:
+    stat = os.stat(path)
+    return (stat.st_mtime, stat.st_size) # Returns file modification time and byte size, to be used as signature to detect changes
+
+def clear_cache() -> None:
+    # Nukes cache
+    try:
+        os.remove(CACHE_PATH)
+    except FileNotFoundError:
+        pass
+
+# Main search
+
+def search(input_path, excluded_path, clean: bool = False):
 
 def search(input_path, excluded_path):
     exclude_flag = True
@@ -42,15 +80,30 @@ def search(input_path, excluded_path):
 
         excluded_path = excluded_set
 
+    prev_cache = {} if clean else load_cache()
+    new_cache: Dict[str, Tuple[float, int]] = {}
+
+    def should_process(file_path_abs: str) -> bool:
+        # Checks if file should be processed or not
+        # by checking if signature matches with the one in the cache (if the file is in cache)
+        # or if clean flag has been passed
+        if not os.path.isfile(file_path_abs):
+            return False
+        
+        sig = file_signature(file_path_abs)
+        new_cache[file_path_abs] = sig
+
+        if clean:
+            return True
+        return prev_cache.get(file_path_abs) != sig
+
     if os.path.isfile(input_path):
-        if not excluded_path:
-            # TODO add in FAS and return value, pass in file and set of repo paths for grouping
-            # single file with no exclusion
-            return 1
-        elif input_path not in excluded_path:
-            # TODO add in FAS and return value, pass in file and set of repo paths for grouping
-            # single file accounting for exclusion
-            return 1
+        if not excluded_path or input_path not in excluded_path:
+            #single file with no exclusion
+            if should_process(input_path):
+                #This is where specifics of files can be extracted.
+                save_cache(new_cache)
+                return 1
         else:
             return 0
 
@@ -59,19 +112,18 @@ def search(input_path, excluded_path):
             if file.startswith(".") and file != ".gitignore":
                 continue  # Skip hidden files
             file_path = os.path.join(root, file)
+            file_path = os.path.abspath(file_path)
             print(file_path)
-            if exclude_flag:
-                if (
-                    file_path not in excluded_path
-                    and time_check(create_time_crit, file_path, "create")
-                    and time_check(mod_time_crit, file_path, "mod")
-                ):  # Added time checkers to abide criteria here
-                    # TODO add in FAS and return value, pass in file and set of repo paths for grouping
-                    # This is where specifics of files can be extracted.
-                    num_of_files_scanned += 1
-            else:
-                # TODO add in FAS and return value, pass in file and set of repo paths for grouping
-                # Given no exclusion this is where details about scanned files can be extracted.
-                num_of_files_scanned += 1
 
+            if exclude_flag:
+                if file_path not in excluded_path and time_check(create_time_crit, file_path, "create") and time_check(mod_time_crit, file_path, "mod"): # Added time checkers to abide criteria here
+                    if should_process(file_path):
+                    #This is where specifics of files can be extracted.
+                        num_of_files_scanned += 1
+            else:
+                if should_process(file_path):
+                #Given no exclusion this is where details about scanned files can be extracted.
+                    num_of_files_scanned += 1
+
+    save_cache(new_cache)
     return num_of_files_scanned
