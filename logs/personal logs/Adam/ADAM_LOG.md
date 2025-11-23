@@ -1,10 +1,86 @@
-# Week 11 (11/9/2025 - 11/16/2025) -> Reading Week
+# Week 12 (11/16/2025 - 11/23/2025):
+
 ## Completed tasks
+
+![Week 12 Tasks completed](Week12/image-1.png)
+
+## Features
+
+![Week 12 Tasks In-progress](Week12/image.png)
+
+## Recap
+
+#### 1. PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/107
+
+This PR's main goal was to fix bugs and issues found during testing of the FSS and CLI modules. in order to make our full test suite ready for review and the full pass testing it will have to undergo for the next two weeks.
+
+Issues Fixed:
+
+- zip extraction will now use the folder for files provided by the param service fixing bug with executable
+- FSS now ignores hidden files, as they aren't useful for our purposes and break the search and search tests.
+- Fixed paths in test files to be OS Relative with pathlib usage
+- Removed Unused draft test files
+- Added missing pandas library to requirements.txt
+- Fixed code formatting(My editor does auto-formatting in accordance with the readme)
+
+##### Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/106
+
+##### Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/105
+
+#### 2. PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/112
+
+The Purpose of this ticket was to tie in all the developed functionality into the CLI and ensure that all modules worked together as intended.
+
+Changes made:
+
+- Reworked CLI to use argparse for argument parsing
+- Added support for new flags
+- Added --help functionality
+- Refactored FSS to use a search configuration object, added file type and time filtering to function call
+- Integrated logging of file analysis results.
+- Updated helper functions for type safety
+- added file type checks.
+- Adjusted tests and showcase generation functions to match new interfaces and return types.
+- Updated param defaults to track current log file.
+- added CLI options to filter files by creation date
+- updated FSS to support time bounds,
+- ensures all file and log operations use UTF-8 encoding.
+- PDF resume generation now uses Noto Unicode fonts for better character support. Still doesn't support emojis
+- Fixed Markdown bug with parsing when "header" key is not set or invalid
+- Fixed bug with old param file overriding new defaults with updates.
+- Fixed FSS not passing .git folders for analysis.
+- Updated FSS Tests to match expectation of .git parsing
+- rewrote tests for new cli implementation
+- Modified get_file_name to return the parent directory name when the input path is a directory, This will name .git files according to their parents
+- Changed expected values for .git files in test_fas to match new naming convention
+- Updated readme to include new cli flags
+
+##### Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/97
+
+### Planned Future Expansion Opportunities:
+
+For the next week I will continue to coordinate final testing and integration of all modules, as well as working on final presentation materials and ensuring all documentation is up to date.
+
+In addition I have a ticket for creating the functionality to export a timeline of skills. This ticket may be blocked depending on the team's progress on the extra data refinement.
+
+### For next week:
+
+#### Tickets
+
+- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/89
+
+# Week 11 (11/9/2025 - 11/16/2025) -> Reading Week
+
+## Completed tasks
+
 #### In Review will be moved to completed after team review. I am writing this log ahead of time
+
 ![Week 11 Tasks completed](Week11/image-1.png)
+
 ## Features
 
 ![Week 11 Tasks In-progress](Week11/image.png)
+
 ## Recap
 
 #### PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/96
@@ -16,24 +92,24 @@
 - Updated Readme with documentation for how to use the showcase module
 
 ### Planned Future Expansion Opportunities:
+
 - Make more specific file type parsing to create more unique sections.
 - Possible parsing of Photoshop files to produce an image to be included
 - Split .git file extra data to be parsed more deeply, outlining outputs in a much cleaner way (The git parse is currently being rewritten)
 
-
 ### For next week:
 
-For the next few weeks I will be coordinating our full implementation and tying together all the teams work into a final presentation as well as doing manual integration testing. I am trying to coordinate rewrites in the file analysis modules as lots of them dont produce very usable outputs, especially the .git analysis. I may be doing this rewrite myself if the team requires help. 
+For the next few weeks I will be coordinating our full implementation and tying together all the teams work into a final presentation as well as doing manual integration testing. I am trying to coordinate rewrites in the file analysis modules as lots of them dont produce very usable outputs, especially the .git analysis. I may be doing this rewrite myself if the team requires help.
 
 My Primary task will be the consolidation of the CLI and related modules
 
 #### Tickets
-- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/97
 
+- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/97
 
 ## Additional Context
 
-No problems with my work, however attempting to direct the team in the right direction is difficult and consumes most of my time. 
+No problems with my work, however attempting to direct the team in the right direction is difficult and consumes most of my time.
 
 ## Team Survey:
 
@@ -153,9 +229,9 @@ Team survey completed.
 I rewrote our application in Python minus the multithreading. Wrote the README with instructions for
 
 - Running, Packaging, and Testing the Base app
-  - Using PyQt5 for GUI
-  - Using pyinstaller for build process
-  - Using python unittest for testing framework
+    - Using PyQt5 for GUI
+    - Using pyinstaller for build process
+    - Using python unittest for testing framework
 - Writing Tests
 - Coding Conventions to be practiced
 - Best Practices for submitting PRs
