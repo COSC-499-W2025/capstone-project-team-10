@@ -15,13 +15,13 @@ class LogConverter:
         self.__log_path = path
         self.csv = pd.read_csv(self.__log_path)
         self.headers = self.csv.columns.to_list()
-        self.data = self.csv.to_dict(orient='records')
+        self.data = self.csv.to_dict(orient = 'records')
 
     def convert_to_JSON(self, output_path = None):
         """
             Convert (and appends) the converted log file in standard .JSON format
         """
-        json_str = self.csv.to_json(orient='records', indent=2)
+        json_str = self.csv.to_json(orient = 'records', indent = 2)
 
         if output_path is None:
             base, _ = os.path.splitext(self.__log_path)
@@ -52,7 +52,7 @@ class LogConverter:
             base, _ = os.path.splitext(self.__log_path)
             output_path = f"{base}_converted.md"
 
-        md_table = tabulate(self.csv, headers='keys', tablefmt='github', showindex=False) # Read the doc for usage
+        md_table = tabulate(self.csv, headers = 'keys', tablefmt = 'github', showindex = False) # Read the doc for usage
 
         # Add a title and metadata
         md_content = f"# Log Data\n\n"
@@ -67,11 +67,13 @@ class LogConverter:
 
         return output_path
 
-    def __convert_to_pdf_test(self, output_path=None):
+    def __convert_to_pdf_test(self, output_path = None):
+
         """
             Convert to PDF (requires additional libraries)
             Note: This is an experimental method using reportlab - libraries are not imported and method is hidden (for reference)
         """
+
         if output_path is None:
             base, _ = os.path.splitext(self.__log_path)
             output_path = f"{base}_converted.pdf"
@@ -114,7 +116,7 @@ class LogConverter:
 
         return output_path
 
-    def convert_to_pdf(self, output_path=None):
+    def convert_to_pdf(self, output_path = None):
 
         """
             Convert to PDF using fpdf2 with enhanced table formatting
@@ -155,7 +157,6 @@ class LogConverter:
             # Check for page break
             if pdf.get_y() + row_height > pdf.h - pdf.b_margin:
                 pdf.add_page(orientation = 'L')
-                # Reprint header
                 pdf.set_font("Helvetica", 'B', 11)
                 pdf.set_fill_color(200, 200, 200)
                 for header in self.headers:
@@ -176,6 +177,3 @@ class LogConverter:
 
         pdf.output(output_path)
         return output_path
-
-convert_test = LogConverter(r"C:\Users\pqbao\AppData\Roaming\Capstone Project Team 10\logs\0.log")
-convert_test.convert_to_md()
