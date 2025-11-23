@@ -56,6 +56,11 @@ def get_created_time(file_path: str) -> str:
 
 
 def get_file_name(file_path: str) -> str:
+    if os.path.isdir(file_path):
+        # return the parent directory name
+        parent_dir = os.path.dirname(file_path)
+        # Get the name of the parent directory
+        return os.path.basename(parent_dir)
     return os.path.basename(file_path)
 
 
