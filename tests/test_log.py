@@ -1,8 +1,10 @@
-import pytest
 import os
+
+import pytest
+
 import src.log.log as log
-from src.fas.fas import FileAnalysis
 import src.param.param as param
+from src.fas.fas import FileAnalysis
 
 path_to_test_zip = "tests/testdata/test_cli/testScanFolder.zip"
 path_to_test_folder = "tests/testdata/test_cli/testScanFolder"
@@ -19,6 +21,7 @@ def clean_log_folder():
 
 def setup_log_tests():
     param.init()
+    clean_log_folder()
 
 
 def clean_up_log_tests():
@@ -49,15 +52,14 @@ test_file_analysis: FileAnalysis = FileAnalysis(
     created_time="2023-09-30T11:00:00",
     extra_data="EXTRA EXTRA DATA",
 )
-expectedHeader: str = (
-    "File path analyzed,File name,File type,Last modified,Created time,Extra data,Importance"
-)
+expectedHeader: str = "File path analyzed,File name,File type,Last modified,Created time,Extra data,Importance"
 expectedBody: str = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,EXTRA EXTRA DATA,0.0"
 
 
 class TestLog:
     def test_log_start(self):
         setup_log_tests()
+        log.open_log_file()
         global test_file_analysis
         log.write(test_file_analysis)
         # Read the produced file, check that the lines are written
@@ -68,7 +70,6 @@ class TestLog:
 
     def test_log_append(self):
         setup_log_tests()
-        log.open_log_file()
         global test_file_analysis
         log.write(test_file_analysis)
         # Read the produced file, check that the lines are written

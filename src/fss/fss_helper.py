@@ -1,5 +1,5 @@
-from pathlib import Path
 from datetime import datetime, timedelta
+from pathlib import Path
 
 """
 These are the files for storing helper methods for fss - the sole job of the fss is to only
@@ -8,64 +8,32 @@ while this method library can constantly be tinkered, added and fix without much
 fss.py
 """
 
-def str_path_converter(path):
-    """
-        Converts a string path to a string path and ensures the casting of Path obj.
 
-        Inputs:
-            (str) or (Path) obj
-
-        Outputs:
-            (Path) obj
-    """
+def str_path_converter(path: str | Path) -> Path:
+    # Converts a string path to a string path and ensures the casting of Path obj.
     if not isinstance(path, Path):
         file_path = Path(path)
     else:
         file_path = path
     return file_path
 
-def get_creation_time(path):
-    """
-        Retrieves the creation time of a file.
 
-        Inputs:
-            (Path) obj - the path of the obj.
-
-        Outputs:
-            (datetime) obj representing the creation time of the file.
-    """
+def get_creation_time(path: Path) -> datetime:
+    # Retrieves the creation time of a file.
     file_path = str_path_converter(path)
     stat = file_path.stat()
     creation_time = getattr(stat, "st_birthtime", stat.st_ctime)
     return datetime.fromtimestamp(creation_time)
 
-def get_mod_time(path):
-    """
-        Retrieves the latest modification time of a file.
 
-        Inputs:
-            (Path) obj - the path of the obj.
-
-        Outputs:
-            (datetime) obj representing the latest modification time of the file.
-    """
+def get_mod_time(path: Path) -> datetime:
+    # Retrieves the latest modification time of a file.
     file_path = str_path_converter(path)
     return datetime.fromtimestamp(file_path.stat().st_mtime)
 
-def time_check(time_criteria, path, arg):
-    """
-        Checks whether a time criteria is met or not by the given path to the obj.
 
-        Inputs:
-            (List (datetime, datetime)) a list of 2 datetime obj, indicating the lower / upper bound of time chosen by the user
-            (Path) obj - the path of the obj.
-            (str) arg - the arguments that indicates whether we are checking for the:
-                - "mod" - modification time or
-                - anything else for the creation time.
-
-        Outputs:
-            Returns a True if the time criteria is met (within the range given), and False otherwise.
-    """
+def time_check(time_criteria: list, path: Path, arg: str) -> bool:
+    # Checks whether a time criteria is met or not by the given path to the obj.
     file_path = str_path_converter(path)
 
     lower_time, upper_time = time_criteria
@@ -91,3 +59,8 @@ def time_check(time_criteria, path, arg):
 
     # Both bounds present
     return lower_time <= file_time <= upper_time
+
+
+def file_type_check(file_path: str | Path, supported_types: set) -> bool:
+    file_extension = str(file_path).split(".")[-1].lower()
+    return file_extension in supported_types

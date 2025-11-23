@@ -122,52 +122,111 @@ python src/main.py --cli
 
 ```
 
-or to bypass permission request
-
 ```sh
-python src/main.py --cli -y
+
+python -m src.main <file_path> [options]
 
 ```
 
-#### Using the --zip flag
+- `<file_path>`: Path to start scanning, or a zip file to extract.
+
+---
+
+#### Options
+
+| Option                      | Description                                                                                        | Example                                         |
+| --------------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `--zip <zipfile>`           | Extract the specified zip file and scan its contents.                                              | `--zip myprojects.zip`                          |
+| `--exclude-paths <paths>`   | Space-separated list of absolute paths to exclude from the scan.                                   | `--exclude-paths /path/to/folder /path/to/file` |
+| `--file-types <types>`      | Space-separated list of file types to include (by extension, e.g. `py`, `md`, `pdf`).              | `--file-types py md pdf`                        |
+| `-y`, `--yes`               | Automatically grant file access permission (skip interactive prompt).                              | `-y`                                            |
+| `-r`, `--resume_entries`    | Generate a PDF resume from scanned projects. Optionally specify a directory to save the result.    | `-r` or `-r /path/to/save`                      |
+| `-p`, `--portfolio_entries` | Generate a web portfolio from scanned projects. Optionally specify a directory to save the result. | `-p` or `-p /path/to/save`                      |
+| `-c`, `--clean`             | Start a new log file instead of resuming the last one.                                             | `-c`                                            |
+| `-b`, `--before <date>`     | Only include files created before the specified date (`YYYY-MM-DD`).                               | `-b 2023-01-01`                                 |
+| `-a`, `--after <date>`      | Only include files created after the specified date (`YYYY-MM-DD`).                                | `-a 2022-01-01`                                 |
+| `-q`, `--quiet`             | Suppress output (except for log file location).                                                    | `-q`                                            |
+
+---
+
+#### Examples
+
+##### Scan a Directory
 
 ```sh
-python src/main.py --cli -y --zip {Path to zip file}
+python -m src.main /path/to/projects
 ```
 
-the --zip flag shall always be followed by the file path of the zip or it will return an error
-
-#### Using the -q flag
+##### Scan and Exclude Paths
 
 ```sh
-python src/main.py --cli -y --zip {Path to zip file} -q
+python -m src.main /path/to/projects --exclude-paths .git node_modules
 ```
 
-#### Using the --file-types flag
-
-The file-types flag allows the user to specify what file types they would like to scan.
-it works by taking in a comma separated list of file paths to exclude from analysis, the last element must not have a comma after it.
+##### Scan Only Python and Markdown Files
 
 ```sh
-python src/main.py --cli -y --zip {Path to zip file} -q --file-types .txt, .py, .md, (etc)
+python -m src.main /path/to/projects --file-types py md
 ```
 
-#### Using the --exclude-paths flag
-
-The Exclude paths flag allows the user to exclude certain file paths from being analyzed.
-it works by taking in a comma separated list of file paths to exclude from analysis, the last element must not have a comma after it.
+##### Scan Files Created After a Certain Date
 
 ```sh
-python src/main.py --cli -y --zip {Path to zip file} -q --exclude-paths /folder/path, /folder/path2, /path2, (etc)
+python -m src.main /path/to/projects --after 2022-01-01
 ```
 
-#### Setting the starting directory
+##### Extract a Zip File and Scan
 
 ```sh
-python src/main.py --cli -y -q {Path to zip file}
+python -m src.main --zip myprojects.zip
 ```
 
-The starting file path must be the last parmeter in the file
+##### Generate Resume PDF
+
+```sh
+python -m src.main /path/to/projects -r
+```
+
+Or specify a directory to save the resume:
+
+```sh
+python -m src.main /path/to/projects -r /path/to/save
+```
+
+##### Generate Portfolio Website
+
+```sh
+python -m src.main /path/to/projects -p
+```
+
+Or specify a directory to save the portfolio:
+
+```sh
+python -m src.main /path/to/projects -p /path/to/save
+```
+
+##### Suppress Output
+
+```sh
+python -m src.main /path/to/projects -q
+```
+
+---
+
+#### Notes
+
+- If you do not use `-y`/`--yes`, you will be prompted for file access permission.
+- The log file location will be printed at the end of the scan.
+- Resume and portfolio generation require valid output directories, the default storage location is set by the params. The users downloads folder is the current default.
+
+---
+
+#### Troubleshooting
+
+- No output? Use `-q` only if you want minimal output.
+- Permission denied? Use `-y` to skip the prompt.
+- Date filters not working? Ensure dates are in `YYYY-MM-DD` format.
+- File types not filtering? Use extensions without the dot (e.g., `py`, not `.py`).
 
 ### With GUI
 
