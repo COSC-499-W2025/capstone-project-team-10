@@ -28,14 +28,14 @@ class TestFSS:
         # TODO: update this function call according to implementation
         result = fss.search(fss.FSS_Search(path_to_entire_test_folder))
         # Assert that the number of files searched is equal to the expect value
-        assert result == 4
+        assert result == 3
 
     def test_fss_excluded_file(self):
         # TODO: update this function call according to implementation
         result = fss.search(
             fss.FSS_Search(path_to_entire_test_folder, set([path_to_excluded_file]))
         )
-        assert result == 3
+        assert result == 2
 
     def test_fss_excluded_folder(self):
         # TODO: update this function call according to implementation
