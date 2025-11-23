@@ -15,15 +15,15 @@ class TestFasRtf:
         assert result["num_paragraphs"] == 5
         assert result["num_chars"] == 77
         assert result["num_words"] == 14
-        assert result['filtered_word_count'] == 8
-        assert result['unique_words'] == 8
-        assert result['sentence_count'] == 1
-        assert result['lexical_diversity'] == 1.0
-        assert result['top_keywords'] == [('test', 1), ('labeeskneez', 1), ('wawaweewa', 1), ('lorem', 1), ('ipsum', 1), ('got', 1), ('games', 1), ('phone', 1)]
-        assert result['sentiment'] == 'neutral'
-        assert result['sentiment_score'] == 0.0
-        assert result['named_entities'] == [('Labeeskneez Wawaweewa Lorem', 'PERSON')]
-        assert result['summary'] == 'This is a test\nLabeeskneez\nWawaweewa\nLorem ipsum\nYou got games on your phone?'
+        assert result["filtered_word_count"] == 8
+        assert result["unique_words"] == 8
+        assert result["sentence_count"] == 1
+        assert result["lexical_diversity"] == 1.0
+        assert result["top_keywords"] == [("test", 1), ("labeeskneez", 1), ("wawaweewa", 1), ("lorem", 1), ("ipsum", 1), ("got", 1), ("games", 1), ("phone", 1)]
+        assert result["sentiment"] == "neutral"
+        assert result["sentiment_score"] == 0.0
+        assert result["named_entities"] == [('Labeeskneez Wawaweewa Lorem', 'PERSON')]
+        assert result["summary"] == "This is a test\nLabeeskneez\nWawaweewa\nLorem ipsum\nYou got games on your phone?"
 
     def test_invalid_odt_file(self):
         result = fas.extract_odt_data("tests/testdata/test_fas/fas_docx_test.docx")
