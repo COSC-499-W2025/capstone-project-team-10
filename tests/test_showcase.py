@@ -9,6 +9,17 @@ from unittest.mock import MagicMock, patch
 import src.showcase.showcase as showcase
 from src.fas.fas import FileAnalysis
 
+import src.fas.fas_docx as docx
+import src.fas.fas_rtf as rtf
+import src.fas.fas_odt as odt
+
+docx_file_path = os.path.join("tests", "testdata", "test_showcase","docx_test.docx")
+docx_result = docx.extract_docx_data(docx_file_path)
+rtf_file_path = os.path.join("tests", "testdata", "test_fas","fas_rtf_data.rtf")
+rtf_result = rtf.extract_rtf_data(rtf_file_path)
+odt_file_path = os.path.join("tests", "testdata", "test_fas","fas_odt_data.odt")
+odt_result = odt.extract_odt_data(odt_file_path)
+
 TEST_DIR = Path("test_output")
 keep_files = False
 
@@ -59,7 +70,7 @@ def make_test_file(writer: Any) -> None:
             "skills",
         ],
     )
-    # file_name, file_type, file_path, last_modified, created_time, extra_data
+    # file_path, file_name, file_type, last_modified, created_time, extra_data
     writer.writerow(
         [
             "tests/testdata/test_showcase/bob.png",
@@ -69,6 +80,94 @@ def make_test_file(writer: Any) -> None:
             "2023-01-01T00:00:00",
             "artistic project",
         ],
+    )
+    writer.writerow(
+        [
+            "tests/testdata/test_showcase/docx_test.docx",
+            docx_result["title"],
+            "docx",
+            "2023-01-03T00:00:00", # Currently just a static value as using docx_result["modified"]/["created"] causes the test to fail
+            "2023-01-01T00:00:00",
+            [
+                docx_result["author"],
+                docx_result["keywords"],
+                docx_result["category"],
+                docx_result["comments"],
+                docx_result["num_paragraphs"],
+                docx_result["num_tables"],
+                docx_result["num_chars"],
+                docx_result["num_words"],
+                docx_result["filtered_word_count"],
+                docx_result["unique_words"],
+                docx_result["sentence_count"],
+                docx_result["lexical_diversity"],
+                docx_result["top_keywords"],
+                docx_result["sentiment"],
+                docx_result["sentiment_score"],
+                #docx_result["named_entities"], This is commented out, as it is excessive and causes the output to look poor and has little to no relevance to key skills
+                docx_result["summary"],
+                docx_result["complexity"],
+                docx_result["depth"],
+                docx_result["structure"],
+                docx_result["sentiment_insight"],
+            ],
+        ]
+    ) 
+    writer.writerow(
+        [
+            "tests/testdata/test_fas/fas_rtf_data.rtf",
+            rtf_result["title"],
+            "rtf",
+            "2023-01-03T00:00:00", # Currently just a static value as using rtf_result["modified"]/["created"] causes the test to fail
+            "2023-01-01T00:00:00",
+            [
+                rtf_result["author"],
+                rtf_result["num_paragraphs"],
+                rtf_result["num_chars"],
+                rtf_result["num_words"],
+                rtf_result["filtered_word_count"],
+                rtf_result["unique_words"],
+                rtf_result["sentence_count"],
+                rtf_result["lexical_diversity"],
+                rtf_result["top_keywords"],
+                rtf_result["sentiment"],
+                rtf_result["sentiment_score"],
+                rtf_result["named_entities"],
+                rtf_result["summary"],
+                rtf_result["complexity"],
+                rtf_result["depth"],
+                rtf_result["structure"],
+                rtf_result["sentiment_insight"],
+            ],
+        ]
+    )
+    writer.writerow(
+        [
+            "tests/testdata/test_fas/fas_odt_data.odt",
+            odt_result["title"],
+            "odt",
+            "2023-01-03T00:00:00", # Currently just a static value as using odt_result["modified"]/["created"] causes the test to fail
+            "2023-01-01T00:00:00",
+            [
+                odt_result["author"],
+                odt_result["num_paragraphs"],
+                odt_result["num_chars"],
+                odt_result["num_words"],
+                odt_result["filtered_word_count"],
+                odt_result["unique_words"],
+                odt_result["sentence_count"],
+                odt_result["lexical_diversity"],
+                odt_result["top_keywords"],
+                odt_result["sentiment"],
+                odt_result["sentiment_score"],
+                odt_result["named_entities"],
+                odt_result["summary"],
+                odt_result["complexity"],
+                odt_result["depth"],
+                odt_result["structure"],
+                odt_result["sentiment_insight"],
+            ],
+        ]
     )
 
 
@@ -112,6 +211,7 @@ def test_generate_resume():
             pdf_files = list(export_folder.glob("*.pdf"))
             assert pdf_files, "No PDF file was created!"
     finally:
+        print()
         cleanup_test_dir()
 
 
@@ -149,4 +249,5 @@ def test_generate_portfolio():
             zip_files = list(export_folder.glob("*.zip"))
             assert zip_files, "No zip archive was created in the test folder!"
     finally:
+        print()
         cleanup_test_dir()
