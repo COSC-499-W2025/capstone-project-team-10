@@ -2,8 +2,11 @@ import pytest
 import os
 import src.fss.fss as fss
 from unittest.mock import patch
-
+from pathlib import Path
 import pytest
+from src.param import param
+from src.log import log
+from src.fas.fas import analyze_file
 
 import src.fss.fss as fss
 
@@ -49,12 +52,26 @@ class TestFSS:
         assert result == -1
 
     def test_delta_scan(self):
-        fss.clear_cache()
+        param.init()
+
+        logs_dir = Path(param.result_log_folder_path)
+        if logs_dir.exists():
+            for f in logs_dir.iterdir():
+                if f.is_file:
+                    f.unlink
+        else:
+            logs_dir.mkdir(parents=True, exist_ok=True)
+        
+        print(logs_dir)
+        log.resume_log_file()
 
         result1 = fss.search(path_to_test_file, None)
         assert result1 == 1
 
-        assert os.path.exists(fss.CACHE_PATH)
+        assert any(logs_dir.iterdir())
+        fa = analyze_file(path_to_test_file)
+        assert fa is not None
+        log.write(fa)
 
         result2 = fss.search(path_to_test_file, None)
         assert result2 == 0
@@ -64,4 +81,3 @@ class TestFSS:
 
         result3 = fss.search(path_to_test_file, None)
         assert result3 == 1
-        fss.clear_cache()
