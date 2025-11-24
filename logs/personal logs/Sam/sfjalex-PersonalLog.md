@@ -1,3 +1,16 @@
+# Week 12 (11/17/2025 - 11/23/2025)
+
+![Week Twelve Tasks](Week12/WeekTwelveTasks.png)
+
+# Features
+
+![Week Twelve Feature](Week12/WeekTwelveFeature.png)
+
+# Recap
+
+This week I spent a lot of time refining the analysis of word specific filetypes. Now each of docx, odt, and rft will return looks into the skills of the user who created the document, as well as suggesting possible ways to improve their writing by looking at word variance, length, sentence structure, and depth it now gives actionable feedback to the user on what they can do. As well I have produced showcase tests of these as well via the showcase.py module to display what it would look like should it be returned as a web portfolio or resume item. Next week is going to be focused on the integration of all modules of our project, specifically the integration of project grouping and actually linking that to the log and showcase modules to produce actual results for the end user.
+
+
 # Week 11 (11/10/2025 - 11/16/2025)
 
 There is no week 11 (reading break) peer evaluation, so tasks image cannot be obtained.
