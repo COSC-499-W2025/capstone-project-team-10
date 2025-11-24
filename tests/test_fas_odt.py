@@ -25,6 +25,10 @@ class TestFasRtf:
         assert result["sentiment_score"] == 0.0
         assert result["named_entities"] == [('Labeeskneez Wawaweewa Lorem', 'PERSON')]
         assert result["summary"] == "This is a test\nLabeeskneez\nWawaweewa\nLorem ipsum\nYou got games on your phone?"
+        assert result["complexity"] == 'High - Advanced vocabulary, excellent vocabulary, varied and diverse word choices.'
+        assert result["depth"] == 'Consider adding more detail to fully develop your ideas.' 
+        assert result["structure"] == 'Consider combining related ideas for better flow.'
+        assert result["sentiment_insight"] == 'Overall neutral sentiment within your writing. Professional standard sentiment of writing, if you are aiming for a more positive or negative sentiment consider changing your word choices.'
 
     def test_invalid_odt_file(self):
         result = fas.extract_odt_data("tests/testdata/test_fas/fas_docx_test.docx")

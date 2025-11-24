@@ -29,6 +29,10 @@ class TestFasDocx:
         assert result["sentiment_score"] == 0.0
         assert result["named_entities"] == []
         assert result["summary"] == "This is a title\nA\nB\nC\nD\n6"
+        assert result["complexity"] == 'High - Advanced vocabulary, excellent vocabulary, varied and diverse word choices.'
+        assert result["depth"] == 'Consider adding more detail to fully develop your ideas.'
+        assert result["structure"] == 'Consider combining related ideas for better flow.'
+        assert result["sentiment_insight"] == 'Overall neutral sentiment within your writing. Professional standard sentiment of writing, if you are aiming for a more positive or negative sentiment consider changing your word choices.'
 
     def test_invalid_docx_file(self):
         result = fas.extract_docx_data("tests/testdata/test_fas/fas_rtf_data.rtf")
