@@ -1,12 +1,13 @@
 import datetime
 import pytest
+import os
 import src.fas.fas_odt as fas
 
-rtf_file_path = "tests/testdata/test_fas/fas_odt_data.odt"
+odt_file_path = os.path.join("tests", "testdata", "test_fas","fas_odt_data.odt")
 
 class TestFasRtf:
     def test_odt_content(self):
-        result = fas.extract_odt_data(rtf_file_path)
+        result = fas.extract_odt_data(odt_file_path)
         assert result["author"] == "testAuthor"
         assert result["title"] == "odtTitle"
         assert result["subject"] == "odt"

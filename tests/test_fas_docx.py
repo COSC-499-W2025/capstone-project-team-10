@@ -1,8 +1,9 @@
 import pytest
 import datetime
+import os
 import src.fas.fas_docx as fas
 
-docx_file_path = "tests/testdata/test_fas/fas_docx_test.docx"
+docx_file_path = os.path.join("tests", "testdata", "test_fas","fas_docx_test.docx")
 
 class TestFasDocx:
     def test_docx_content(self):

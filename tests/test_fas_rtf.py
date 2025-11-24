@@ -1,8 +1,9 @@
 import datetime
 import pytest
+import os
 import src.fas.fas_rtf as fas
 
-rtf_file_path = "tests/testdata/test_fas/fas_rtf_data.rtf"
+rtf_file_path = os.path.join("tests", "testdata", "test_fas","fas_rtf_data.rtf")
 
 class TestFasRtf:
     def test_extract_datetime(self):
