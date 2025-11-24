@@ -2,6 +2,7 @@ import os
 import datetime
 import mimetypes
 from typing import Optional, Any
+import json
 
 
 class FileAnalysis:
@@ -22,7 +23,29 @@ class FileAnalysis:
         self.created_time: str = created_time
         self.extra_data: Optional[Any] = extra_data
         self.importance = importance
+    def to_json(self) -> dict:
+        return {
+            "file_path": self.file_path,
+            "file_name": self.file_name,
+            "file_type": self.file_type,
+            "last_modified": self.last_modified,
+            "created_time": self.created_time,
+            "extra_data": _make_json_safe(self.extra_data),
+            "importance": self.importance,
+        }
+    
 
+def _make_json_safe(value):
+    if isinstance(value, dict):
+        return {k: _make_json_safe(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_make_json_safe(v) for v in value]
+    if isinstance(value, (int, float, str, bool)) or value is None:
+        return value
+    if isinstance(value, datetime.datetime):
+        return value.isoformat()
+    # fallback: convert to string
+    return str(value)
 
 def get_file_type(file_path: str) -> str:
     # First, try to get the file extension
@@ -92,7 +115,7 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                 return fas_image_format.analyze_image(file_path)
             
             case "md" | "markdown":
-                from src.fas.fas_md import Markdown  # import your Markdown wrapper
+                from src.fas.fas_md import Markdown  # import Markdown wrapper
                 md = Markdown(file_path)
                 return {
                     "headers": md.get_headers(),
@@ -173,25 +196,12 @@ def analyze_file(file_path: str) -> Optional[FileAnalysis]:
         created_time=created_time,
         extra_data=extra_data,
         importance=importance,
-    )
+    ).to_json()
 
 def analyze_path(file_path: str) -> Optional[FileAnalysis]:
     if not os.path.exists(file_path):
         print(f"Error: Path '{file_path}' does not exist.")
         return None
-
-    if os.path.isdir(file_path) and file_path.endswith(".git"):
-        # Placeholder for git analysis
-        print("Analyzing .git folder (placeholder).")
-        return FileAnalysis(
-            file_path=file_path,
-            file_name=".git",
-            file_type="git",
-            last_modified="N/A",
-            created_time="N/A",
-            extra_data=None,
-        )
-
     # Otherwise treat as a regular file
     return analyze_file(file_path)
 
@@ -207,7 +217,8 @@ if __name__ == "__main__":
     test_path = input("Enter a file path to analyze: ").strip()
     result = run_fas(test_path)
     if result:
-        print(result.__dict__)
+        # print(result.__dict__)
+        print(json.dumps(result, indent=2))
     else:
         print("Analysis failed or file not found.")
 
