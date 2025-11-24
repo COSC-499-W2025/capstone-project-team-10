@@ -1,8 +1,9 @@
-import os
 import datetime
 import mimetypes
-from typing import Optional, Any
+import os
+from typing import Any, Optional
 import json
+from src.fss.repo_reader import Repository
 
 
 class FileAnalysis:
@@ -49,7 +50,9 @@ def _make_json_safe(value):
 
 def get_file_type(file_path: str) -> str:
     # First, try to get the file extension
-    ext = os.path.splitext(file_path)[1].lower().lstrip(".")
+    # file_path should be a string
+    file_name = file_path.split(os.path.sep)[-1]
+    ext = file_name.split(".")[-1].lower()
     if ext:
         return ext
 
@@ -75,45 +78,68 @@ def get_created_time(file_path: str) -> str:
 
 
 def get_file_name(file_path: str) -> str:
+    if os.path.isdir(file_path):
+        # return the parent directory name
+        parent_dir = os.path.dirname(file_path)
+        # Get the name of the parent directory
+        return os.path.basename(parent_dir)
     return os.path.basename(file_path)
 
 
 def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
     # This is all placeholder and will be replaced when we have proper handlers
     try:
-        print(f"Getting extra data for file type: {file_type}")
+        print(f"Scanning: {file_path}")
         match file_type:
             # The reason why the case of "pdf" is quite big is becuase fas_PDF returns an object therefore we need to map its attributes to a dictionary
             # so that it is consistent with other file types that return dictionaries.
             case "pdf":
-                from src.fas import fas_pdf  
+                from src.fas import fas_pdf
+
                 print("Extracting PDF data...")
                 return fas_pdf.extract_pdf_data(file_path)
 
             case "docx":
                 from src.fas import fas_docx
+
                 return fas_docx.extract_docx_data(file_path)
-            
+
             case "odt":
                 from src.fas import fas_odt
+
                 return fas_odt.extract_odt_data(file_path)
-            
+
             case "rtf":
                 from src.fas import fas_rtf
+
                 return fas_rtf.extract_rtf_data(file_path)
-            
+
             case "xlsx" | "xls":
                 from src.fas import fas_excel
+
                 return fas_excel.extract_excel_data(file_path)
 
             case "psd" | "photoshop":
                 from src.fas import fas_photoshop
+
                 return fas_photoshop.extract_photoshop_data(file_path)
-            
-            case "jpeg" | "jpg" | "png" | "gif" | "webp" | "tiff" | "bmp" | "heif" | "heic" | "avif":
+
+            case (
+                "jpeg"
+                | "jpg"
+                | "png"
+                | "gif"
+                | "webp"
+                | "tiff"
+                | "bmp"
+                | "heif"
+                | "heic"
+                | "avif"
+            ):
                 from src.fas import fas_image_format
+
                 return fas_image_format.analyze_image(file_path)
-            
+
             case "md" | "markdown":
                 from src.fas.fas_md import Markdown  # import Markdown wrapper
                 md = Markdown(file_path)
@@ -128,10 +154,11 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             case "git":
                 # from src.fas import fas_git
                 # return fas_git.extract_git_data(file_path)
-                #This will enter the grouping and within grouping will go through all files within the git repo and assign them a repo id
+                # This will enter the grouping and within grouping will go through all files within the git repo and assign them a repo id
                 import fas_git_grouping
+
                 git_group = fas_git_grouping.GitGrouping()
-                #Currently it only returns the repo_id and files present within the git folder
+                # Currently it only returns the repo_id and files present within the git folder
                 return git_group.add_repository(file_path)
 
             case _:
@@ -142,7 +169,8 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
         # Handler not implemented yet
         print(f"Error. No handler module found for file type: {file_type}")
         return None
-    
+
+
 def compute_importance(file_type: str, extra_data: Optional[Any]) -> float:
     """
     Returns an importance score for the file.
@@ -157,7 +185,10 @@ def compute_importance(file_type: str, extra_data: Optional[Any]) -> float:
         "xlsx": 6,
         "xls": 6,
         "md": 7,  # markdown is often documentation, high importance
-        "jpg": 2, "jpeg": 2, "png": 2, "gif": 2,
+        "jpg": 2,
+        "jpeg": 2,
+        "png": 2,
+        "gif": 2,
         "psd": 3,
     }
 
@@ -179,7 +210,6 @@ def compute_importance(file_type: str, extra_data: Optional[Any]) -> float:
     return round(float(importance), 2)
 
 
-
 def analyze_file(file_path: str) -> Optional[FileAnalysis]:
     file_name = get_file_name(file_path)
     file_type = get_file_type(file_path)
@@ -198,19 +228,25 @@ def analyze_file(file_path: str) -> Optional[FileAnalysis]:
         importance=importance,
     ).to_json()
 
+
 def analyze_path(file_path: str) -> Optional[FileAnalysis]:
     if not os.path.exists(file_path):
         print(f"Error: Path '{file_path}' does not exist.")
         return None
+
+    if os.path.isdir(file_path) and file_path.endswith(".git"):
+        # Placeholder for git analysis
+        return analyze_file(file_path)
+
     # Otherwise treat as a regular file
     return analyze_file(file_path)
 
 
-def run_fas(file_path: Optional[str] = None) -> Optional[FileAnalysis]:
+def run_fas(file_path: str) -> Optional[FileAnalysis]:
     return analyze_path(file_path)
 
 
-# This is just to run code directly for testing purposes 
+# This is just to run code directly for testing purposes
 # To run fas from command line
 # python -m src.fas.fas
 if __name__ == "__main__":

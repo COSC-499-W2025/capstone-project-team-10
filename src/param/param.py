@@ -48,12 +48,22 @@ def set_program_constants() -> None:
     optional_parameters_path = os.path.join(program_file_path, "params.json")
 
 
+def recursive_update(defaults, overrides):
+    for k, v in overrides.items():
+        if k in defaults and isinstance(defaults[k], dict) and isinstance(v, dict):
+            defaults[k] = recursive_update(defaults[k], v)
+        else:
+            defaults[k] = v
+    return defaults
+
+
 def load_additional_params() -> None:
     global optional_parameters_path
     global params
     try:
-        with open(optional_parameters_path, "r") as param_file:
-            params = json.load(param_file)
+        with open(optional_parameters_path, "r", encoding="utf-8") as param_file:
+            load_defaults()
+            recursive_update(params, json.load(param_file).copy())
     except FileNotFoundError:
         print("No additional parameters file found. Using default parameters.")
         load_defaults()
@@ -69,7 +79,7 @@ def save_additional_params() -> None:
     global optional_parameters_path
     global params
     try:
-        with open(optional_parameters_path, "w") as param_file:
+        with open(optional_parameters_path, "w", encoding="utf-8") as param_file:
             json.dump(params, param_file, indent=4)
     except OSError as e:
         print(f"Failed to Save Parameters: {e}")
@@ -78,7 +88,6 @@ def save_additional_params() -> None:
 def get(key: str):
     global params
     path = key.split(".")
-
     current_level = params
     for part in path[:-1]:
         if part not in current_level or not isinstance(current_level[part], dict):
@@ -125,7 +134,7 @@ def clear() -> None:
 def load_defaults() -> None:
     global params, file, project_name, project_version
     params.clear()
-    with open("src/param/param_defaults.json", "r") as default_params:
+    with open("src/param/param_defaults.json", "r", encoding="utf-8") as default_params:
         params.update(json.load(default_params))
     project_name = get("config.project_name")
     project_version = get("config.config_info")

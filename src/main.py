@@ -1,14 +1,15 @@
 import sys
-from gui.gui_app import run_gui
-from cli.cli_app import run_cli
-import param.param as param
+
+import src.param.param as param
+from src.cli.cli_app import run_cli
+from src.gui.gui_app import run_gui
 
 
 def main():
     # Intiialize Params
     param.init()
     if len(sys.argv) > 1 and sys.argv.__contains__("--cli"):
-        run_cli(sys.argv)
+        run_cli()
     else:
         run_gui()
     # After execution save any changed params
