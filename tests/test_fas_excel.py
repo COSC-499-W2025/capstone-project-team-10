@@ -1,6 +1,7 @@
 import os
 import openpyxl
 import pytest
+from openpyxl.chart import BarChart, Reference
 from src.fas.fas_excel import extract_excel_data
 
 # Test directories and files
@@ -23,6 +24,13 @@ def create_excel_test_file():
     ws2 = wb.create_sheet("Data")
     ws2["A1"] = 123
     ws2["A2"] = 456
+
+    chart = BarChart()
+    chart.title = "Sample Chart"
+
+    data = Reference(ws2, min_col=1, min_row=1, max_row=2)
+    chart.add_data(data, titles_from_data=False)
+    ws2.add_chart(chart, "C5")
 
     ws3 = wb.create_sheet("HelloWorld")
     ws3["A1"] = "Hello"
@@ -97,6 +105,21 @@ class TestFasExcel:
         assert hello["max_row"] >= 1
         assert hello["max_column"] >= 2
 
+    def test_chart_detection(self):
+        metadata = extract_excel_data(TEST_FILE_PATH)
+
+        stats = metadata["sheet_stats"]
+
+        assert "charts" in stats["Summary"]
+        assert "charts" in stats["Data"]
+        assert "charts" in stats["HelloWorld"]
+
+        assert stats["Summary"]["charts"] == 0
+        assert stats["HelloWorld"]["charts"] == 0
+
+        # Data has one chart added in create_excel_test_file()
+        assert stats["Data"]["charts"] == 1
+
     def test_key_skills(self):
         file_path = create_excel_test_file()
         metadata = extract_excel_data(file_path)
@@ -105,7 +128,7 @@ class TestFasExcel:
         # For this test file, we expect at least Analytical Skills and Excel Proficiency
         assert "Analytical Skills" in skills
         assert "Excel Proficiency" in skills
-        # Data Visualization may not appear because no charts exist
+        assert "Data Visualization" in skills
         # Financial Modeling may not appear because no financial formulas exist
 
     def test_invalid_excel_file(self):
