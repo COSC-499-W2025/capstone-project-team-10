@@ -15,4 +15,5 @@ numpy
 psd-tools
 PyDriller
 fpdf2
+tabulate
 pandas
