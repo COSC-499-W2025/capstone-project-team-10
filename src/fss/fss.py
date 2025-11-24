@@ -1,7 +1,9 @@
+import csv
 import os
 import re
-from pathlib import Path
-import csv
+from typing import Dict
+from src.fas.fas import get_last_modified_time
+import src.param.param as param
 from src.fss.fss_helper import *
 from typing import Dict, Tuple
 from src.param import param
@@ -11,8 +13,6 @@ from src.fas.fas import get_last_modified_time
 # It should be the fss intaker responsibility to control if these values are valid (lower << upper, only 2 values in a list, etc.)
 create_time_crit = [None, None]
 mod_time_crit = [None, None]
-
-# Cache Helpers
 
 def load_cache() -> Dict[str, str]:
     # Loads and reads the cache file
@@ -30,17 +30,15 @@ def load_cache() -> Dict[str, str]:
             continue
         if not pattern.match(log_file.name):
             continue
-
-    with log_file.open("r", newline="", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            file_path = row.get("File path analyzed")
-            last_modified = row.get("Last modified")
-            if file_path and last_modified:
-                cache[file_path] = last_modified
+        
+        with log_file.open("r", newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                file_path = row.get("File path analyzed")
+                last_modified = row.get("Last modified")
+                if file_path and last_modified:
+                    cache[file_path] = last_modified
     return cache
-
-# Main search
 
 def search(input_path, excluded_path, clean: bool = False):
 
@@ -55,7 +53,7 @@ def search(input_path, excluded_path, clean: bool = False):
         # invalid returns -1
         return -1
 
-    input_path = os.path.abspath(input_path)
+    abs_input_path = os.path.abspath(input_path)
 
     if exclude_flag:
         # ensures that the excluded paths input is a set
@@ -93,8 +91,8 @@ def search(input_path, excluded_path, clean: bool = False):
 
         return last_modified_logged != current_last_modified
 
-    if os.path.isfile(input_path):
-        if not excluded_path or input_path not in excluded_path:
+    if os.path.isfile(abs_input_path):
+        if not excluded_path or abs_input_path not in excluded_path:
             #single file with no exclusion
             if should_process(input_path):
                 #This is where specifics of files can be extracted.
@@ -104,7 +102,7 @@ def search(input_path, excluded_path, clean: bool = False):
         else:
             return 0
 
-    for root, dirs, files in os.walk(input_path, topdown=True):
+    for root, dirs, files in os.walk(abs_input_path, topdown=True):
         for file in files:
             if file.startswith(".") and file != ".gitignore":
                 continue  # Skip hidden files

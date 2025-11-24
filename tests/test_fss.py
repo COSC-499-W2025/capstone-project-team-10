@@ -1,13 +1,10 @@
-import pytest
 import os
-import src.fss.fss as fss
-from unittest.mock import patch
 from pathlib import Path
-import pytest
-from src.param import param
-from src.log import log
+from unittest.mock import patch
 from src.fas.fas import analyze_file
-
+import src.log.log as log
+import pytest
+import src.param.param as param
 import src.fss.fss as fss
 
 path_to_test_folder = str(Path("tests/testdata/test_fss/testScanFolder"))
@@ -21,7 +18,13 @@ path_to_excluded_folder = str(
 )
 path_to_invalid_folder = str(Path("/DUMMMMMMMMMY/DUMMY/DUMB/DUMMY"))
 
+def clean_log_folder():
+    import shutil
 
+    log_folder = str(param.result_log_folder_path)
+    if os.path.exists(log_folder):
+        shutil.rmtree(log_folder)
+    os.makedirs(log_folder)
 class TestFSS:
     def test_fss_single_file(self):
         # TODO: update this function call according to implementation
@@ -81,3 +84,4 @@ class TestFSS:
 
         result3 = fss.search(path_to_test_file, None)
         assert result3 == 1
+        clean_log_folder()
