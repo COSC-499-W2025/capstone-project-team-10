@@ -1,3 +1,29 @@
+# Week 12 (11/16/2025 - 11/23/2025)
+
+![Week 12 - Task Completed](W12/Done.png)
+
+
+## Features
+
+![Week 12 - In Progress](W12/Features.png)
+
+## Recap
+
+- For week 12, I work on the master ticket with our teamate for FAS key skills
+  - Specifically, I made FAS return a JSON instead of just string.
+  - I also made fas excel give fas the skills of the user
+  - I have also fixed the bug of log.py I encountered on Week 11
+- For next week, I think we will connect our project together and make a demo.
+
+## Additional Context
+## Team Survey:
+
+
+![Week 12 - Team Survey](W12/Team_Survey.png)
+![Week 12 - Team Survey](W12/Team_Survey_(1).png)
+![Week 12 - Team Survey](W12/Team_Survey_(2).png)
+![Week 12 - Team Survey](W12/Team_Survey_(3).png)
+
 # Week 11 (11/09/2025 - 11/16/2025)
 
 ![Week 11 - Task Completed](W11/Done.png)
