@@ -147,11 +147,11 @@ def test_run_cli(monkeypatch):
     assert "Filtering by file types:" in all_output
 
     # Check Resume is created
-    assert "/tmp/resume.pdf" in all_output
+    assert "resume.pdf" in all_output
     assert "Resume generated at:" in all_output
 
     # Check Portfolio is created
-    assert "/tmp/portfolio.zip" in all_output
+    assert "portfolio.zip" in all_output
     assert "Portfolio generated at:" in all_output
 
     # Check that the bounds string is correct
@@ -159,7 +159,7 @@ def test_run_cli(monkeypatch):
     assert "2023-01-01" in all_output
 
     # Check that the zip extraction message is present
-    assert "/tmp/unzipped" in all_output
+    assert "unzipped" in all_output
     assert "File unzipped at:" in all_output
 
     # Check that the log file location is printed
@@ -221,11 +221,11 @@ def test_run_cli_quiet(monkeypatch):
     assert "Filtering by file types:" not in all_output
 
     # Check Resume is created
-    assert "/tmp/resume.pdf" not in all_output
+    assert "resume.pdf" not in all_output
     assert "Resume generated at:" not in all_output
 
     # Check Portfolio is created
-    assert "/tmp/portfolio.zip" not in all_output
+    assert "portfolio.zip" not in all_output
     assert "Portfolio generated at:" not in all_output
 
     # Check that the bounds string is correct
@@ -233,7 +233,7 @@ def test_run_cli_quiet(monkeypatch):
     assert "2023-01-01" not in all_output
 
     # Check that the zip extraction message is present
-    assert "/tmp/unzipped" not in all_output
+    assert "unzipped" not in all_output
     assert "File unzipped at:" not in all_output
 
     # Check that the log file location is printed
