@@ -5,6 +5,7 @@ import src.fas.fas_pdf as pdfr
 TESTPATH1 = os.path.join("tests", "testdata", "test_fas_pdf","samplePDF1.pdf")
 TESTPATH2 = os.path.join("tests", "testdata", "test_fas_pdf","samplePDF2.pdf")
 TESTPATH3 = os.path.join("tests", "testdata", "test_fas_pdf","sampleText1.txt")
+TESTPATH4 = os.path.join("tests", "testdata", "test_fas_pdf","samplePDF4.pdf")
 
 class TestPDF:
 
@@ -15,6 +16,10 @@ class TestPDF:
     @pytest.fixture
     def sample_pdf2(self):
         return pdfr.extract_pdf_data(TESTPATH2)
+    
+    @pytest.fixture
+    def sample_pdf4(self):
+        return pdfr.extract_pdf_data(TESTPATH4)
     
     def test_file_not_found(self):
         with pytest.raises(FileNotFoundError):
@@ -99,3 +104,8 @@ class TestPDF:
 
     def test_word_count(self, sample_pdf):
         assert sample_pdf["counts"]["words"] > 0
+
+    def test_ligatures(self, sample_pdf4):
+        assert "fi" in sample_pdf4["text"] # Check if fi is correctly found
+        assert "firearm" in sample_pdf4["text"] # Check if fi is correctly displayed in word
+        assert "question" in sample_pdf4["text"] # Check if ti is correctly displayed in word
