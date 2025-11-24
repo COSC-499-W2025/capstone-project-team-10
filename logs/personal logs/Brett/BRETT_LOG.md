@@ -1,3 +1,15 @@
+# Week 12 (11/17/2025 = 11/23/2025)
+
+![Week 12 Tasks](Week12/Week12Tasks.png)
+
+## Features
+
+![Week 12 KanBan](Week12/Week12KanBan1.png)
+![Week 12 KanBan](Week12/Week12KanBan2.png)
+
+## Recap
+We continued coding work and focused on linking modules together to create our working demo. I worked on bugfixing the pdf module which contained bugs for ligature/font issues with pdf formatting and encoding. I also worked on refactoring the programming_reader.py to improve the analysis and use packages instead of hardcoded regex for library imports. I also tested both modules and reviewed and helped teamates with code. We will continue with feature testing and ensuring everything is working properly with out demo and output docuements. Next week I will try and improve the efficiency of the nltk usage and pickup any new issues that might come from this weeks refactoring.
+
 # Week 10 (11/3/2025 - 11/9/2025)
 
 ![Week 10 Tasks](Week10/Week10Tasks.png)
