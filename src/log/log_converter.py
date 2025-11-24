@@ -1,12 +1,15 @@
 import os
+
 import pandas as pd
 from tabulate import tabulate
 from fpdf import FPDF
 
+
 class LogConverter:
     """
-        Storing both the paths and file contents
+    Storing both the paths and file contents
     """
+
     def __init__(self, path):
         self.__log_path = path
         self.csv = pd.read_csv(self.__log_path)
@@ -15,7 +18,7 @@ class LogConverter:
 
     def convert_to_JSON(self, output_path = None):
         """
-            Convert (and appends) the converted log file in standard .JSON format
+        Convert (and appends) the converted log file in standard .JSON format
         """
         json_str = self.csv.to_json(orient = 'records', indent = 2)
 

@@ -43,6 +43,18 @@ class TestFas:
         result = fas.run_fas("tests/testdata/test_fas/nonexistent_file_123.docx")
         assert result is None
 
+    def test_git_folder_placeholder(self, tmp_path):
+        # A .git folder returns a placeholder FileAnalysis object
+        git_dir = tmp_path / ".git"
+        git_dir.mkdir()
+        result = fas.run_fas(str(git_dir))
+        assert result is not None
+        print(result.file_type)
+        print(result.file_name)
+        assert result.file_type == "git"
+        assert result.file_name == "test_git_folder_placeholder0"
+        assert result.extra_data is None
+
     def test_importance_exists(self):
         result = fas.run_fas(TEST_FILE)
         assert hasattr(result, "importance")
