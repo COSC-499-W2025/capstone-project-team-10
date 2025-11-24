@@ -1,9 +1,10 @@
-from pathlib import Path
 import csv
 import re
+from pathlib import Path
 
 import src.param.param as param
 from src.fas.fas import FileAnalysis
+
 # TODO: if multithreading is needed add locks around file write operations
 
 # Newest Log is always max count after maximum logs are being stored
@@ -40,6 +41,7 @@ def resume_log_file() -> None:
             current_log_file = str(
                 Path(param.result_log_folder_path) / f"{newest_log_number}.log"
             )
+            param.set("logging.current_log_file", current_log_file)
         else:
             open_log_file()
     else:
@@ -101,7 +103,7 @@ def open_log_file() -> None:
     )
 
     # create the log file, overwriting if it exists
-    with open(current_log_file, "w", newline="") as log_file:
+    with open(current_log_file, "w", encoding="utf-8", newline="") as log_file:
         writer = csv.writer(log_file)
         writer.writerows(
             [
@@ -116,14 +118,14 @@ def open_log_file() -> None:
                 ]
             ]
         )
+        param.set("logging.current_log_file", current_log_file)
 
 
 def write(fileAnalysis: FileAnalysis) -> None:
     global current_log_file
     if current_log_file == "" or not Path(current_log_file).exists():
         resume_log_file()
-    with open(current_log_file, "a", newline="") as log_file:
-        print("Logging to filepath" + current_log_file)
+    with open(current_log_file, "a", encoding="utf-8", newline="") as log_file:
         writer = csv.writer(log_file)
         writer.writerow(
             [
