@@ -22,17 +22,18 @@ class FileAnalysis:
         self.file_type: str = file_type
         self.last_modified: str = last_modified
         self.created_time: str = created_time
-        self.extra_data: Optional[Any] = extra_data
+        # self.extra_data: Optional[Any] = extra_data
+        self.extra_data = _make_json_safe(extra_data)
         self.importance = importance
     def to_json(self) -> dict:
         return {
-            "file_path": self.file_path,
-            "file_name": self.file_name,
-            "file_type": self.file_type,
-            "last_modified": self.last_modified,
-            "created_time": self.created_time,
+            # "file_path": self.file_path,
+            # "file_name": self.file_name,
+            # "file_type": self.file_type,
+            # "last_modified": self.last_modified,
+            # "created_time": self.created_time,
             "extra_data": _make_json_safe(self.extra_data),
-            "importance": self.importance,
+            # "importance": self.importance,
         }
     
 
@@ -226,7 +227,7 @@ def analyze_file(file_path: str) -> Optional[FileAnalysis]:
         created_time=created_time,
         extra_data=extra_data,
         importance=importance,
-    ).to_json()
+    )
 
 
 def analyze_path(file_path: str) -> Optional[FileAnalysis]:
@@ -245,6 +246,35 @@ def analyze_path(file_path: str) -> Optional[FileAnalysis]:
 def run_fas(file_path: str) -> Optional[FileAnalysis]:
     return analyze_path(file_path)
 
+def analyze_file_json(file_path: str) -> Optional[FileAnalysis]:
+    file_name = get_file_name(file_path)
+    file_type = get_file_type(file_path)
+    last_modified = get_last_modified_time(file_path)
+    created_time = get_created_time(file_path)
+    extra_data = get_file_extra_data(file_path, file_type)
+    importance = compute_importance(file_type, extra_data)
+
+    return FileAnalysis(
+        file_path=file_path,
+        file_name=file_name,
+        file_type=file_type,
+        last_modified=last_modified,
+        created_time=created_time,
+        extra_data=extra_data,
+        importance=importance,
+    ).to_json()
+
+def analyze_path_json(file_path: str) -> Optional[FileAnalysis]:
+    if not os.path.exists(file_path):
+        print(f"Error: Path '{file_path}' does not exist.")
+        return None
+    # Otherwise treat as a regular file
+    return analyze_file_json(file_path)
+
+
+def run_fas_json(file_path: Optional[str] = None) -> Optional[FileAnalysis]:
+    return analyze_path_json(file_path)
+
 
 # This is just to run code directly for testing purposes
 # To run fas from command line
@@ -252,9 +282,11 @@ def run_fas(file_path: str) -> Optional[FileAnalysis]:
 if __name__ == "__main__":
     test_path = input("Enter a file path to analyze: ").strip()
     result = run_fas(test_path)
+    resultJSON = run_fas_json(test_path)
     if result:
-        # print(result.__dict__)
-        print(json.dumps(result, indent=2))
+        # print(result.__dict__)   
+        print(result)
+        print(json.dumps(result.__dict__, indent=2))
     else:
         print("Analysis failed or file not found.")
 
@@ -266,5 +298,5 @@ if __name__ == "__main__":
 # RTF: tests\testdata\test_fas\fas_rtf_data.rtf
 # Excel: tests\testdata\test_fas\fas_excel_test.xlsx
 # Photoshop: tests\testdata\test_fas\fas_photoshop_test.psd
-# Image: tests\testdata\test_fas\fas_image_test.jpg
+# Image: tests\testdata\test_fas\fas_image_test.png
 # Markdown: tests\testdata\test_md\test_markdown.md
