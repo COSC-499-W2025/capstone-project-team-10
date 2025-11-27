@@ -109,11 +109,14 @@ class LogSorter:
         return {"Parameters": self.params, "Orders": self.ascending}
 
 r"""
-sorter = LogSorter(r"C:\Users\pqbao\AppData\Roaming\Capstone Project Team 10\logs\0.log")
-print(sorter.get_available_columns())
-sorter.set_sort_parameters(['Created time'], [True])
-print(sorter.get_preview())
-sorter.sort()
-print(sorter.get_sort_params())
+sorter = LogSorter(r"C:\Users\pqbao\GitHub\capstone-project-team-10\tests\testdata\test_log_sorter\test_log.log")   # Loads the data - just go over to src.tests.testdata.test_log_sorter, and grab the absolute path, append it here
+print(sorter.get_available_columns())   # Prints the columns that the .csv holds
+sorter.set_sort_parameters(['Created time'], [True])    # Sort by, 'Created time' first, and by Ascending (for 'Created time')
+print(sorter.get_preview()) # Get the preview, to see the new columns (it might obfuscate since df is abbreviated
+sorter.sort()   # Initialize the sort
+print(sorter.get_sort_params()) # Prints out the params
+sorter.return_csv() # Returns the .csv beside the test file%
+# Try it out for yourself - the example output test_log_sorted.log is right beside the file.
 """
+
 
