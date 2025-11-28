@@ -103,17 +103,20 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             case "docx":
                 from src.fas import fas_docx
 
-                return fas_docx.extract_docx_data(file_path)
+                # return fas_docx.extract_docx_data(file_path)
+                metadata = fas_docx.extract_docx_data(file_path)
 
             case "odt":
                 from src.fas import fas_odt
 
-                return fas_odt.extract_odt_data(file_path)
+                # return fas_odt.extract_odt_data(file_path)
+                metadata = fas_docx.extract_docx_data(file_path)
 
             case "rtf":
                 from src.fas import fas_rtf
 
-                return fas_rtf.extract_rtf_data(file_path)
+                # return fas_rtf.extract_rtf_data(file_path)
+                metadata = fas_docx.extract_docx_data(file_path)
 
             case "xlsx" | "xls":
                 from src.fas import fas_excel
@@ -165,11 +168,73 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             case _:
                 # Generic or unsupported type
                 return None
+        if file_type in ("docx", "odt", "rtf") and isinstance(metadata, dict):
+
+            skills = []
+
+            for key in ["complexity", "depth", "structure", "sentiment_insight"]:
+                if key in metadata:
+                    skill = feedback_to_skill(metadata[key])
+                    if skill:
+                        skills.append(skill)
+
+            metadata["key_skills"] = skills
+        return metadata
+
 
     except ModuleNotFoundError:
         # Handler not implemented yet
         print(f"Error. No handler module found for file type: {file_type}")
         return None
+    
+def feedback_to_skill(feedback: str) -> str | None:
+    if not feedback:
+        return None
+
+    f = feedback.lower()
+
+    # ---------- Complexity ----------
+    if "high - advanced vocabulary" in f:
+        return "Advanced Vocabulary"
+    if "medium - standard vocabulary" in f:
+        return "Strong Vocabulary"
+    if "low - simple vocabulary" in f:
+        return "Basic Vocabulary"
+
+    # ---------- Length & Depth ----------
+    if "extensive detail and depth used to explore your ideas" in f:
+        return "In-Depth Writing"
+    if "extensive depth and sufficient detail" in f:
+        return "Thorough Writing"
+    if "extensive length but consider adding more depth" in f:
+        return "High Output Writing"
+    if "average length and excellent depth and detail" in f:
+        return "Balanced Writing"
+    if "average length and sufficient detail" in f:
+        return "Clear Writing"
+    if "average length but consider adding more depth" in f:
+        return "Developing Writing"
+    if "consider adding more detail to fully develop your ideas" in f:
+        return "Concise Writing"
+
+    # ---------- Sentence Structure ----------
+    if "breaking up complex sentences" in f:
+        return "Complex Sentence Structure"
+    if "combining related ideas for better flow" in f:
+        return "Sentence Flow"
+    if "well formed and approprite sentences" in f:
+        return "Strong Writing Structure"
+
+    # ---------- Sentiment ----------
+    if "overall negative sentiment" in f:
+        return "Emotive Writing"
+    if "overall positive sentiment" in f:
+        return "Positive Tone"
+    if "overall neutral sentiment" in f:
+        return "Professional Tone"
+
+    return None
+
 
 
 def compute_importance(file_type: str, extra_data: Optional[Any]) -> float:
