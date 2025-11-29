@@ -11,6 +11,16 @@ import { Connection } from 'typeorm';
 
 declare function print(...args: any[]): void;
 
+function helper(): void {
+    print("I'm a helper");
+}
+
+class Animal {
+    speak(): void {
+        print("Animal sound");
+    }
+}
+
 for (let i: number = 0; i < 10; i++) {
     for (let j: number = 0; j < 10; j++) {
         print(i, j);

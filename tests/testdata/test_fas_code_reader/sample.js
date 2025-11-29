@@ -12,3 +12,13 @@ for(let i = 0; i < 10; i++){
         print(i , j);
     }
 }
+
+function helper() {
+    console.log("I'm a helper");
+}
+
+class Animal {
+    speak() {
+        console.log("Animal sound");
+    }
+}

@@ -3,6 +3,10 @@
 #include <string.h> 
 #include <math.h>  
 
+void helper() {
+    printf("I'm a helper\n");
+}
+
 int main() {
     printf("Hello from C!\n");
 

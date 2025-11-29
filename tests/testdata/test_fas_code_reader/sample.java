@@ -19,3 +19,7 @@ public class HelloWorld {
 
     }
 }
+
+public void helper() {
+    System.out.println("I'm a helper");
+}

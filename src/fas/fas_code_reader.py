@@ -49,57 +49,73 @@ LANGUAGE_CONFIGS = {
         "name_children": ["dotted_name", "module_name"],
         "clean": None,
         "validate": None,
-        "loop_nodes": ["for_statement", "while_statement"]
+        "loop_nodes": ["for_statement", "while_statement"],
+        "class_nodes": ["class_definition"],
+        "function_nodes": ["function_definition"],
     },
     "javascript": {
         "import_nodes": ["import_statement", "call_expression"],
         "name_children": ["string"],
         "clean": strip_quotes,
         "validate": is_import_call(["require"]),
-        "loop_nodes": ["for_statement", "for_in_statement", "while_statement", "do_statement"]
+        "loop_nodes": ["for_statement", "for_in_statement", "while_statement", "do_statement"],
+        "class_nodes": ["class_declaration"],
+        "function_nodes": ["function_declaration", "arrow_function"],
     },
     "c": {
         "import_nodes": ["preproc_include"],
         "name_children": ["string_literal", "system_lib_string"],
         "clean": strip_quotes_and_brackets,
         "validate": None,
-        "loop_nodes": ["for_statement", "while_statement", "do_statement"]
+        "loop_nodes": ["for_statement", "while_statement", "do_statement"],
+        "class_nodes": [],
+        "function_nodes": ["function_definition"],
     },
     "cpp": {
         "import_nodes": ["preproc_include"],
         "name_children": ["string_literal", "system_lib_string"],
         "clean": strip_quotes_and_brackets,
         "validate": None,
-        "loop_nodes": ["for_statement", "while_statement", "do_statement", "for_range_loop"]
+        "loop_nodes": ["for_statement", "while_statement", "do_statement", "for_range_loop"],
+        "class_nodes": ["class_specifier"],
+        "function_nodes": ["function_definition"],
     },
     "java": {
         "import_nodes": ["import_declaration"],
         "name_children": ["scoped_identifier"],
         "clean": None,
         "validate": None,
-        "loop_nodes": ["for_statement", "enhanced_for_statement", "while_statement", "do_statement"]
+        "loop_nodes": ["for_statement", "enhanced_for_statement", "while_statement", "do_statement"],
+        "class_nodes": ["class_declaration"],
+        "function_nodes": ["method_declaration"],
     },
     "typescript": {
         "import_nodes": ["import_statement", "call_expression"],
         "name_children": ["string"],
         "clean": strip_quotes,
         "validate": is_import_call(["require"]),
-        "loop_nodes": ["for_statement", "for_in_statement", "while_statement", "do_statement"]
+        "loop_nodes": ["for_statement", "for_in_statement", "while_statement", "do_statement"],
+        "class_nodes": ["class_declaration"],
+        "function_nodes": ["function_declaration", "arrow_function"],
     },
     "go": {
         "import_nodes": ["import_spec"],
         "name_children": ["interpreted_string_literal"],
         "clean": strip_quotes,
         "validate": None,
-        "loop_nodes": ["for_statement"]
+        "loop_nodes": ["for_statement"],
+        "class_nodes": [],
+        "function_nodes": ["function_declaration", "method_declaration"],
     },
     "rust": {
         "import_nodes": ["use_declaration"],
         "name_children": ["scoped_identifier", "identifier"],
         "clean": None,
         "validate": None,
-        "loop_nodes": ["for_expression", "while_expression", "loop_expression"]
-    }
+        "loop_nodes": ["for_expression", "while_expression", "loop_expression"],
+        "class_nodes": ["struct_item", "impl_item"],
+        "function_nodes": ["function_item"],
+    },
 }
 
 class CodeReader:
@@ -113,6 +129,7 @@ class CodeReader:
         self.filetype = None
         self.libraries = []
         self.complexity = {}
+        self.oop = {}
 
         # Checks if the filepath exists
         if not os.path.isfile(self.filepath):
@@ -231,7 +248,6 @@ class CodeReader:
             "loop_structures": loop_structures,
         }
 
-
     def _find_top_level_loops(self, node, loop_types):
         """Finds loops that aren't nested inside other loops."""
         if node.type in loop_types:
@@ -241,7 +257,6 @@ class CodeReader:
         for child in node.children:
             results.extend(self._find_top_level_loops(child, loop_types))
         return results
-
 
     def _collect_loops(self, node, loop_types, depth):
         """Collects a loop and all nested loops within it."""
@@ -259,7 +274,6 @@ class CodeReader:
         
         return loops
 
-
     def _search_for_loops(self, node, loop_types, depth):
         """Searches non-loop nodes for nested loops."""
         loops = []
@@ -270,7 +284,6 @@ class CodeReader:
                 loops.extend(self._search_for_loops(child, loop_types, depth))
         return loops
 
-
     def _depth_to_complexity(self, depth):
         if depth == 0:
             return "O(1)"
@@ -279,6 +292,99 @@ class CodeReader:
         else:
             return f"O(n^{depth})"
 
+    def extract_oop(self, root_node):
+        """
+        Extracts OOP structures: classes and standalone functions.
+        
+        Returns:
+            dict with classes and functions
+        """
+        if not self.filetype:
+            return {}
+        
+        config = LANGUAGE_CONFIGS.get(self.filetype)
+        
+        if not config:
+            return {}
+        
+        classes = []
+        functions = []
+        
+        class_types = config.get("class_nodes", [])
+        function_types = config.get("function_nodes", [])
+        
+        if class_types:
+            class_nodes = self.find_nodes(root_node, class_types)
+            for node in class_nodes:
+                classes.append(self._extract_class_info(node, function_types))
+        
+        # Find standalone functions (not inside classes)
+        if function_types:
+            functions = self._find_standalone_functions(root_node, class_types, function_types)
+        
+        return {
+            "classes": classes,
+            "functions": functions,
+        }
+
+    def _extract_class_info(self, class_node, function_types):
+        """Extracts information from a class node."""
+        name = None
+        methods = []
+        has_inheritance = False
+        
+        for child in class_node.children:
+            # Get class name
+            if child.type in ["identifier", "name", "type_identifier"]:
+                name = child.text.decode("utf-8")
+            
+            # Check for inheritance
+            if child.type in ["argument_list", "superclass", "class_heritage", "base_class_clause"]:
+                has_inheritance = True
+        
+        # Find methods inside the class
+        method_nodes = self.find_nodes(class_node, function_types)
+        for method_node in method_nodes:
+            method_name = self._get_function_name(method_node)
+            if method_name:
+                methods.append(method_name)
+        
+        return {
+            "name": name,
+            "line": class_node.start_point[0] + 1,
+            "methods": methods,
+            "has_inheritance": has_inheritance,
+        }
+
+    def _find_standalone_functions(self, root_node, class_types, function_types):
+        """Finds functions that are not inside classes."""
+        functions = []
+        
+        for child in root_node.children:
+            if child.type in function_types:
+                name = self._get_function_name(child)
+                if name:
+                    functions.append({
+                        "name": name,
+                        "line": child.start_point[0] + 1,
+                    })
+            elif child.type not in class_types:
+                # Recurse into non-class nodes (e.g., modules, namespaces)
+                functions.extend(self._find_standalone_functions(child, class_types, function_types))
+        
+        return functions
+
+    def _get_function_name(self, func_node):
+        """Extracts the function name from a function node."""
+        for child in func_node.children:
+            if child.type in ["identifier", "name", "property_identifier"]:
+                return child.text.decode("utf-8")
+            if child.type in ["function_declarator", "declarator"]:
+                for subchild in child.children:
+                    if subchild.type == "identifier":
+                        return subchild.text.decode("utf-8")
+        return None
+
     def extract(self):
         self.extract_file_type()
         
@@ -286,3 +392,4 @@ class CodeReader:
             tree = self.parse_file()
             self.libraries = self.extract_imports(tree.root_node)
             self.complexity = self.extract_complexity(tree.root_node)
+            self.oop = self.extract_oop(tree.root_node)
