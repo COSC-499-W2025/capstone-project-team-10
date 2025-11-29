@@ -4,6 +4,8 @@ import os
 from typing import Any, Optional
 import json
 from src.fss.repo_reader import Repository
+from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
+from src.fas.fas_programming_reader import ProgrammingReader
 
 
 class FileAnalysis:
@@ -75,7 +77,8 @@ def get_created_time(file_path: str) -> str:
     if hasattr(st, "st_birthtime"):  # macOS
         return datetime.datetime.fromtimestamp(st.st_birthtime).isoformat()
     else:  # Windows/Linux fallback
-        return datetime.datetime.fromtimestamp(st.st_ctime).isoformat()
+        # return datetime.datetime.fromtimestamp(st.st_ctime).isoformat()
+        return datetime.datetime.fromtimestamp(st.st_birthtime).isoformat()
 
 
 def get_file_name(file_path: str) -> str:
@@ -90,6 +93,8 @@ def get_file_name(file_path: str) -> str:
 def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
     # This is all placeholder and will be replaced when we have proper handlers
     try:
+        _, ext = os.path.splitext(file_path)
+        ext = ext.lower()
         print(f"Scanning: {file_path}")
         match file_type:
             # The reason why the case of "pdf" is quite big is becuase fas_PDF returns an object therefore we need to map its attributes to a dictionary
@@ -154,6 +159,13 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                     "code_blocks": md.get_code_blocks(),
                     "paragraphs": md.get_paragraphs(),
                 }
+            case _ if ext in em:
+                reader = ProgrammingReader(file_path)
+                return {
+                    "language": reader.filetype,
+                    "libraries": reader.libraries,
+                }
+
 
             case "git":
                 # from src.fas import fas_git
@@ -257,9 +269,39 @@ def compute_importance(file_type: str, extra_data: Optional[Any]) -> float:
         "gif": 2,
         "psd": 3,
     }
+    # Language-specific importance scores
+    language_scores = {
+        "python": 9,        
+        "javascript": 9,    
+        "typescript": 8,    
+        "java": 8,          
+        "kotlin": 7,        
+        "c": 7,             
+        "cpp": 8,           
+        "csharp": 7,        
+        "php": 6,          
+        "ruby": 5,         
+        "go": 7,            
+        "rust": 8,          
+        "swift": 6,         
+        "perl": 4,          
+        "shell": 5,         
+        "haskell": 4,       
+        "ocaml": 4,        
+        "elixir": 5,        
+        "r": 6,             
+        "matlab": 5,        
+        "pascal": 3,        
+    }
 
-    # Start with base importance from type
-    importance = base_scores.get(file_type.lower(), 1)
+     # If extra_data contains canonical language, use language_scores
+    
+    if isinstance(extra_data, dict) and "language" in extra_data:
+        language = extra_data["language"]
+        importance = language_scores.get(language, 5)  # default 5 if language not in dict
+    else:
+        importance = base_scores.get(file_type.lower(), 1)
+  
 
     # Boost importance if file contains meaningful content
     try:
@@ -270,6 +312,10 @@ def compute_importance(file_type: str, extra_data: Optional[Any]) -> float:
             importance += extra_data.get("page_count", 0) * 0.2
             importance += extra_data.get("table_count", 0) * 0.5
             importance += extra_data.get("image_count", 0) * 0.1
+
+        if "libraries" in extra_data:
+                lib_count = len(extra_data["libraries"])
+                importance += lib_count * 0.6   # each library adds complexity
     except:
         pass  # extra_data might not be structured
 
