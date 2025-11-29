@@ -2,7 +2,6 @@ from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
 from pygments.lexers import get_lexer_for_filename
 from tree_sitter import Language, Parser
 import os
-
 import tree_sitter_python
 import tree_sitter_javascript
 import tree_sitter_c
@@ -117,10 +116,9 @@ LANGUAGE_CONFIGS = {
 
 class CodeReader:
     """
-    Detects the file type of code files and extracts any imported libraries.
-    Supports multiple languages and uses language-specific regex patterns and parsing.
+    Detects the file type of code files and extracts any libraries, functions, loops, complexities, and oop.
+    Supports multiple languages and uses tree_sitter and parsing.
     """
-
     def __init__(self, filepath) -> None:
         self.filepath = filepath
         self.filetype = None
@@ -137,7 +135,7 @@ class CodeReader:
 
     def extract_file_type(self):
         """
-        Identifies the file type using file extensions or shebang line as a fallback.
+        Identifies the file type using file extensions or pygments line as a fallback.
         Raises a value error if the file can't be identified.
         """
         _, extension = os.path.splitext(self.filepath)
@@ -164,6 +162,7 @@ class CodeReader:
             raise ValueError(f"Error! Unsupported language '{self.filetype}' for file '{self.filepath}'")
 
     def parse_file(self):
+        """Creates Parser for specific coding language"""
         if self.filetype not in LANGUAGE_MAP:
             raise ValueError(f"Language does not support deep analysis: {self.filetype}")
         
@@ -176,7 +175,6 @@ class CodeReader:
 
     def find_nodes(self, node, node_types: list):
         results = []
-    
         if node.type in node_types:
             results.append(node)
         
@@ -186,6 +184,7 @@ class CodeReader:
         return results
 
     def extract_imports(self, root_node):
+        """Extracts libraries and packages using language specific keyword detection."""
         if not self.filetype:
             return []
 
@@ -216,6 +215,7 @@ class CodeReader:
         return imports
     
     def extract_complexity(self, root_node):
+        """Extracts loops and time complexities from nested loops."""
         if not self.filetype:
             return {}
         
@@ -273,6 +273,7 @@ class CodeReader:
         return loops
 
     def _depth_to_complexity(self, depth):
+        """Transforms depth value into Big O notation."""
         if depth == 0:
             return "O(1)"
         elif depth == 1:
@@ -281,12 +282,7 @@ class CodeReader:
             return f"O(n^{depth})"
 
     def extract_oop(self, root_node):
-        """
-        Extracts OOP structures: classes and standalone functions.
-        
-        Returns:
-            dict with classes and functions
-        """
+        """Extracts OOP structures: classes and standalone functions."""
         if not self.filetype:
             return {}
         
@@ -375,9 +371,16 @@ class CodeReader:
 
     def extract(self):
         self.extract_file_type()
-        
-        if self.filetype in LANGUAGE_MAP:
-            tree = self.parse_file()
-            self.libraries = self.extract_imports(tree.root_node)
-            self.complexity = self.extract_complexity(tree.root_node)
-            self.oop = self.extract_oop(tree.root_node)
+        tree = self.parse_file()
+        self.libraries = self.extract_imports(tree.root_node)
+        self.complexity = self.extract_complexity(tree.root_node)
+        self.oop = self.extract_oop(tree.root_node)
+
+    def extract_data_from_code_file(self):
+        """Returns all extracted data as a single dictionary."""
+        return {
+            "filetype": self.filetype,
+            "libraries": self.libraries,
+            "complexity": self.complexity,
+            "oop": self.oop
+        }
