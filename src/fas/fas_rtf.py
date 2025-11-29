@@ -1,7 +1,7 @@
 import datetime
 import re
 from striprtf.striprtf import rtf_to_text
-from fas.fas_text_analysis import TextSummary
+from src.fas.fas_text_analysis import TextSummary
 
 def extract_rtf_data(path):
     try:

@@ -4,6 +4,9 @@ import os
 from typing import Any, Optional
 import json
 from src.fss.repo_reader import Repository
+from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
+from utils.libraries_mappings import LIBRARY_SKILL_MAP as lsm
+from src.fas.fas_programming_reader import ProgrammingReader
 
 
 class FileAnalysis:
@@ -75,7 +78,8 @@ def get_created_time(file_path: str) -> str:
     if hasattr(st, "st_birthtime"):  # macOS
         return datetime.datetime.fromtimestamp(st.st_birthtime).isoformat()
     else:  # Windows/Linux fallback
-        return datetime.datetime.fromtimestamp(st.st_ctime).isoformat()
+        # return datetime.datetime.fromtimestamp(st.st_ctime).isoformat()
+        return datetime.datetime.fromtimestamp(st.st_birthtime).isoformat()
 
 
 def get_file_name(file_path: str) -> str:
@@ -90,6 +94,8 @@ def get_file_name(file_path: str) -> str:
 def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
     # This is all placeholder and will be replaced when we have proper handlers
     try:
+        _, ext = os.path.splitext(file_path)
+        ext = ext.lower()
         print(f"Scanning: {file_path}")
         match file_type:
             # The reason why the case of "pdf" is quite big is becuase fas_PDF returns an object therefore we need to map its attributes to a dictionary
@@ -103,17 +109,20 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             case "docx":
                 from src.fas import fas_docx
 
-                return fas_docx.extract_docx_data(file_path)
+                # return fas_docx.extract_docx_data(file_path)
+                metadata = fas_docx.extract_docx_data(file_path)
 
             case "odt":
                 from src.fas import fas_odt
 
-                return fas_odt.extract_odt_data(file_path)
+                # return fas_odt.extract_odt_data(file_path)
+                metadata = fas_odt.extract_odt_data(file_path)
 
             case "rtf":
                 from src.fas import fas_rtf
 
-                return fas_rtf.extract_rtf_data(file_path)
+                # return fas_rtf.extract_rtf_data(file_path)
+                metadata = fas_rtf.extract_rtf_data(file_path)
 
             case "xlsx" | "xls":
                 from src.fas import fas_excel
@@ -151,6 +160,15 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                     "code_blocks": md.get_code_blocks(),
                     "paragraphs": md.get_paragraphs(),
                 }
+            
+            case _ if ext in em:
+                reader = ProgrammingReader(file_path)
+                # return {
+                #     "language": reader.filetype,
+                #     "libraries": reader.libraries,
+                # }
+                language = reader.filetype
+                libraries = reader.libraries
 
             case "git":
                 # from src.fas import fas_git
@@ -165,11 +183,95 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             case _:
                 # Generic or unsupported type
                 return None
+            
+
+        if file_type in ("docx", "odt", "rtf") and isinstance(metadata, dict):
+
+            skills = []
+
+            for key in ["complexity", "depth", "structure", "sentiment_insight"]:
+                if key in metadata:
+                    skill = feedback_to_skill(metadata[key])
+                    if skill:
+                        skills.append(skill)
+
+            metadata["key_skills"] = skills
+        elif ext in em:
+            # Programming files key skills inference based on language and libraries
+            # This will be removed once we have a more sophisticated way of inferring skills in FAS programming reader
+            skills = []
+
+            metadata = {
+                "language": language,
+                "libraries": libraries,
+            }
+
+            # Always include the language as a skill
+            if language:
+                skills.append(f"{language.capitalize()} programming")
+
+            for lib in libraries:
+                if lib in lsm:
+                    skills.append(lsm[lib])
+
+            # Remove duplicates
+            metadata["key_skills"] = list(set(skills))
+        return metadata
+
 
     except ModuleNotFoundError:
         # Handler not implemented yet
         print(f"Error. No handler module found for file type: {file_type}")
         return None
+    
+def feedback_to_skill(feedback: str) -> str | None:
+    if not feedback:
+        return None
+
+    f = feedback.lower()
+
+    # ---------- Complexity ----------
+    if "high - advanced vocabulary" in f:
+        return "Advanced Vocabulary"
+    if "medium - standard vocabulary" in f:
+        return "Strong Vocabulary"
+    if "low - simple vocabulary" in f:
+        return "Basic Vocabulary"
+
+    # ---------- Length & Depth ----------
+    if "extensive detail and depth used to explore your ideas" in f:
+        return "In-Depth Writing"
+    if "extensive depth and sufficient detail" in f:
+        return "Thorough Writing"
+    if "extensive length but consider adding more depth" in f:
+        return "High Output Writing"
+    if "average length and excellent depth and detail" in f:
+        return "Balanced Writing"
+    if "average length and sufficient detail" in f:
+        return "Clear Writing"
+    if "average length but consider adding more depth" in f:
+        return "Developing Writing"
+    if "consider adding more detail to fully develop your ideas" in f:
+        return "Concise Writing"
+
+    # ---------- Sentence Structure ----------
+    if "breaking up complex sentences" in f:
+        return "Complex Sentence Structure"
+    if "combining related ideas for better flow" in f:
+        return "Sentence Flow"
+    if "well formed and approprite sentences" in f:
+        return "Strong Writing Structure"
+
+    # ---------- Sentiment ----------
+    if "overall negative sentiment" in f:
+        return "Emotive Writing"
+    if "overall positive sentiment" in f:
+        return "Positive Tone"
+    if "overall neutral sentiment" in f:
+        return "Professional Tone"
+
+    return None
+
 
 
 def compute_importance(file_type: str, extra_data: Optional[Any]) -> float:
@@ -192,9 +294,39 @@ def compute_importance(file_type: str, extra_data: Optional[Any]) -> float:
         "gif": 2,
         "psd": 3,
     }
+    # Language-specific importance scores
+    language_scores = {
+        "python": 9,        
+        "javascript": 9,    
+        "typescript": 8,    
+        "java": 8,          
+        "kotlin": 7,        
+        "c": 7,             
+        "cpp": 8,           
+        "csharp": 7,        
+        "php": 6,          
+        "ruby": 5,         
+        "go": 7,            
+        "rust": 8,          
+        "swift": 6,         
+        "perl": 4,          
+        "shell": 5,         
+        "haskell": 4,       
+        "ocaml": 4,        
+        "elixir": 5,        
+        "r": 6,             
+        "matlab": 5,        
+        "pascal": 3,        
+    }
 
-    # Start with base importance from type
-    importance = base_scores.get(file_type.lower(), 1)
+     # If extra_data contains canonical language, use language_scores
+    
+    if isinstance(extra_data, dict) and "language" in extra_data:
+        language = extra_data["language"]
+        importance = language_scores.get(language, 5)  # default 5 if language not in dict
+    else:
+        importance = base_scores.get(file_type.lower(), 1)
+  
 
     # Boost importance if file contains meaningful content
     try:
@@ -205,6 +337,10 @@ def compute_importance(file_type: str, extra_data: Optional[Any]) -> float:
             importance += extra_data.get("page_count", 0) * 0.2
             importance += extra_data.get("table_count", 0) * 0.5
             importance += extra_data.get("image_count", 0) * 0.1
+
+        if "libraries" in extra_data:
+                lib_count = len(extra_data["libraries"])
+                importance += lib_count * 0.6   # each library adds complexity
     except:
         pass  # extra_data might not be structured
 
