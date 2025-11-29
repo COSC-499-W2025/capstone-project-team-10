@@ -5,6 +5,7 @@ from typing import Any, Optional
 import json
 from src.fss.repo_reader import Repository
 from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
+from utils.libraries_mappings import LIBRARY_SKILL_MAP as lsm
 from src.fas.fas_programming_reader import ProgrammingReader
 
 
@@ -159,13 +160,15 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                     "code_blocks": md.get_code_blocks(),
                     "paragraphs": md.get_paragraphs(),
                 }
+            
             case _ if ext in em:
                 reader = ProgrammingReader(file_path)
-                return {
-                    "language": reader.filetype,
-                    "libraries": reader.libraries,
-                }
-
+                # return {
+                #     "language": reader.filetype,
+                #     "libraries": reader.libraries,
+                # }
+                language = reader.filetype
+                libraries = reader.libraries
 
             case "git":
                 # from src.fas import fas_git
@@ -180,6 +183,8 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             case _:
                 # Generic or unsupported type
                 return None
+            
+
         if file_type in ("docx", "odt", "rtf") and isinstance(metadata, dict):
 
             skills = []
@@ -191,6 +196,26 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                         skills.append(skill)
 
             metadata["key_skills"] = skills
+        elif ext in em:
+            # Programming files key skills inference based on language and libraries
+            # This will be removed once we have a more sophisticated way of inferring skills in FAS programming reader
+            skills = []
+
+            metadata = {
+                "language": language,
+                "libraries": libraries,
+            }
+
+            # Always include the language as a skill
+            if language:
+                skills.append(f"{language.capitalize()} programming")
+
+            for lib in libraries:
+                if lib in lsm:
+                    skills.append(lsm[lib])
+
+            # Remove duplicates
+            metadata["key_skills"] = list(set(skills))
         return metadata
 
 
