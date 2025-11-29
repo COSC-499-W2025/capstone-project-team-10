@@ -5,6 +5,7 @@ import re
 import shutil
 from datetime import datetime, timedelta
 from pathlib import Path
+import ast
 
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
@@ -12,6 +13,8 @@ from fpdf.enums import XPos, YPos
 import src.log.log as log
 import src.param.param as param
 from src.fas.fas import FileAnalysis
+
+from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
 
 # Template for resume entry in PDF
 resume_entry_template = """
@@ -139,17 +142,57 @@ def generate_resume() -> Path | None:
                 pdf_output.set_font("Noto", size=12)
                 # Add details based on file type
                 file_analysis.extra_data = clean_text(file_analysis.extra_data)
+                _, ext = os.path.splitext(file_analysis.file_path)
+                ext = ext.lower()       
                 match file_analysis.file_type:
                     case file_type if file_type in image_types:
-                        # Add image project description and image
+                        
+                        # Convert extra_data to dict if it is a string
+                        extra_data_raw = file_analysis.extra_data
+                        extra_data_dict = {}
+
+                        if isinstance(extra_data_raw, str):
+                            try:
+                                extra_data_dict = ast.literal_eval(extra_data_raw)
+                            except (ValueError, SyntaxError):
+                                extra_data_dict = {}
+                        elif isinstance(extra_data_raw, dict):
+                            extra_data_dict = extra_data_raw
+
+                        # Basic generic description
+                        project_desc = "Digital Artwork / Image Project"
+
+                        # Optionally, include size or format for a bit more info
+                        image_meta = extra_data_dict.get("image", {})
+                        img_format = image_meta.get("format")
+                        if img_format:
+                            project_desc += f" ({img_format})"
+
+                        # Short project description
                         pdf_output.multi_cell(
                             0,
                             10,
-                            f"Artistic Project: [Insert Description]",
+                            f"Artistic Project: {project_desc}",
                             new_x=XPos.LMARGIN,
                             new_y=YPos.NEXT,
                         )
+
+                        # Image dimensions (optional)
+                        image_meta = extra_data_dict.get("image", {})
+                        width = image_meta.get("width")
+                        height = image_meta.get("height")
+                        if width and height:
+                            pdf_output.multi_cell(
+                                0,
+                                10,
+                                f"Image Dimensions: {width} x {height}",
+                                new_x=XPos.LMARGIN,
+                                new_y=YPos.NEXT,
+                            )
+
+                        # Embed the image itself
                         pdf_output.image(file_analysis.file_path, w=100)
+
                     case file_type if file_type in collaborative_types:
                         # Add collaborative project details
                         pdf_output.multi_cell(
@@ -160,6 +203,77 @@ def generate_resume() -> Path | None:
                             new_y=YPos.NEXT,
                         )
                         # TODO: Expand to include more details about the files in the git project
+
+                    case "xlsx" | "xls" | "docx" | "odt" | "rtf":            
+                        key_skills = []
+                        extra_data_raw = file_analysis.extra_data
+
+                        # Convert locally (do not mutate file_analysis.extra_data)
+                        if isinstance(extra_data_raw, str):
+                            try:
+
+
+                                parsed = ast.literal_eval(extra_data_raw)
+                                if isinstance(parsed, dict):
+                                    key_skills = parsed.get("key_skills", []) or []
+                            except (ValueError, SyntaxError):
+                                # conversion failed: string isn't a valid Python literal dict
+                                key_skills = []
+                        elif isinstance(extra_data_raw, dict):
+                            # In case it's already a dict for some reason, handle it too
+                            key_skills = extra_data_raw.get("key_skills", []) or []
+
+                        # Final text to place in PDF
+                        skills_text = ", ".join(key_skills) if key_skills else file_analysis.file_type.upper() + " Data Analysis"
+
+                        pdf_output.multi_cell(
+                            0,
+                            10,
+                            f"Key Skills demonstrated in this project: {skills_text}",
+                            new_x=XPos.LMARGIN,
+                            new_y=YPos.NEXT,
+                        )
+                    # Add support for coding file extensions
+                    case _ if ext in em:
+                        key_skills = []
+                        extra_data_raw = file_analysis.extra_data
+
+                        # Convert locally (do not mutate file_analysis.extra_data)
+                        if isinstance(extra_data_raw, str):
+                            try:
+
+
+                                parsed = ast.literal_eval(extra_data_raw)
+                                if isinstance(parsed, dict):
+                                    key_skills = parsed.get("key_skills", []) or []
+                            except (ValueError, SyntaxError):
+                                # conversion failed: string isn't a valid Python literal dict
+                                key_skills = []
+                        elif isinstance(extra_data_raw, dict):
+                            # In case it's already a dict for some reason, handle it too
+                            key_skills = extra_data_raw.get("key_skills", []) or []
+
+                        # Final text to place in PDF
+                        skills_text = ", ".join(key_skills) if key_skills else "Excel Data Analysis"
+
+                        pdf_output.multi_cell(
+                            0,
+                            10,
+                            f"Key Skills demonstrated in this project: {skills_text}",
+                            new_x=XPos.LMARGIN,
+                            new_y=YPos.NEXT,
+                        )
+
+                    case "psd":
+
+                        pdf_output.multi_cell(
+                            0,
+                            10,
+                            f"Artistic Project: Photoshop Project",
+                            new_x=XPos.LMARGIN,
+                            new_y=YPos.NEXT,
+                        )
+
                     case _:
                         # Add key skills for text files
                         pdf_output.multi_cell(

@@ -1,7 +1,7 @@
 from odf.opendocument import load
 from odf.text import P
 from odfdo import Document
-from fas.fas_text_analysis import TextSummary
+from src.fas.fas_text_analysis import TextSummary
 
 def extract_odt_data(path):
     try:
