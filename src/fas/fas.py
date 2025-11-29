@@ -116,13 +116,13 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                 from src.fas import fas_odt
 
                 # return fas_odt.extract_odt_data(file_path)
-                metadata = fas_docx.extract_docx_data(file_path)
+                metadata = fas_odt.extract_odt_data(file_path)
 
             case "rtf":
                 from src.fas import fas_rtf
 
                 # return fas_rtf.extract_rtf_data(file_path)
-                metadata = fas_docx.extract_docx_data(file_path)
+                metadata = fas_rtf.extract_rtf_data(file_path)
 
             case "xlsx" | "xls":
                 from src.fas import fas_excel

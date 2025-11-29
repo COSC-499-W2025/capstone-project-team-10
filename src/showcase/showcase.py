@@ -224,7 +224,7 @@ def generate_resume() -> Path | None:
                             key_skills = extra_data_raw.get("key_skills", []) or []
 
                         # Final text to place in PDF
-                        skills_text = ", ".join(key_skills) if key_skills else "Excel Data Analysis"
+                        skills_text = ", ".join(key_skills) if key_skills else file_analysis.file_type.upper() + " Data Analysis"
 
                         pdf_output.multi_cell(
                             0,
