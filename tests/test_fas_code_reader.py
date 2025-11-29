@@ -19,7 +19,7 @@ class TestCodeReader:
         with pytest.raises(ValueError):
             progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.xyz"))
 
-    def test_python_extract_imports(self):
+    def test_python_extract(self):
         pr = progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.py"))
         assert pr.filetype == 'python'
         assert len(pr.libraries) > 0
@@ -29,7 +29,7 @@ class TestCodeReader:
         assert len(pr.oop) > 0
         assert 'helper' in [f['name'] for f in pr.oop['functions']]
  
-    def test_javascript_extract_imports(self):
+    def test_javascript_extract(self):
         pr = progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.js"))
         assert pr.filetype == 'javascript'
         assert len(pr.libraries) > 0
@@ -39,7 +39,7 @@ class TestCodeReader:
         assert len(pr.oop) > 0
         assert 'helper' in [f['name'] for f in pr.oop['functions']]
 
-    def test_c_extract_imports(self):
+    def test_c_extract(self):
         pr = progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.c"))
         assert pr.filetype == 'c'
         assert len(pr.libraries) > 0
@@ -49,7 +49,7 @@ class TestCodeReader:
         assert pr.oop['classes'] == []
         assert 'helper' in [f['name'] for f in pr.oop['functions']]
 
-    def test_cpp_extract_imports(self):
+    def test_cpp_extract(self):
         pr = progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.cpp"))
         assert pr.filetype == 'cpp'
         assert len(pr.libraries) > 0
@@ -60,7 +60,7 @@ class TestCodeReader:
         assert 'Animal' in [c['name'] for c in pr.oop['classes']]
         assert 'helper' in [f['name'] for f in pr.oop['functions']]
 
-    def test_java_extract_imports(self):
+    def test_java_extract(self):
         pr = progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.java"))
         assert pr.filetype == 'java'
         assert len(pr.libraries) > 0
@@ -70,7 +70,7 @@ class TestCodeReader:
         assert len(pr.oop) > 0
         assert 'helper' in [f['name'] for f in pr.oop['functions']]
 
-    def test_typescript_extract_imports(self):
+    def test_typescript_extract(self):
         pr = progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.ts"))
         assert pr.filetype == 'typescript'
         assert len(pr.libraries) > 0
@@ -80,7 +80,7 @@ class TestCodeReader:
         assert len(pr.oop) > 0
         assert 'helper' in [f['name'] for f in pr.oop['functions']]
 
-    def test_go_extract_imports(self):
+    def test_go_extract(self):
         pr = progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.go"))
         assert pr.filetype == 'go'
         assert len(pr.libraries) > 0
@@ -90,7 +90,7 @@ class TestCodeReader:
         assert pr.oop['classes'] == []
         assert 'helper' in [f['name'] for f in pr.oop['functions']]
 
-    def test_rust_extract_imports(self):
+    def test_rust_extract(self):
         pr = progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.rs"))
         assert pr.filetype == 'rust'
         assert len(pr.libraries) > 0
