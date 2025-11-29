@@ -17,6 +17,7 @@ PyDriller
 fpdf2
 tabulate
 pandas
+tree_sitter
 tree-sitter-python
 tree-sitter-javascript
 tree-sitter-c
