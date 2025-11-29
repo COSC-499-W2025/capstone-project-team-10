@@ -8,6 +8,11 @@ use super::parent_module;
 use super::super::grandparent;
 
 fn main() {
-    let map: HashMap<String, i32> = HashMap::new();
-    println!("Hello, Rust!");
+
+    for i in 1..6 {
+        for j in 1.=6 {
+            println!("i is: {}", i);
+            println!("j is: {}", j);
+        }
+    }
 }

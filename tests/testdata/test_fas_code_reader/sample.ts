@@ -9,4 +9,10 @@ import { format } from 'date-fns';
 //@ts-ignore
 import { Connection } from 'typeorm'; 
 
-console.log("Hello, World!");
+declare function print(...args: any[]): void;
+
+for (let i: number = 0; i < 10; i++) {
+    for (let j: number = 0; j < 10; j++) {
+        print(i, j);
+    }
+}

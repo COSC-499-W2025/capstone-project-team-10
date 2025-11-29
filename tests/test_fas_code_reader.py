@@ -24,46 +24,62 @@ class TestCodeReader:
         assert pr.filetype == 'python'
         assert len(pr.libraries) > 0
         assert pr.libraries == ['os', 'sys', 'json', 'pandas', 'requests']
-        print(pr.complexity)
-
+        assert len(pr.complexity) > 0
+        assert pr.complexity['estimated'] == 'O(n^3)'
+ 
     def test_javascript_extract_imports(self):
         pr = progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.js"))
         assert pr.filetype == 'javascript'
         assert len(pr.libraries) > 0
         assert pr.libraries == ['fs', 'http', 'express', 'axios', 'moment', 'react']
+        assert len(pr.complexity) > 0
+        assert pr.complexity['estimated'] == 'O(n^2)'
+
 
     def test_c_extract_imports(self):
         pr = progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.c"))
         assert pr.filetype == 'c'
         assert len(pr.libraries) > 0
         assert pr.libraries == ['stdio.h', 'stdlib.h', 'string.h', 'math.h']
+        assert len(pr.complexity) > 0
+        assert pr.complexity['estimated'] == 'O(n^2)'
 
     def test_cpp_extract_imports(self):
         pr = progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.cpp"))
         assert pr.filetype == 'cpp'
         assert len(pr.libraries) > 0
         assert pr.libraries == ['iostream', 'string', 'my_utility.h']
+        assert len(pr.complexity) > 0
+        assert pr.complexity['estimated'] == 'O(n^2)'
 
     def test_java_extract_imports(self):
         pr = progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.java"))
         assert pr.filetype == 'java'
         assert len(pr.libraries) > 0
         assert pr.libraries == ['java.io.BufferedReader', 'java.io.FileReader', 'java.io.IOException', 'java.net.URI', 'com.google.gson.Gson']
+        assert len(pr.complexity) > 0
+        assert pr.complexity['estimated'] == 'O(n^3)'
 
     def test_typescript_extract_imports(self):
         pr = progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.ts"))
         assert pr.filetype == 'typescript'
         assert len(pr.libraries) > 0
         assert pr.libraries == ['fs', 'events', 'axios', 'date-fns', 'typeorm']
+        assert len(pr.complexity) > 0
+        assert pr.complexity['estimated'] == 'O(n^2)'
 
     def test_go_extract_imports(self):
         pr = progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.go"))
         assert pr.filetype == 'go'
         assert len(pr.libraries) > 0
         assert pr.libraries == ['fmt', 'net/http', 'encoding/json', './local/package', 'github.com/gorilla/mux']
+        assert len(pr.complexity) > 0
+        assert pr.complexity['estimated'] == 'O(n^2)'
 
     def test_rust_extract_imports(self):
         pr = progr.CodeReader(os.path.join(TEST_DATA_DIR, "sample.rs"))
         assert pr.filetype == 'rust'
         assert len(pr.libraries) > 0
         assert pr.libraries == ['std::collections::HashMap', 'std::io::Result', 'tokio::runtime::Runtime', 'crate::internal::module', 'self::local_function', 'super::parent_module', 'super::super::grandparent']
+        assert len(pr.complexity) > 0
+        assert pr.complexity['estimated'] == 'O(n^2)'

@@ -8,5 +8,14 @@ public class HelloWorld {
 
     public static void main(String[] args) {
         System.out.println("Hello, World!");
+
+        for(int i = 0; i < 10; i++ ){
+            for(int j = 0; j < 15; j++){
+                for (int k = 0; k < 20; k++){
+                    System.out.println(i + j + k);
+                }
+            }
+        }
+
     }
 }

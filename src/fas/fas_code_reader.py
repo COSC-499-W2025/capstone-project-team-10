@@ -56,44 +56,50 @@ LANGUAGE_CONFIGS = {
         "name_children": ["string"],
         "clean": strip_quotes,
         "validate": is_import_call(["require"]),
-        "loop_nodes": ["for_statement", "for_in_statement", "while_statement"]
+        "loop_nodes": ["for_statement", "for_in_statement", "while_statement", "do_statement"]
     },
     "c": {
-        "import_nodes": ["preproc_include"] ,
+        "import_nodes": ["preproc_include"],
         "name_children": ["string_literal", "system_lib_string"],
-        "clean": strip_brackets,
-        "validate": None
+        "clean": strip_quotes_and_brackets,
+        "validate": None,
+        "loop_nodes": ["for_statement", "while_statement", "do_statement"]
     },
     "cpp": {
         "import_nodes": ["preproc_include"],
         "name_children": ["string_literal", "system_lib_string"],
         "clean": strip_quotes_and_brackets,
         "validate": None,
+        "loop_nodes": ["for_statement", "while_statement", "do_statement", "for_range_loop"]
     },
     "java": {
         "import_nodes": ["import_declaration"],
         "name_children": ["scoped_identifier"],
         "clean": None,
         "validate": None,
+        "loop_nodes": ["for_statement", "enhanced_for_statement", "while_statement", "do_statement"]
     },
     "typescript": {
         "import_nodes": ["import_statement", "call_expression"],
         "name_children": ["string"],
         "clean": strip_quotes,
         "validate": is_import_call(["require"]),
+        "loop_nodes": ["for_statement", "for_in_statement", "while_statement", "do_statement"]
     },
     "go": {
         "import_nodes": ["import_spec"],
         "name_children": ["interpreted_string_literal"],
         "clean": strip_quotes,
         "validate": None,
+        "loop_nodes": ["for_statement"]
     },
     "rust": {
         "import_nodes": ["use_declaration"],
         "name_children": ["scoped_identifier", "identifier"],
         "clean": None,
         "validate": None,
-    },
+        "loop_nodes": ["for_expression", "while_expression", "loop_expression"]
+    }
 }
 
 class CodeReader:
