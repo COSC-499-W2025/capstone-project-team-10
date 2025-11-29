@@ -237,29 +237,43 @@ def generate_resume() -> Path | None:
                     case _ if ext in em:
                         key_skills = []
                         extra_data_raw = file_analysis.extra_data
+                        code_complexity = "Not Available"
 
                         # Convert locally (do not mutate file_analysis.extra_data)
                         if isinstance(extra_data_raw, str):
                             try:
-
-
                                 parsed = ast.literal_eval(extra_data_raw)
                                 if isinstance(parsed, dict):
                                     key_skills = parsed.get("key_skills", []) or []
+                                    complexity = parsed.get("complexity")
+                                    if isinstance(complexity, dict):
+                                        code_complexity = complexity.get("estimated", "Not Available")
                             except (ValueError, SyntaxError):
                                 # conversion failed: string isn't a valid Python literal dict
                                 key_skills = []
                         elif isinstance(extra_data_raw, dict):
                             # In case it's already a dict for some reason, handle it too
                             key_skills = extra_data_raw.get("key_skills", []) or []
+                            complexity = extra_data_raw.get("complexity")
+                            if isinstance(complexity, dict):
+                                code_complexity = complexity.get("estimated", "Not Available")
+
 
                         # Final text to place in PDF
-                        skills_text = ", ".join(key_skills) if key_skills else "Excel Data Analysis"
+                        skills_text = ", ".join(key_skills) if key_skills else extra_data_raw.get("language") + " Programming"
+
 
                         pdf_output.multi_cell(
                             0,
                             10,
                             f"Key Skills demonstrated in this project: {skills_text}",
+                            new_x=XPos.LMARGIN,
+                            new_y=YPos.NEXT,
+                        )
+                        pdf_output.multi_cell(
+                            0,
+                            10,
+                            f"Code Complexity: {code_complexity}",
                             new_x=XPos.LMARGIN,
                             new_y=YPos.NEXT,
                         )
