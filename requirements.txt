@@ -3,3 +3,11 @@ pyinstaller
 pytest
 pdfplumber
 pymupdf
+tree-sitter-python
+tree-sitter-javascript
+tree-sitter-c
+tree-sitter-cpp
+tree-sitter-java
+tree-sitter-typescript
+tree-sitter-go
+tree-sitter-rust

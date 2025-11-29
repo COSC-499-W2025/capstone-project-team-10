@@ -15,9 +15,6 @@ import tree_sitter_rust
 def strip_quotes(text):
     return text.strip("'\"")
 
-def strip_brackets(text):
-    return text.strip("<>")
-
 def strip_quotes_and_brackets(text):
     return text.strip("'\"<>")
 
@@ -259,29 +256,20 @@ class CodeReader:
         return results
 
     def _collect_loops(self, node, loop_types, depth):
-        """Collects a loop and all nested loops within it."""
-        loops = [{
-            "type": node.type,
-            "line": node.start_point[0] + 1,
-            "depth": depth,
-        }]
-        
-        for child in node.children:
-            if child.type in loop_types:
-                loops.extend(self._collect_loops(child, loop_types, depth + 1))
-            else:
-                loops.extend(self._search_for_loops(child, loop_types, depth + 1))
-        
-        return loops
-
-    def _search_for_loops(self, node, loop_types, depth):
-        """Searches non-loop nodes for nested loops."""
+        """Collects all loops starting from node."""
         loops = []
+        
+        if node.type in loop_types:
+            loops.append({
+                "type": node.type,
+                "line": node.start_point[0] + 1,
+                "depth": depth,
+            })
+            depth += 1
+        
         for child in node.children:
-            if child.type in loop_types:
-                loops.extend(self._collect_loops(child, loop_types, depth))
-            else:
-                loops.extend(self._search_for_loops(child, loop_types, depth))
+            loops.extend(self._collect_loops(child, loop_types, depth))
+        
         return loops
 
     def _depth_to_complexity(self, depth):
