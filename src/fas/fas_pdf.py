@@ -2,6 +2,8 @@ import os
 import re
 import pdfplumber as plum
 import fitz
+import math
+from fas.fas_text_analysis import TextSummary
 from typing import Dict, Any, cast
 
 def extract_pdf_data(path: str) -> Dict[str, Any]:
@@ -104,7 +106,18 @@ def extract_pdf_data(path: str) -> Dict[str, Any]:
                 }
             }
 
-        print(metadata['text'])
+            ta = TextSummary(text) if text.strip() else None
+
+            if ta:
+                keywords = ta.getCommonWords(10)
+                stats = ta.getStatistics()
+                sentiment = ta.getSentiment()
+                summary = ta.getSummary(int(math.sqrt(line_count + 1)) + 1)
+                metadata["keywords"] = keywords
+                metadata["text_stats"] = stats
+                metadata["text_sentiment"] = sentiment
+                metadata["text_summary"] = summary
+
         return metadata
 
     except FileNotFoundError:
