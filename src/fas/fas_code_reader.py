@@ -49,12 +49,14 @@ LANGUAGE_CONFIGS = {
         "name_children": ["dotted_name", "module_name"],
         "clean": None,
         "validate": None,
+        "loop_nodes": ["for_statement", "while_statement"]
     },
     "javascript": {
         "import_nodes": ["import_statement", "call_expression"],
         "name_children": ["string"],
         "clean": strip_quotes,
         "validate": is_import_call(["require"]),
+        "loop_nodes": ["for_statement", "for_in_statement", "while_statement"]
     },
     "c": {
         "import_nodes": ["preproc_include"] ,
@@ -104,6 +106,7 @@ class CodeReader:
         self.filepath = filepath
         self.filetype = None
         self.libraries = []
+        self.complexity = {}
 
         # Checks if the filepath exists
         if not os.path.isfile(self.filepath):
@@ -192,9 +195,88 @@ class CodeReader:
         
         return imports
     
+    def extract_complexity(self, root_node):
+        if not self.filetype:
+            return {}
+        
+        config = LANGUAGE_CONFIGS.get(self.filetype)
+        
+        if not config or "loop_nodes" not in config:
+            return {}
+        
+        loop_types = config["loop_nodes"]
+        top_level_loops = self._find_top_level_loops(root_node, loop_types)
+        
+        loop_structures = []
+        max_depth = 0
+        
+        for loop_node in top_level_loops:
+            loops = self._collect_loops(loop_node, loop_types, 1)
+            structure_depth = max(loop["depth"] for loop in loops)
+            max_depth = max(max_depth, structure_depth)
+            loop_structures.append({
+                "complexity": self._depth_to_complexity(structure_depth),
+                "loops": loops,
+            })
+        
+        return {
+            "max_depth": max_depth,
+            "estimated": self._depth_to_complexity(max_depth),
+            "loop_structures": loop_structures,
+        }
+
+
+    def _find_top_level_loops(self, node, loop_types):
+        """Finds loops that aren't nested inside other loops."""
+        if node.type in loop_types:
+            return [node]
+        
+        results = []
+        for child in node.children:
+            results.extend(self._find_top_level_loops(child, loop_types))
+        return results
+
+
+    def _collect_loops(self, node, loop_types, depth):
+        """Collects a loop and all nested loops within it."""
+        loops = [{
+            "type": node.type,
+            "line": node.start_point[0] + 1,
+            "depth": depth,
+        }]
+        
+        for child in node.children:
+            if child.type in loop_types:
+                loops.extend(self._collect_loops(child, loop_types, depth + 1))
+            else:
+                loops.extend(self._search_for_loops(child, loop_types, depth + 1))
+        
+        return loops
+
+
+    def _search_for_loops(self, node, loop_types, depth):
+        """Searches non-loop nodes for nested loops."""
+        loops = []
+        for child in node.children:
+            if child.type in loop_types:
+                loops.extend(self._collect_loops(child, loop_types, depth))
+            else:
+                loops.extend(self._search_for_loops(child, loop_types, depth))
+        return loops
+
+
+    def _depth_to_complexity(self, depth):
+        if depth == 0:
+            return "O(1)"
+        elif depth == 1:
+            return "O(n)"
+        else:
+            return f"O(n^{depth})"
+
     def extract(self):
         self.extract_file_type()
         
         if self.filetype in LANGUAGE_MAP:
             tree = self.parse_file()
             self.libraries = self.extract_imports(tree.root_node)
+            self.complexity = self.extract_complexity(tree.root_node)
