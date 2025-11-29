@@ -94,9 +94,9 @@ LANGUAGE_CONFIGS = {
     },
 }
 
-class ProgrammingReader:
+class CodeReader:
     """
-    Detects the file type of programming files and extracts any imported libraries.
+    Detects the file type of code files and extracts any imported libraries.
     Supports multiple languages and uses language-specific regex patterns and parsing.
     """
 
