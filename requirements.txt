@@ -17,3 +17,12 @@ PyDriller
 fpdf2
 tabulate
 pandas
+tree_sitter
+tree-sitter-python
+tree-sitter-javascript
+tree-sitter-c
+tree-sitter-cpp
+tree-sitter-java
+tree-sitter-typescript
+tree-sitter-go
+tree-sitter-rust
