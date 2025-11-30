@@ -70,7 +70,6 @@ def search(search: FSS_Search):
                 )
                 file = Path(file_analysis.file_path)
                 if file.exists():
-                    print(f"Delta Scanning file: {file_analysis.file_path}")
                     if file_analysis.file_path in search.excluded_path:
                         continue
                     if datetime.fromtimestamp(
@@ -79,6 +78,7 @@ def search(search: FSS_Search):
                         exclude_flag = True
                         search.excluded_path.add(file_analysis.file_path)
                         continue
+                    print(f"Scanning previously found file: {file_analysis.file_path}")
                     new_file_result = fas.run_fas(file_analysis.file_path)
                     if new_file_result:
                         num_of_files_scanned += 1
