@@ -4,7 +4,7 @@ import src.fas.fas as fas
 from pydriller import Git, Repository as PyDrillerRepo
 from typing import Optional, List, Dict
 import os
-from datetime import datetime
+import src.param.param as param
 
 class GitGrouping:
     
@@ -13,7 +13,7 @@ class GitGrouping:
         self.files = {}
         self.commits = {}  
     
-    def add_repository(self, repo_path: str, repo_id: Optional[str] = None, filter_author: Optional[str] = None):
+    def add_repository(self, repo_path: str, repo_id: Optional[str] = None):
         repo_path = Path(repo_path).resolve()
         
         # Once a repo has been added, if it does not currently have a repo id, 
@@ -22,7 +22,7 @@ class GitGrouping:
             repo_id = str(repo_path)
         
         # Use repo_reader to create a repo object
-        repo = Repository(str(repo_path), filter_author=filter_author)
+        repo = Repository(str(repo_path), filter_author = param.get("scan.github_username"))
         repo.extrapolate()
         
         self.repositories[repo_id] = repo
@@ -40,7 +40,7 @@ class GitGrouping:
         
         # Build the git_output object with all required fields
         git_output = {
-            "author": repo.authors,
+            "author": repo.get_authors(),
             "title": repo_id, # Repo ID becomes the title of the project
             "subject": "Git Repo",
             "created": created_date,
@@ -67,7 +67,7 @@ class GitGrouping:
             print("\n")
             
             # A set of the files present within the git repo so there are no repeated or wasted analysis/searches
-            output = set()  
+            output = []  
 
             print(project_path)
             print("\n")
@@ -79,11 +79,17 @@ class GitGrouping:
                 
                 # Only analyze if is a file and exists
                 if os.path.isfile(file_path):
-                    file_result: fas.FileAnalysis | None = fas.run_fas(file_path)
+                    file_result = fas.run_fas(file_path)
                     
                     # Add result to output, which will be added to the returned project file attached in extra data
                     if file_result is not None:
-                        output.add(file_result)
+                        output.append({
+                            "File name": file_result.file_name,
+                            "File type": file_result.file_type,
+                            "Last modified": file_result.last_modified,
+                            "Created time": file_result.created_time,
+                            "Extra data": file_result.extra_data,
+                        })
             
             return output
             
@@ -108,29 +114,3 @@ class GitGrouping:
         except Exception as e:
             print(f"[Error] Failed to extract repository dates: {type(e).__name__}: {e}")
             return None, None
-        
-    def get_commits_by_author(self, repo_id: str, author_name: Optional[str] = None) -> List[Dict]:
-        # Get all commits from a specific author in a repository.
-        if repo_id not in self.commits:
-            return []
-        
-        return [commit for commit in self.commits[repo_id] if commit['author'] == author_name]
-    
-    def analyze_commit_patterns(self, repo_id: str) -> Dict:
-        # Analyze commit patterns in a repository, returns statistics about commits, changes, and file modifications.
-        if repo_id not in self.commits:
-            return {}
-        
-        commits = self.commits[repo_id]
-        
-        if not commits:
-            return {}
-        
-        total_insertions = sum(c['insertions'] for c in commits)
-        total_deletions = sum(c['deletions'] for c in commits)
-        
-        return {
-            "total_commits": len(commits),
-            "total_insertions": total_insertions,
-            "total_deletions": total_deletions,
-        }

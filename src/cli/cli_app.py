@@ -80,7 +80,7 @@ def add_cli_args(parser: argparse.ArgumentParser):
     )     
     parser.add_argument(
         "-g",
-        "--g",
+        "--github_username",
         type=str,
         help="Input a github username for specific git repo parsing.",
     )
@@ -150,6 +150,10 @@ def run_cli():
     if file_types:
         param.set("supported_file_types", list(file_types))
         print(f"Filtering by file types: {file_types}")
+    
+    if args.github_username:
+        param.set("scan.github_username", args.github_username)
+        print(f"GitHub username set to: {args.github_username}")
 
     bound_str: str = "Files created between:"
     if lower_bound:

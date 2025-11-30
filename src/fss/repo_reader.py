@@ -18,11 +18,10 @@ class Repository:
             # Parse commits and authors
             for commit in PyDrillerRepo(self.path).traverse_commits():
                 author = commit.author.name
-                commit_hash = commit.hash
                 
+                self.authors.setdefault(author)
                 if self.filter_author and author != self.filter_author:
                     continue
-                self.authors.setdefault(author, []).append(commit_hash)
 
                 commit_data = {
                     'author': author,
@@ -66,13 +65,6 @@ class Repository:
     def get_commits_content(self):
         # Return list of all commit content.
         return self.commits_content
-    
-    def get_commit_by_hash(self, commit_hash):
-        # Return specific commit content by hash.
-        for commit in self.commits_content:
-            if commit['hash'] == commit_hash:
-                return commit
-        return None
 
     def get_language_dict(self):
         # Return dictionary of languages and file counts.
