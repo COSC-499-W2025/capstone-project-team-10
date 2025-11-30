@@ -6,7 +6,7 @@ import json
 from src.fss.repo_reader import Repository
 from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
 from utils.libraries_mappings import LIBRARY_SKILL_MAP as lsm
-from src.fas.fas_programming_reader import ProgrammingReader
+from src.fas.fas_code_reader import CodeReader
 
 
 class FileAnalysis:
@@ -162,7 +162,7 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                 }
             
             case _ if ext in em:
-                reader = ProgrammingReader(file_path)
+                reader = CodeReader(file_path)
                 # return {
                 #     "language": reader.filetype,
                 #     "libraries": reader.libraries,
