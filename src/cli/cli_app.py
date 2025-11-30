@@ -77,6 +77,12 @@ def add_cli_args(parser: argparse.ArgumentParser):
         "--after",
         type=str,
         help="Only include files created after the specified date (YYYY-MM-DD).",
+    )     
+    parser.add_argument(
+        "-g",
+        "--g",
+        type=str,
+        help="Input a github username for specific git repo parsing.",
     )
     # Flags
     parser.add_argument("-q", "--quiet", action="store_true", help="Suppress output.")
