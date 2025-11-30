@@ -26,3 +26,4 @@ tree-sitter-java
 tree-sitter-typescript
 tree-sitter-go
 tree-sitter-rust
+beautifulsoup4
