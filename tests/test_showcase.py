@@ -288,24 +288,24 @@ def test_generate_portfolio():
 
 
 
-def test_image_project_contains_image():
+def test_resume_image_project_contains_image():
     images = extract_pdf_images()
     assert len(images) > 0, "No images found for the image project in PDF"
 
-def test_docx_project_key_skills_and_summary():
+def test_resume_docx_project_key_skills_and_summary():
     text = extract_pdf_text()
     assert "Key Skills" in text, "Key skills missing in DOCX project"
     assert "File Summary" in text or "summary" in text.lower(), "Summary missing in DOCX project"
 
-def test_xlsx_project_key_skills():
+def test_resume_xlsx_project_key_skills():
     text = extract_pdf_text()
     assert "Key Skills" in text, "Key skills missing in XLSX project"
 
-def test_psd_project_artistic_label():
+def test_resume_psd_project_artistic_label():
     text = extract_pdf_text()
     assert "Artistic Project" in text or "Photoshop" in text, "PSD project label missing"
 
-def test_python_project_key_skills_and_code_complexity():
+def test_resume_coding_project_key_skills_and_code_complexity():
     text = extract_pdf_text()
     assert "Key Skills" in text, "Python project key skills missing"
     assert "Code Complexity" in text, "Python project code complexity missing"
@@ -340,7 +340,7 @@ def test_portfolio_psd_project_artistic_label():
     # Check Artistic Project label
     assert "Artistic Project" in psd_div.get_text(), "PSD project missing 'Artistic Project' label"
 
-def test_portfolio_python_project_key_skills_and_code_complexity():
+def test_portfolio_coding_project_key_skills_and_code_complexity():
     soup = load_portfolio_html()
     py_div = soup.find("div", class_="py")
     assert py_div, "No Python project found"
