@@ -159,6 +159,10 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                     "word_count": md.get_word_counts(),
                     "code_blocks": md.get_code_blocks(),
                     "paragraphs": md.get_paragraphs(),
+                    "complexity": md.get_complexity(),
+                    "depth": md.get_depth(),
+                    "structure": md.get_structure(),
+                    "sentiment_insight": md.get_sentiment_insight(),
                 }
             
             case _ if ext in em:
@@ -185,7 +189,7 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                 return None
             
 
-        if file_type in ("docx", "odt", "rtf") and isinstance(metadata, dict):
+        if file_type in ("docx", "odt", "rtf", "md") and isinstance(metadata, dict):
 
             skills = []
 

@@ -1,5 +1,8 @@
 import mrkdwn_analysis
 
+from src.fas.fas_docx import generate_complexity_feedback, generate_length_vocab_feedback, generate_sentence_feedback
+from src.fas.fas_text_analysis import TextSummary
+import src.fas.fas_docx
 
 class Markdown:
     """
@@ -16,6 +19,7 @@ class Markdown:
         """
         self.analyzer = mrkdwn_analysis.MarkdownAnalyzer(path)
         self.md_path = path
+        self.text_analyzer = TextSummary(self.get_paragraphs())
 
     def get_headers(self) -> dict[str, list[str]]:
         # Utilize the identify_headers() to extract the information of all headers
@@ -93,10 +97,23 @@ class Markdown:
     # Note - there is so much more that markdown-analysis can do - but there's also a few that it cannot do.
     # Have to congregate a meetings to discuss what (more) is needed to extract from an .md, but for now, this should do.
 
+    r"""
+        Functions to help integrate with the current FAS - generate based on paragraphs
+        
+        Credits: sfjalex, A-Shrew
+    """
+    def get_complexity(self):
+        return generate_complexity_feedback(self.text_analyzer.getStatistics()["lexical_diversity"])
 
-"""
-# Usage
-test_markdown = Markdown("test_markdown.md")
-hierarchy = test_markdown.get_paragraphs()
-print(hierarchy)
-"""
+    def get_depth(self):
+        return generate_length_vocab_feedback(self.text_analyzer.getStatistics())
+
+    def get_structure(self):
+        return generate_sentence_feedback(self.text_analyzer.getStatistics())
+
+    def get_sentiment_insight(self):
+        return generate_sentence_feedback(self.text_analyzer.getSentiment())
+
+    r"""
+        Functions to help integrate with the current FAS - generate based on paragraphs
+    """
