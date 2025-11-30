@@ -8,6 +8,7 @@ import src.fss.fss as fss
 import src.log.log as log
 import src.param.param as param
 import src.zip.zip_app as zip
+import src.log.log_sorter as sorter
 from src.showcase.showcase import generate_portfolio, generate_resume
 
 
@@ -165,6 +166,67 @@ def run_cli():
 
     print("Scan complete.")
     print(f"Log file located at:{param.get('logging.current_log_file')}")
+
+    sort_response = input("Sort the logs? (Y/N)").lower()
+    if sort_response == "y":
+        sort = sorter.LogSorter(param.get('logging.current_log_file'))
+        print(f"Available columns: {sort.get_available_columns()}")
+        sort_criteria = input("Sorting criteria (delimited by comma): \n")
+        sort_ordering = input("Sorting ordering (ascending = True, descending = False, delimited by comma): \n")
+
+        criteria = [c.strip() for c in sort_criteria.split(",") if c.strip()]
+        if not criteria:
+            print("No sorting criteria provided. Skipping sorting.")
+        else:
+
+            # Helper function
+            def __parse_bool_token(tok: str):
+                t = tok.strip().lower()
+                if t in ("true", "t", "1", "asc", "ascending"):
+                    return True
+                if t in ("false", "f", "0", "desc", "descending"):
+                    return False
+                raise ValueError(f"Unrecognized sort order token: '{tok}'")
+            
+            ordering = []
+            if sort_ordering and sort_ordering.strip():
+                tokens = [t.strip() for t in sort_ordering.split(",") if t.strip()]
+                try:
+                    ordering = [__parse_bool_token(tok) for tok in tokens]
+                except ValueError as e:
+                    print(f"Invalid sort ordering: {e}. Skipping sort.")
+                    ordering = []
+            if not ordering:
+                ordering = [True] * len(criteria)
+
+            if len(ordering) != len(criteria):
+                print(f"Number of ordering flags ({len(ordering)}) does not match number of criteria ({len(criteria)}). Skipping sort.")
+            else:
+                try:
+                    sort.set_sort_parameters(criteria, ordering)
+                except ValueError as e:
+                    print(f"Sort parameter error: {e}")
+                else:
+
+                    # Preview
+                    try:
+                        preview = sort.get_preview(5)
+                        print("Preview of sorted data (first 5 rows):")
+                        print(preview)
+                    except ValueError:
+                        # get_preview raises if params not set; shouldn't happen here but guard anyway
+                        pass
+
+                    # Sort
+                    try:
+                        sort.sort()
+                        sort.return_csv()
+                        orig = param.get('logging.current_log_file')
+                        orig_path = Path(orig)
+                        new_path = orig_path.with_name(f"{orig_path.stem}_sorted{orig_path.suffix}")
+                        print(f"Sorted log written to: {new_path}")
+                    except Exception as e:
+                        print(f"Failed to sort/write sorted log: {e}")
 
     if args.resume_entries:
         # check that the included path is valid
