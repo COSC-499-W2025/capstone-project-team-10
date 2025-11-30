@@ -1,10 +1,15 @@
+import csv
 import os
 from datetime import date, datetime
 from pathlib import Path
+import re
+from typing import Dict
 
 import src.fas.fas as fas
 import src.log.log as log
+import src.param.param as param
 from src.fss.fss_helper import file_type_check, time_check
+from src.fas.fas import get_last_modified_time
 
 
 class FSS_Search:
@@ -22,12 +27,64 @@ class FSS_Search:
         self.time_lower_bound = time_lower_bound
         self.time_upper_bound = time_upper_bound
 
+def load_cache() -> Dict[str, str]:
+    # Loads and reads the cache file
+    # It returns a dictionary of  [absolute file path: (modified time, size)]
+    cache: Dict[str, str]  = {}
+    
+    logs_folder = Path(param.result_log_folder_path)
+    if not logs_folder.exists():
+        return cache
+    
+    pattern = re.compile(param.log_file_naming_regex)
+    latest_log = None
+    latest_idx = -1
+
+    for log_file in logs_folder.iterdir():
+        if not log_file.is_file():
+            continue
+        match = pattern.match(log_file.name)
+        if not match:
+            continue
+
+        try:
+            index = int(match.group(1))
+        except ValueError:
+            continue
+
+        if index > latest_idx:
+            latest_log = log_file
+            latest_idx = index
+
+    if latest_log is None:
+        return cache
+    
+    with latest_log.open("r", newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            file_path = row.get("File path analyzed")
+            last_modified = row.get("Last modified")
+            if file_path and last_modified:
+                cache[file_path] = last_modified
+    return cache
+
+def should_process(path, cache) -> bool:
+    last_modified_cached = cache.get(path)
+    if last_modified_cached is None:
+        return True
+    return get_last_modified_time(path) != last_modified_cached
 
 def search(search: FSS_Search):
     exclude_flag = True
     num_of_files_scanned = 0
+    excluded_set = set()
+    cache = load_cache()
 
-    if not search.excluded_path:
+    for cached_path in cache.keys():
+        if not should_process(cached_path, cache):
+            excluded_set.add(os.path.abspath(cached_path))
+
+    if not search.excluded_path and not excluded_set:
         # If there is not included exclusion, the flag will be set to false to skip comparisons
         exclude_flag = False
 
@@ -39,7 +96,6 @@ def search(search: FSS_Search):
 
     if exclude_flag:
         # ensures that the excluded paths input is a set
-        excluded_set = set()
         for e_path in search.excluded_path:
             e_path = os.path.abspath(e_path)
             excluded_set.add(e_path)
