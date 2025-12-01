@@ -16,10 +16,11 @@ class Markdown:
 
         (MarkdownAnalyzer) instance
         (Path) string Path of the .md
+        (Text_Analyzer) instance
         """
         self.analyzer = mrkdwn_analysis.MarkdownAnalyzer(path)
         self.md_path = path
-        self.text_analyzer = TextSummary(" ".join(self.get_paragraphs()["Paragraph"]))
+        self.text_analyzer = TextSummary(" ".join(self.analyzer.identify_paragraphs()["Paragraph"]))
 
     def get_headers(self) -> dict[str, list[str]]:
         # Utilize the identify_headers() to extract the information of all headers
