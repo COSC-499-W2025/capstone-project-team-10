@@ -142,7 +142,7 @@ python -m src.main <file_path> [options]
 | `-y`, `--yes`                     | Automatically grant file access permission (skip interactive prompt).                                                           | `-y`                                            |
 | `-r`, `--resume_entries`          | Generate a PDF resume from scanned projects. Optionally specify a directory to save the result.                                 | `-r` or `-r /path/to/save`                      |
 | `-p`, `--portfolio_entries`       | Generate a web portfolio from scanned projects. Optionally specify a directory to save the result.                              | `-p` or `-p /path/to/save`                      |
-| `-s`, `--skill_timeline_entries`  | Generate a PDF of key skills from scanned projects, ordered chronologically. Optionally specify a directory to save the result. | `-s` or `-s /path/to/save`                      |
+| `-t`, `--skill_timeline_entries`  | Generate a PDF of key skills from scanned projects, ordered chronologically. Optionally specify a directory to save the result. | `-t` or `-t /path/to/save`                      |
 | `-c`, `--clean`                   | Start a new log file instead of resuming the last one.                                                                          | `-c`                                            |
 | `-b`, `--before <date>`           | Only include files created before the specified date (`YYYY-MM-DD`).                                                            | `-b 2023-01-01`                                 |
 | `-a`, `--after <date>`            | Only include files created after the specified date (`YYYY-MM-DD`).                                                             | `-a 2022-01-01`                                 |
@@ -209,13 +209,13 @@ python -m src.main /path/to/projects -p /path/to/save
 ##### Generate Key Skills
 
 ```sh
-python -m src.main /path/to/projects -s
+python -m src.main /path/to/projects -t
 ```
 
 Or specify a directory to save key skills:
 
 ```sh
-python -m src.main /path/to/projects -s /path/to/save
+python -m src.main /path/to/projects -t /path/to/save
 ```
 
 ##### Suppress Output

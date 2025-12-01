@@ -518,7 +518,7 @@ def generate_skill_timeline() -> Path | None:
         return None
     
     sorter = LogSorter(str(log_file))
-    sorter.set_sort_parameters(["Last modified"], [True])
+    sorter.set_sort_parameters(["Last modified"], [False])
     sorter.sort()                
     sorter.return_csv()
 
@@ -611,7 +611,7 @@ def generate_skill_timeline() -> Path | None:
                 # Skip log rows with no skills
                 if not skills:
                     continue
-                
+
                 date_str = fa.created_time
                 if not date_str or date_str == "N/A":
                     date_str = fa.last_modified

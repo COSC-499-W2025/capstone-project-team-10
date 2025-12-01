@@ -61,7 +61,7 @@ def add_cli_args(parser: argparse.ArgumentParser):
         help="Output a web portfolio with project descriptions. Optional: Include a directory path to change where the result is saved",
     )
     parser.add_argument(
-        "-s",
+        "-t",
         "--skill_timeline_entries",
         nargs="?",
         const=True,
