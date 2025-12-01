@@ -13,6 +13,7 @@ from fpdf.enums import XPos, YPos
 
 import src.log.log as log
 import src.param.param as param
+from src.log.log_sorter import LogSorter
 from src.fas.fas import FileAnalysis
 
 from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
@@ -81,6 +82,7 @@ def generate_all():
     """
     generate_resume()
     generate_portfolio()
+    generate_skill_timeline()
 
 
 def generate_resume() -> Path | None:
@@ -632,3 +634,173 @@ def generate_portfolio() -> Path | None:
     except Exception as e:
         print(f"Failed to read log file: {e}")
         return
+
+def generate_skill_timeline() -> Path | None:
+    """
+    Generates a chronological skills timeline from the sorted log file.
+    """
+    logging.getLogger("fpdf").setLevel(logging.ERROR)
+    logging.getLogger("fontTools").setLevel(logging.ERROR)
+
+    todays_date = datetime.now().strftime("%m-%d-%y")
+    export_path: Path = Path(param.export_folder_path) / (todays_date + "-skills_timeline.pdf")
+    file_number: int = 0
+
+    # Ensure unique filename
+    while export_path.exists():
+        file_number += 1
+        export_path = Path(param.export_folder_path) / (
+            f"{todays_date}-skills_timeline-{file_number}.pdf"
+        )
+
+    # Determine which log file to read
+    if not log.current_log_file:
+        print("No current log file available.")
+        return None
+
+    log_file = Path(log.current_log_file)
+
+    if not log_file.exists():
+        print(f"Log file not found: {log_file}")
+        return None
+    
+    sorter = LogSorter(str(log_file))
+    sorter.set_sort_parameters(["Last modified"], [False])
+    sorter.sort()                
+    sorter.return_csv()
+
+    log_file = log_file.with_name(
+        f"{log_file.stem}_sorted{log_file.suffix}"
+    )
+    # Ensure export folder exists
+    if not export_path.parent.exists():
+        print(f"Export folder does not exist: {export_path.parent}")
+        return None
+
+    try:
+        with open(log_file, "r", encoding="utf-8", newline="") as lf, \
+             open(export_path, "w", encoding="utf-8") as out:
+
+            reader = csv.DictReader(lf)
+
+            pdf = FPDF()
+            pdf.add_page()
+
+            pdf.add_font("Noto", "", "src/showcase/fonts/noto.ttf", uni=True)
+            pdf.add_font("Noto", "B", "src/showcase/fonts/notob.ttf", uni=True)
+            pdf.add_font("Noto", "I", "src/showcase/fonts/notoi.ttf", uni=True)
+            pdf.add_font("Noto", "BI", "src/showcase/fonts/notobi.ttf", uni=True)
+
+            pdf.set_font("Noto", "B", size=16)
+            pdf.multi_cell(
+              0,
+              10,
+              "Skill Timeline", 
+              new_x=XPos.LMARGIN, 
+              new_y=YPos.NEXT,
+            )
+            pdf.ln(4)
+
+            next(reader, None)
+
+            for row in reader:
+                # Build FileAnalysis from row
+                fa = FileAnalysis(
+                    row.get("File path analyzed", ""),
+                    row.get("File name", ""),
+                    row.get("File type", ""),
+                    row.get("Last modified", ""),
+                    row.get("Created time", ""),
+                    row.get("Extra data", ""),
+                )
+
+                extra_data_raw = fa.extra_data
+                skills: list[str] = []
+
+                if isinstance(extra_data_raw, dict):
+                    # direct dict stored in memory
+                    candidate = (
+                        extra_data_raw.get("key_skills")
+                        or extra_data_raw.get("skills")
+                    )
+                    if isinstance(candidate, list):
+                        skills = [str(s).strip() for s in candidate if str(s).strip()]
+                    elif isinstance(candidate, str) and candidate.strip():
+                        skills = [candidate.strip()]
+
+                elif isinstance(extra_data_raw, str):
+                    text = extra_data_raw.strip()
+                    if text:
+                        # try parsing string literal
+                        try:
+                            parsed = ast.literal_eval(text)
+                        except Exception:
+                            # treat raw string as a single skill description
+                            skills = [clean_text(text)]
+                        else:
+                            if isinstance(parsed, dict):
+                                candidate = (
+                                    parsed.get("key_skills")
+                                    or parsed.get("skills")
+                                )
+                                if isinstance(candidate, list):
+                                    skills = [
+                                        str(s).strip() for s in candidate if str(s).strip()
+                                    ]
+                                elif isinstance(candidate, str) and candidate.strip():
+                                    skills = [candidate.strip()]
+                            elif isinstance(parsed, list):
+                                skills = [str(s).strip() for s in parsed if str(s).strip()]
+                            else:
+                                # fallback: treat as single item
+                                skills = [clean_text(text)]
+
+                # Skip log rows with no skills
+                if not skills:
+                    continue
+
+                date_str = fa.created_time
+                if not date_str or date_str == "N/A":
+                    date_str = fa.last_modified
+
+                # Try formatting nicely
+                if date_str and date_str != "N/A":
+                    try:
+                        dt = datetime.fromisoformat(date_str)
+                        date_display = dt.strftime("%Y-%m-%d")
+                    except Exception:
+                        date_display = date_str
+                else:
+                    date_display = "N/A"
+
+                # --- Write timeline item ---
+                pdf.set_font("Noto", "B", size=12)
+                header_line = (
+                    f"{date_display} - {fa.file_name} "
+                    f"({fa.file_type.upper()})"
+                )
+                pdf.multi_cell(
+                    0,
+                    8,
+                    clean_text(header_line),
+                    new_x=XPos.LMARGIN,
+                    new_y=YPos.NEXT,
+                )
+
+                pdf.set_font("Noto", "", size=11)
+                skills_text = ", ".join(skills)
+                pdf.multi_cell(
+                    0,
+                    6,
+                    f"Skills: {clean_text(skills_text)}",
+                    new_x=XPos.LMARGIN,
+                    new_y=YPos.NEXT,
+                )
+                pdf.ln(3)
+
+        pdf.output(str(export_path))
+        return export_path
+
+    except Exception as e:
+        print(f"Failed to generate skills timeline: {e}")
+        return None
