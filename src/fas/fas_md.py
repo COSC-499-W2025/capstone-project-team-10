@@ -1,6 +1,6 @@
 import mrkdwn_analysis
 
-from src.fas.fas_docx import generate_complexity_feedback, generate_length_vocab_feedback, generate_sentence_feedback
+from src.fas.fas_docx import generate_complexity_feedback, generate_length_vocab_feedback, generate_sentence_feedback, generate_sentiment_feedback
 from src.fas.fas_text_analysis import TextSummary
 import src.fas.fas_docx
 
@@ -19,7 +19,7 @@ class Markdown:
         """
         self.analyzer = mrkdwn_analysis.MarkdownAnalyzer(path)
         self.md_path = path
-        self.text_analyzer = TextSummary(self.get_paragraphs())
+        self.text_analyzer = TextSummary(" ".join(self.get_paragraphs()["Paragraph"]))
 
     def get_headers(self) -> dict[str, list[str]]:
         # Utilize the identify_headers() to extract the information of all headers
@@ -112,8 +112,4 @@ class Markdown:
         return generate_sentence_feedback(self.text_analyzer.getStatistics())
 
     def get_sentiment_insight(self):
-        return generate_sentence_feedback(self.text_analyzer.getSentiment())
-
-    r"""
-        Functions to help integrate with the current FAS - generate based on paragraphs
-    """
+        return generate_sentiment_feedback(self.text_analyzer.getSentiment())
