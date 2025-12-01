@@ -9,7 +9,7 @@ import src.log.log as log
 import src.param.param as param
 import src.zip.zip_app as zip
 import src.log.log_sorter as sorter
-from src.showcase.showcase import generate_portfolio, generate_resume
+from src.showcase.showcase import generate_portfolio, generate_resume, generate_skill_timeline
 
 
 def prompt_file_perms():
@@ -62,6 +62,14 @@ def add_cli_args(parser: argparse.ArgumentParser):
         help="Output a web portfolio with project descriptions. Optional: Include a directory path to change where the result is saved",
     )
     parser.add_argument(
+        "-t",
+        "--skill_timeline_entries",
+        nargs="?",
+        const=True,
+        default=None,
+        help="Output a pdf with with key skills ordered chronologically. Optional: Include a directory path to change where the result is saved",
+    )
+    parser.add_argument(
         "-c",
         "--clean",
         action="store_true",
@@ -78,6 +86,12 @@ def add_cli_args(parser: argparse.ArgumentParser):
         "--after",
         type=str,
         help="Only include files created after the specified date (YYYY-MM-DD).",
+    )     
+    parser.add_argument(
+        "-g",
+        "--github_username",
+        type=str,
+        help="Input a github username for specific git repo parsing.",
     )
     # Flags
     parser.add_argument("-q", "--quiet", action="store_true", help="Suppress output.")
@@ -145,6 +159,12 @@ def run_cli():
     if file_types:
         param.set("supported_file_types", list(file_types))
         print(f"Filtering by file types: {file_types}")
+    
+    if args.github_username:
+        param.set("scan.github_username", args.github_username)
+        print(f"GitHub username set to: {args.github_username}")
+    else:
+        param.set("scan.github_username", "")
 
     bound_str: str = "Files created between:"
     if lower_bound:
@@ -257,6 +277,21 @@ def run_cli():
             print(f"Portfolio generated at: {file_path}")
         else:
             print("Portfolio generation failed.")
+
+    if args.skill_timeline_entries:
+        # check that the included path is valid
+        if (
+            isinstance(args.skill_timeline_entries, str)
+            and Path(args.skill_timeline_entries).exists()
+            and Path(args.skill_timeline_entries).is_dir()
+        ):
+            param.export_folder_path = args.skill_timeline_entries
+        print("Generating timeline of skills...")
+        file_path = generate_skill_timeline()
+        if file_path:
+            print(f"Skill time generated at: {file_path}")
+        else:
+            print("Skill timeline generation failed.")
 
     if args.quiet:
         builtins.print = _original_print

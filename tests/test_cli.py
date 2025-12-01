@@ -121,6 +121,8 @@ def test_run_cli(monkeypatch):
         "--after",
         "2022-01-01",
         "--yes",
+        "-g",
+        "test_username",
     ]
     monkeypatch.setattr(sys, "argv", test_args)
     # Patch print to capture output
@@ -162,6 +164,10 @@ def test_run_cli(monkeypatch):
     assert "unzipped" in all_output
     assert "File unzipped at:" in all_output
 
+    # Check that the github username was taken in and correct
+    assert "GitHub" in all_output
+    assert "test_username" in all_output
+
     # Check that the log file location is printed
     assert "Log file located at:" in all_output
 
@@ -194,6 +200,8 @@ def test_run_cli_quiet(monkeypatch):
         "2022-01-01",
         "--yes",
         "-q",
+        "-g",
+        "test_username",
     ]
     monkeypatch.setattr(sys, "argv", test_args)
     # Patch print to capture output
@@ -235,6 +243,10 @@ def test_run_cli_quiet(monkeypatch):
     # Check that the zip extraction message is present
     assert "unzipped" not in all_output
     assert "File unzipped at:" not in all_output
+
+    # Check that the github username was taken in and is correct
+    assert "GitHub" not in all_output
+    assert "test_username" not in all_output
 
     # Check that the log file location is printed
     assert "Log file located at:" not in all_output

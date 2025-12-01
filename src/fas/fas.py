@@ -6,7 +6,7 @@ import json
 from src.fss.repo_reader import Repository
 from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
 from utils.libraries_mappings import LIBRARY_SKILL_MAP as lsm
-from src.fas.fas_programming_reader import ProgrammingReader
+from src.fas.fas_code_reader import CodeReader
 
 
 class FileAnalysis:
@@ -162,22 +162,21 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                 }
             
             case _ if ext in em:
-                reader = ProgrammingReader(file_path)
+                reader = CodeReader(file_path)
                 # return {
                 #     "language": reader.filetype,
                 #     "libraries": reader.libraries,
                 # }
                 language = reader.filetype
                 libraries = reader.libraries
+                complexity = reader.complexity
+                oop = reader.oop
+
 
             case "git":
-                # from src.fas import fas_git
-                # return fas_git.extract_git_data(file_path)
+                from src.fas.fas_git_grouping import GitGrouping
                 # This will enter the grouping and within grouping will go through all files within the git repo and assign them a repo id
-                import fas_git_grouping
-
-                git_group = fas_git_grouping.GitGrouping()
-                # Currently it only returns the repo_id and files present within the git folder
+                git_group = GitGrouping()
                 return git_group.add_repository(file_path)
 
             case _:
@@ -194,6 +193,7 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                     skill = feedback_to_skill(metadata[key])
                     if skill:
                         skills.append(skill)
+                        
 
             metadata["key_skills"] = skills
         elif ext in em:
@@ -204,15 +204,29 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             metadata = {
                 "language": language,
                 "libraries": libraries,
+                "complexity": complexity,
+                "oop": oop,
             }
 
             # Always include the language as a skill
             if language:
                 skills.append(f"{language.capitalize()} programming")
 
-            for lib in libraries:
-                if lib in lsm:
-                    skills.append(lsm[lib])
+            if isinstance(libraries, list):
+                for lib in libraries:
+                    if lib in lsm:
+                        skills.append(lsm[lib])
+
+            if isinstance(oop, dict):
+                if oop.get("classes"):
+                    skills.append("Object-oriented programming (OOP)")
+                if oop.get("functions"):
+                    skills.append("Modular function design")
+
+            if isinstance(complexity, dict):
+                est = complexity.get("estimated")
+                if est and est != "O(1)":
+                    skills.append("Algorithmic complexity analysis")
 
             # Remove duplicates
             metadata["key_skills"] = list(set(skills))
