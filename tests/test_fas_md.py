@@ -66,3 +66,19 @@ class TestMarkdown:
         assert isinstance(md.get_code_blocks(), dict)
         assert isinstance(md.get_paragraphs(), dict)
         assert isinstance(md.get_word_counts(), int)
+
+    # Test the 4 helper fas integration methods
+    def test_integration_feedback_values(self, md):
+        # verify the human-readable feedback strings produced by the integration
+        assert md.get_complexity() == (
+            "High - Advanced vocabulary, excellent vocabulary, varied and diverse word choices."
+        )
+        assert md.get_depth() == (
+            "Consider adding more detail to fully develop your ideas."
+        )
+        assert md.get_structure() == (
+            "Consider combining related ideas for better flow."
+        )
+        assert md.get_sentiment_insight() == (
+            "Overall neutral sentiment within your writing. Professional standard sentiment of writing, if you are aiming for a more positive or negative sentiment consider changing your word choices."
+        )
