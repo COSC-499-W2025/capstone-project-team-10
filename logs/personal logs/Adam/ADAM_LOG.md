@@ -1,3 +1,55 @@
+# Week 13 (11/23/2025 - 11/30/2025):
+
+## Completed tasks
+
+All in review features will be merged by the end of the week
+
+![Week 13 Tasks completed](Week13/image-1.png)
+
+## Features
+
+![Week 13 Tasks In-progress](Week13/image.png)
+
+## Recap
+
+#### 1. PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/112
+
+- Added logic to perform delta scanning in the search function, skipping files that have not changed since the last scan based on log data.
+- Updated tests to cover delta scan scenarios and added setup/teardown for log files to ensure test isolation.
+
+##### Tickets: 
+- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/118
+- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/61
+
+#### 2. Milestone 1 presentation: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/126
+
+##### https://docs.google.com/presentation/d/1XbbpL8-pQWZaCGlv856EApih3Kqz07bX3TclOWLYgPc/edit?usp=sharing
+
+I created the slides for our milestone 1 presentation, compiling a collection of examples and helpful images for us to present on. putting a 
+focus on milestone 1 features
+
+### For next week:
+
+For the next week I will documenting our milestone 1 requirement compliance, in addition to ensureing that we are prepared for the next semester
+
+#### Tickets
+
+- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/137
+
+## Additional Context
+
+No problems with my work, I did have to pick up some slack due to other teammates needing additional help. My original plan for this 
+week was to complete a different ticket (https://github.com/COSC-499-W2025/capstone-project-team-10/issues/89) but another group member 
+needed more coding work so I passed it off to them and took over the slides. I also rewrote a malfunctioning module for tickets
+- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/118 and 
+- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/61 
+
+This was additional work that I was not expecting to be completing this week
+
+## Team Survey:
+
+Survey completed
+
 # Week 12 (11/16/2025 - 11/23/2025):
 
 ## Completed tasks
