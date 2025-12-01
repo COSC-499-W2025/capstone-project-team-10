@@ -276,7 +276,6 @@ def generate_resume() -> Path | None:
                             new_x=XPos.LMARGIN,
                             new_y=YPos.NEXT,
                         )
-                        # TODO: Expand to include more details about the files in the git project
 
                     case "xlsx" | "xls" | "docx" | "odt" | "rtf":            
                         key_skills = []
@@ -482,9 +481,84 @@ def generate_portfolio() -> Path | None:
                             <img src="resources/{file_analysis.file_name}.{ext}" width="300"/>
                         """
                     elif ext in collaborative_types:
+                        key_skills = []
+                        extra_data_skills = []
+                        commits = []
+                        author = []
+                        extra_data_raw = file_analysis.extra_data
+
+                        # Get key skills of git project
+                        if isinstance(extra_data_raw, str):
+                            try:
+                                parsed = ast.literal_eval(extra_data_raw)
+                                if isinstance(parsed, dict):
+                                    key_skills = parsed.get("key_skills", []) or []
+                                    extra_data_skills = parsed.get("extra data", []) or []
+                                    commits = parsed.get("commits", []) or []
+                                    author = parsed.get("author", []) or []
+                            except (ValueError, SyntaxError):
+                                key_skills = []
+                                commits = []
+                        elif isinstance(extra_data_raw, dict):
+                            key_skills = extra_data_raw.get("key_skills", []) or []
+                            extra_data_skills = extra_data_raw.get("extra data", []) or []
+                            commits = extra_data_raw.get("commits", []) or []
+                            author = extra_data_raw.get("author", []) or []
+
+                        total_commits = commits.get("total_commits", 0)
+                        total_insertions = commits.get("total_insertions", 0)
+                        total_deletions = commits.get("total_deletions", 0)
+                        net_change = commits.get("net_change", 0)
+                        message_analysis_raw= commits.get("message_analysis", "N/A")
+
+                        if message_analysis_raw != "N/A":
+                            if isinstance(message_analysis_raw, str):
+                                try:
+                                    # Try to parse if it's a string representation of a set
+                                    parsed_set = ast.literal_eval(message_analysis_raw)
+                                    if isinstance(parsed_set, (set, list)):
+                                        message_analysis = ", ".join(sorted(parsed_set))
+                                    else:
+                                        message_analysis = message_analysis_raw
+                                except (ValueError, SyntaxError):
+                                    message_analysis = message_analysis_raw
+                            elif isinstance(message_analysis_raw, (set, list)):
+                                message_analysis = ", ".join(sorted(message_analysis_raw))
+                            else:
+                                message_analysis = str(message_analysis_raw)
+                        else:
+                            message_analysis = "N/A"
+
+                        # Extract key_skills from extra_data_skills (which is a list of file dicts)
+                        all_project_skills = []
+                        if isinstance(extra_data_skills, list):
+                            for file_dict in extra_data_skills:
+                                if isinstance(file_dict, dict):
+                                    file_extra_data = file_dict.get("Extra data", {})
+                                    if isinstance(file_extra_data, dict):
+                                        file_skills = file_extra_data.get("key_skills", [])
+                                        if file_skills:
+                                            all_project_skills.extend(file_skills)
+    
+                        # Remove duplicates and join
+                        all_project_skills = list(set(all_project_skills))
+                        skills_text = ", ".join(key_skills) if key_skills else file_analysis.file_type.upper() + " Data Analysis"
+                        project_skills_text = ", ".join(all_project_skills) if all_project_skills else "N/A"
+
+                        commit_summary = f"Total Commits: {total_commits} \nTotal Insertions: +{total_insertions} \nTotal Deletions: -{total_deletions} \nNet Change: {net_change} \nCommit objectives: {message_analysis}"
+                        # If there is more than one author it becomes a collaborative project
+                        project_text = "Project Contributions: "
+                        author_text = "Author: "
+                        if len(author) >= 2:
+                            project_text = "Collaborative Project Contributions: "
+                            author_text = "Authors: "
+                            
                         details = f"""
-                            <p><strong>Project Contributions:</strong></p>
-                            <pre>{file_analysis.extra_data}</pre>
+                            <p>{author_text} {author}</p>
+                            <p><strong>{project_text}</strong></p>
+                            <pre>{skills_text}</pre>
+                            <pre>Commit analysis: {commit_summary}</pre>
+                            <pre>Key skills demonstrated in this project: {project_skills_text}</pre>
                         """
                     elif ext in ("xlsx", "xls", "docx", "odt", "rtf"):
                         key_skills = extra_dict.get("key_skills", [])
