@@ -205,6 +205,7 @@ def run_cli():
             print("Portfolio generation failed.")
 
     if args.skill_timeline_entries:
+        # check that the included path is valid
         if (
             isinstance(args.skill_timeline_entries, str)
             and Path(args.skill_timeline_entries).exists()

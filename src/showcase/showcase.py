@@ -502,8 +502,7 @@ def generate_skill_timeline() -> Path | None:
                 # Skip log rows with no skills
                 if not skills:
                     continue
-
-                # --- Determine timeline date (created_time preferred) ---
+                
                 date_str = fa.created_time
                 if not date_str or date_str == "N/A":
                     date_str = fa.last_modified
