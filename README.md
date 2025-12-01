@@ -134,18 +134,19 @@ python -m src.main <file_path> [options]
 
 #### Options
 
-| Option                      | Description                                                                                        | Example                                         |
-| --------------------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `--zip <zipfile>`           | Extract the specified zip file and scan its contents.                                              | `--zip myprojects.zip`                          |
-| `--exclude-paths <paths>`   | Space-separated list of absolute paths to exclude from the scan.                                   | `--exclude-paths /path/to/folder /path/to/file` |
-| `--file-types <types>`      | Space-separated list of file types to include (by extension, e.g. `py`, `md`, `pdf`).              | `--file-types py md pdf`                        |
-| `-y`, `--yes`               | Automatically grant file access permission (skip interactive prompt).                              | `-y`                                            |
-| `-r`, `--resume_entries`    | Generate a PDF resume from scanned projects. Optionally specify a directory to save the result.    | `-r` or `-r /path/to/save`                      |
-| `-p`, `--portfolio_entries` | Generate a web portfolio from scanned projects. Optionally specify a directory to save the result. | `-p` or `-p /path/to/save`                      |
-| `-c`, `--clean`             | Start a new log file instead of resuming the last one.                                             | `-c`                                            |
-| `-b`, `--before <date>`     | Only include files created before the specified date (`YYYY-MM-DD`).                               | `-b 2023-01-01`                                 |
-| `-a`, `--after <date>`      | Only include files created after the specified date (`YYYY-MM-DD`).                                | `-a 2022-01-01`                                 |
-| `-q`, `--quiet`             | Suppress output (except for log file location).                                                    | `-q`                                            |
+| Option                            | Description                                                                                                                     | Example                                         |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------| ----------------------------------------------- |
+| `--zip <zipfile>`                 | Extract the specified zip file and scan its contents.                                                                           | `--zip myprojects.zip`                          |
+| `--exclude-paths <paths>`         | Space-separated list of absolute paths to exclude from the scan.                                                                | `--exclude-paths /path/to/folder /path/to/file` |
+| `--file-types <types>`            | Space-separated list of file types to include (by extension, e.g. `py`, `md`, `pdf`).                                           | `--file-types py md pdf`                        |
+| `-y`, `--yes`                     | Automatically grant file access permission (skip interactive prompt).                                                           | `-y`                                            |
+| `-r`, `--resume_entries`          | Generate a PDF resume from scanned projects. Optionally specify a directory to save the result.                                 | `-r` or `-r /path/to/save`                      |
+| `-p`, `--portfolio_entries`       | Generate a web portfolio from scanned projects. Optionally specify a directory to save the result.                              | `-p` or `-p /path/to/save`                      |
+| `-s`, `--skill_timeline_entries`  | Generate a PDF of key skills from scanned projects, ordered chronologically. Optionally specify a directory to save the result. | `-s` or `-s /path/to/save`                      |
+| `-c`, `--clean`                   | Start a new log file instead of resuming the last one.                                                                          | `-c`                                            |
+| `-b`, `--before <date>`           | Only include files created before the specified date (`YYYY-MM-DD`).                                                            | `-b 2023-01-01`                                 |
+| `-a`, `--after <date>`            | Only include files created after the specified date (`YYYY-MM-DD`).                                                             | `-a 2022-01-01`                                 |
+| `-q`, `--quiet`                   | Suppress output (except for log file location).                                                                                 | `-q`                                            |
 
 ---
 
@@ -203,6 +204,18 @@ Or specify a directory to save the portfolio:
 
 ```sh
 python -m src.main /path/to/projects -p /path/to/save
+```
+
+##### Generate Key Skills
+
+```sh
+python -m src.main /path/to/projects -s
+```
+
+Or specify a directory to save key skills:
+
+```sh
+python -m src.main /path/to/projects -s /path/to/save
 ```
 
 ##### Suppress Output
