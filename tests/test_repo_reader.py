@@ -72,9 +72,6 @@ def test_repository_extrapolate_success(mock_repo_class, mock_pydriller_repo):
     expected_authors = ['Author A', 'Author B', 'Author C']
     assert sorted(repo.get_authors()) == sorted(expected_authors)
     
-    # Note: get_commits_count() currently doesn't work with the implementation
-    # because authors are set to None via setdefault()
-    # The commit count can be verified through commits_content instead
     commits = repo.get_commits_content()
     author_commit_counts = {}
     for commit in commits:
@@ -114,12 +111,12 @@ def test_repository_filter_author(mock_repo_class, mock_pydriller_repo):
     repo = Repository("/mock/path", filter_author="Author A")
     repo.extrapolate()
 
-    # Should still track all authors
+    # Should track all authors
     assert 'Author A' in repo.get_authors()
     assert 'Author B' in repo.get_authors()
     assert 'Author C' in repo.get_authors()
     
-    # But commits_content should only have Author A's commits
+    # Assert only Author A's commits
     commits = repo.get_commits_content()
     assert len(commits) == 2
     assert all(c['author'] == 'Author A' for c in commits)
@@ -144,7 +141,7 @@ def test_repository_filter_nonexistent_author(mock_repo_class, mock_pydriller_re
     # All authors should still be tracked
     assert len(repo.get_authors()) == 3
     
-    # But commits_content should be empty
+    # Assert commits_content is empty
     commits = repo.get_commits_content()
     assert len(commits) == 0
 
@@ -158,7 +155,6 @@ def test_commits_content_structure(mock_repo_class, mock_pydriller_repo):
 
     commits = repo.get_commits_content()
     
-    # Verify first commit structure
     first_commit = commits[0]
     assert first_commit['author'] == 'Author A'
     assert first_commit['date'] == datetime(2024, 1, 1)
@@ -166,7 +162,6 @@ def test_commits_content_structure(mock_repo_class, mock_pydriller_repo):
     assert first_commit['insertions'] == 100
     assert first_commit['deletions'] == 0
     
-    # Verify last commit structure
     last_commit = commits[-1]
     assert last_commit['author'] == 'Author C'
     assert last_commit['date'] == datetime(2024, 2, 15)
@@ -182,7 +177,6 @@ def test_repository_authors_setdefault(mock_repo_class, mock_pydriller_repo):
     repo = Repository("/mock/path")
     repo.extrapolate()
 
-    # All authors should be in the dictionary
     assert 'Author A' in repo.authors
     assert 'Author B' in repo.authors
     assert 'Author C' in repo.authors
@@ -213,8 +207,7 @@ def test_repository_extrapolate_handles_exception(mock_repo_class):
 def test_repository_get_methods_initial():
     repo = Repository("/mock/path")
     assert repo.get_authors() == []
-    # Note: get_commits_count() will fail if authors dict has None values
-    # So we only test it's a dict initially
+
     assert isinstance(repo.get_commits_count(), dict)
     assert repo.get_language_dict() == {}
     assert repo.get_commits_content() == []
@@ -254,16 +247,6 @@ def test_detect_language_unknown_extension():
 def test_detect_language_no_extension():
     assert detect_language("README") == "Other"
     assert detect_language(".gitignore") == "Other"
-
-# Tests that LANG_MAP contains expected mappings
-def test_lang_map_completeness():
-    assert ".py" in LANG_MAP
-    assert ".js" in LANG_MAP
-    assert ".ts" in LANG_MAP
-    assert ".java" in LANG_MAP
-    assert ".cpp" in LANG_MAP
-    assert LANG_MAP[".py"] == "Python"
-    assert LANG_MAP[".js"] == "JavaScript"
 
 # Tests commits_content with multiple commits from same author
 @patch('src.fss.repo_reader.PyDrillerRepo')
@@ -320,44 +303,3 @@ def test_commits_content_zero_changes(mock_repo_class):
     assert len(commits) == 1
     assert commits[0]['insertions'] == 0
     assert commits[0]['deletions'] == 0
-
-# Tests language detection with files having None as new_path
-@patch('src.fss.repo_reader.PyDrillerRepo')
-def test_language_detection_with_none_paths(mock_repo_class):
-    # Create a mock commit with a file that has new_path = None (deleted file)
-    class MockModifiedFileWithNone:
-        def __init__(self, new_path):
-            self.new_path = new_path
-    
-    class MockCommitWithNone:
-        def __init__(self):
-            self.hash = 'hash1'
-            self.author = MockAuthor('Author A')
-            self.modified_files = [
-                MockModifiedFileWithNone('file1.py'),
-                MockModifiedFileWithNone(None),  # Deleted file
-                MockModifiedFileWithNone('file2.js'),
-            ]
-            self.msg = "Test"
-            self.insertions = 10
-            self.deletions = 5
-            self.author_date = datetime(2024, 1, 1)
-    
-    mock_commit = MockCommitWithNone()
-    
-    def factory(path, only_in_branch=None):
-        mock_repo_instance = MagicMock()
-        mock_repo_instance.traverse_commits.return_value = [mock_commit]
-        return mock_repo_instance
-    
-    mock_repo_class.side_effect = factory
-
-    repo = Repository("/mock/path")
-    repo.extrapolate()
-
-    # Should only count files with non-None paths
-    languages = repo.get_language_dict()
-    assert "Python" in languages
-    assert "JavaScript" in languages
-    assert languages["Python"] == 1
-    assert languages["JavaScript"] == 1

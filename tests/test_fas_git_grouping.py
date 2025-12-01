@@ -94,7 +94,6 @@ def mock_os():
         mock_os.path.isfile.return_value = True
         yield mock_os
 
-
 # Test add_repository with complete git_output structure
 @patch('src.fas.fas_git_grouping.Git')
 @patch('src.fas.fas_git_grouping.PyDrillerRepo')
@@ -102,8 +101,7 @@ def mock_os():
 @patch('src.fas.fas_git_grouping.param')
 @patch('src.fas.fas_git_grouping.fas')
 @patch('src.fas.fas_git_grouping.os')
-def test_add_repository_complete_output(mock_os, mock_fas, mock_param, mock_repo_class, 
-                                         mock_pydriller_repo, mock_git_class, mock_path_resolve):
+def test_add_repository_complete_output(mock_os, mock_fas, mock_param, mock_repo_class, mock_pydriller_repo, mock_git_class, mock_path_resolve):
     # Setup mocks
     mock_param.get.return_value = "test_user"
     mock_git_class.return_value.files.return_value = MOCK_GIT_FILES_RAW
@@ -145,7 +143,6 @@ def test_add_repository_complete_output(mock_os, mock_fas, mock_param, mock_repo
     assert git_output["commits"]["total_deletions"] == 35
     assert git_output["commits"]["net_change"] == 110
 
-
 # Test add_repository with custom ID
 @patch('src.fas.fas_git_grouping.Git')
 @patch('src.fas.fas_git_grouping.PyDrillerRepo')
@@ -153,8 +150,7 @@ def test_add_repository_complete_output(mock_os, mock_fas, mock_param, mock_repo
 @patch('src.fas.fas_git_grouping.param')
 @patch('src.fas.fas_git_grouping.fas')
 @patch('src.fas.fas_git_grouping.os')
-def test_add_repository_custom_id(mock_os, mock_fas, mock_param, mock_repo_class,
-                                   mock_pydriller_repo, mock_git_class, mock_path_resolve):
+def test_add_repository_custom_id(mock_os, mock_fas, mock_param, mock_repo_class, mock_pydriller_repo, mock_git_class, mock_path_resolve):
     # Setup basic mocks
     mock_param.get.return_value = "test_user"
     mock_git_class.return_value.files.return_value = []
@@ -171,7 +167,6 @@ def test_add_repository_custom_id(mock_os, mock_fas, mock_param, mock_repo_class
     assert MOCK_CUSTOM_ID in grouping.files
     assert MOCK_CUSTOM_ID in grouping.commits
     assert MOCK_RESOLVED_PATH_STR not in grouping.repositories
-
 
 # Test get_repo_files with file analysis
 @patch('src.fas.fas_git_grouping.Git')
@@ -193,7 +188,6 @@ def test_get_repo_files_with_analysis(mock_os, mock_fas, mock_git_class):
     assert files[0]["Created time"] == MOCK_FILE_RESULT.created_time
     assert files[0]["Extra data"] == {"lines": 100}
 
-
 # Test get_repo_files filtering
 @patch('src.fas.fas_git_grouping.Git')
 @patch('src.fas.fas_git_grouping.fas')
@@ -207,9 +201,7 @@ def test_get_repo_files_filters_correctly(mock_os, mock_fas, mock_git_class):
     grouping = GitGrouping()
     files = grouping.get_repo_files(MOCK_RESOLVED_PATH_STR, "test_id")
     
-    # Should process 4 valid files (empty strings and whitespace filtered)
     assert len(files) == 4
-
 
 # Test get_repo_files with .git suffix removal
 @patch('src.fas.fas_git_grouping.Git')
@@ -225,7 +217,6 @@ def test_get_repo_files_removes_git_suffix(mock_os, mock_fas, mock_git_class):
     
     mock_git_class.assert_called_once_with("/path/to/repo")
 
-
 # Test get_repo_files exception handling
 @patch('src.fas.fas_git_grouping.Git')
 def test_get_repo_files_git_exception(mock_git_class):
@@ -235,7 +226,6 @@ def test_get_repo_files_git_exception(mock_git_class):
     files = grouping.get_repo_files("/any/path", "test_id")
     
     assert files == set()
-
 
 # Test get_repo_dates success
 @patch('src.fas.fas_git_grouping.PyDrillerRepo')
@@ -256,7 +246,6 @@ def test_get_repo_dates_success(mock_pydriller_repo):
     assert created == MOCK_CREATED_DATE
     assert modified == MOCK_MODIFIED_DATE
 
-
 # Test get_repo_dates with no commits
 @patch('src.fas.fas_git_grouping.PyDrillerRepo')
 def test_get_repo_dates_no_commits(mock_pydriller_repo):
@@ -267,7 +256,6 @@ def test_get_repo_dates_no_commits(mock_pydriller_repo):
     
     assert created is None
     assert modified is None
-
 
 # Test get_repo_dates exception handling
 @patch('src.fas.fas_git_grouping.PyDrillerRepo')
@@ -280,7 +268,6 @@ def test_get_repo_dates_exception(mock_pydriller_repo):
     assert created is None
     assert modified is None
 
-
 # Test commit_analysis with valid data
 def test_commit_analysis():
     grouping = GitGrouping()
@@ -292,7 +279,6 @@ def test_commit_analysis():
     assert result["net_change"] == 110
     assert "message_analysis" in result
 
-
 # Test commit_analysis with empty commits
 def test_commit_analysis_empty():
     grouping = GitGrouping()
@@ -303,7 +289,6 @@ def test_commit_analysis_empty():
     assert result["total_deletions"] == 0
     assert result["message_analysis"] == {}
 
-
 # Test commit_analysis with None
 def test_commit_analysis_none():
     grouping = GitGrouping()
@@ -312,7 +297,6 @@ def test_commit_analysis_none():
     assert result["total_commits"] == 0
     assert result["total_insertions"] == 0
     assert result["total_deletions"] == 0
-
 
 # Test _categorize_messages
 def test_categorize_messages():
@@ -336,14 +320,12 @@ def test_categorize_messages():
     assert "style" in categories
     assert "other" in categories
 
-
 # Test _categorize_messages with empty list
 def test_categorize_messages_empty():
     grouping = GitGrouping()
     categories = grouping._categorize_messages([])
     
     assert categories == set()
-
 
 # Test _categorize_messages with mixed case
 def test_categorize_messages_case_insensitive():
@@ -360,14 +342,12 @@ def test_categorize_messages_case_insensitive():
     assert "feature" in categories
     assert "docs" in categories
 
-
 # Test GitGrouping initial state
 def test_git_grouping_initial_state():
     grouping = GitGrouping()
     assert grouping.repositories == {}
     assert grouping.files == {}
     assert grouping.commits == {}
-
 
 # Test multiple repository additions
 @patch('src.fas.fas_git_grouping.Git')
@@ -376,8 +356,7 @@ def test_git_grouping_initial_state():
 @patch('src.fas.fas_git_grouping.param')
 @patch('src.fas.fas_git_grouping.fas')
 @patch('src.fas.fas_git_grouping.os')
-def test_multiple_repositories(mock_os, mock_fas, mock_param, mock_repo_class,
-                                mock_pydriller_repo, mock_git_class, mock_path_resolve):
+def test_multiple_repositories(mock_os, mock_fas, mock_param, mock_repo_class,mock_pydriller_repo, mock_git_class, mock_path_resolve):
     # Setup basic mocks
     mock_param.get.return_value = "test_user"
     mock_git_class.return_value.files.return_value = []
