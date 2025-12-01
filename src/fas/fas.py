@@ -174,13 +174,9 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
 
 
             case "git":
-                # from src.fas import fas_git
-                # return fas_git.extract_git_data(file_path)
+                from src.fas.fas_git_grouping import GitGrouping
                 # This will enter the grouping and within grouping will go through all files within the git repo and assign them a repo id
-                import fas_git_grouping
-
-                git_group = fas_git_grouping.GitGrouping()
-                # Currently it only returns the repo_id and files present within the git folder
+                git_group = GitGrouping()
                 return git_group.add_repository(file_path)
 
             case _:
