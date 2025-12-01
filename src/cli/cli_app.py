@@ -8,7 +8,7 @@ import src.fss.fss as fss
 import src.log.log as log
 import src.param.param as param
 import src.zip.zip_app as zip
-from src.showcase.showcase import generate_portfolio, generate_resume
+from src.showcase.showcase import generate_portfolio, generate_resume, generate_skill_timeline
 
 
 def prompt_file_perms():
@@ -59,6 +59,14 @@ def add_cli_args(parser: argparse.ArgumentParser):
         const=True,
         default=None,
         help="Output a web portfolio with project descriptions. Optional: Include a directory path to change where the result is saved",
+    )
+    parser.add_argument(
+        "-s",
+        "--skill_timeline_entries",
+        nargs="?",
+        const=True,
+        default=None,
+        help="Output a pdf with with key skills ordered chronologically. Optional: Include a directory path to change where the result is saved",
     )
     parser.add_argument(
         "-c",
@@ -195,6 +203,20 @@ def run_cli():
             print(f"Portfolio generated at: {file_path}")
         else:
             print("Portfolio generation failed.")
+
+    if args.skill_timeline_entries:
+        if (
+            isinstance(args.skill_timeline_entries, str)
+            and Path(args.skill_timeline_entries).exists()
+            and Path(args.skill_timeline_entries).is_dir()
+        ):
+            param.export_folder_path = args.skill_timeline_entries
+        print("Generating timeline of skills...")
+        file_path = generate_skill_timeline()
+        if file_path:
+            print(f"Skill time generated at: {file_path}")
+        else:
+            print("Skill timeline generation failed.")
 
     if args.quiet:
         builtins.print = _original_print

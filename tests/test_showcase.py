@@ -251,3 +251,31 @@ def test_generate_portfolio():
     finally:
         print()
         cleanup_test_dir()
+
+def test_generate_skill_timeline():
+    setup_test_dir()
+    try:
+        export_folder = TEST_DIR
+        log_file = export_folder / "log.csv"
+        # Write a test CSV row
+        with open(log_file, "w", newline="") as f:
+            writer = csv.writer(f)
+            make_test_file(writer)
+        with (
+            patch("src.showcase.showcase.param") as mock_param,
+            patch("src.showcase.showcase.log") as mock_log,
+        ):
+            mock_param.export_folder_path = str(export_folder)
+            mock_log.current_log_file = str(log_file)
+            export_folder.mkdir(parents=True, exist_ok=True)
+            result_path = showcase.generate_skill_timeline()
+            # Now check for the PDF file
+            pdf_files = list(export_folder.glob("*.pdf"))
+            assert pdf_files, "No skills timeline PDF file was created!"
+
+            if result_path is not None:
+                assert result_path.exists()
+                assert result_path in pdf_files
+    finally:
+        print()
+        cleanup_test_dir()
