@@ -1,3 +1,28 @@
+# Week 13 (11/23/2025 - 11/30/2025)
+
+![Week 13 - Task Completed](W13/Done.png)
+
+
+## Features
+
+![Week 13 - In Progress](W13/Features.png)
+
+## Recap
+
+- For week 13, I worked on the showcase module (generating resume and porfolio)
+    - I made it so that the showcase.py now use the key skills of FAS to generate and display a human readable resume/portfolio
+    - I have to change up FAS a bit since FAS has a lot of details so I have to take all that details and make it into key skills to output to showcase
+- For week 14, it is our last week, I think we will go over everything to see if we miss anything
+
+## Additional Context
+## Team Survey:
+
+
+![Week 13 - Team Survey](W13/Team_Survey.png)
+![Week 13 - Team Survey](W13/Team_Survey_(1).png)
+![Week 13 - Team Survey](W13/Team_Survey_(2).png)
+![Week 13 - Team Survey](W13/Team_Survey_(3).png)
+
 # Week 12 (11/16/2025 - 11/23/2025)
 
 ![Week 12 - Task Completed](W12/Done.png)
