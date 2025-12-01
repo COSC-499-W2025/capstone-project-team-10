@@ -1,3 +1,15 @@
+# Week 13 (11/24/2025 = 11/30/2025)
+
+![Week 13 Tasks](Week13/Week13Tasks.png)
+
+## Features
+
+![Week 13 KanBan](Week13/Week13KanBan.png)
+
+## Recap
+This week the group continued refining analysis modules and improved the functionality of the log system. We implemented log sorting and refined the output documents
+for markdown and pdf output. I refactored and improved the programming_reader.py module. It is now called code_reader.py and it now gathers libraries, time complexities, functions, loops, and oop basics. It does this for multiple supported language and is a significant improvement from the previous module which only found libraries. I also added the nltk fas_text_analysis.py module to the fas_pdf.py module to perform text analysis on the text found in pdfs. I still need to refine the output from the text analysis in the module as it does not interpret results from the data.
+
 # Week 12 (11/17/2025 = 11/23/2025)
 
 ![Week 12 Tasks](Week12/Week12Tasks.png)
