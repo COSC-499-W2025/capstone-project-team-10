@@ -66,3 +66,21 @@ I got confused and thought the peer evaluation for November 9th were on November
 
   ## Recap
   I worked on the functionality for delta scans of previous results and implemented a simple cache system. I was told that it would be better to connect my implementation with Log.py instead of a cache, so I will have to make major tweaks to my pull request. I had some difficulty implementing it but I have a better idea of how it works right now so hopefully changing it won't be too difficult. So for this upcoming week I will work on that and also work on refining skill extraction for modules I've previously worked on (wherever it applies). The project is going well.
+
+# Week 12 (11/16/2025 - 11/23/2025)
+<img width="1085" height="640" alt="image" src="https://github.com/user-attachments/assets/ce8470c0-721a-4b02-b0aa-d33f0973b993" />
+
+## Tasks
+<img width="689" height="136" alt="image" src="https://github.com/user-attachments/assets/23db252b-4ce7-4527-a5e6-b931eac4c266" />
+
+## Recap
+I worked on reimplementing the delta scan feature in the FSS, It had to go through a lot of changes but it was a chill week, we have our milestone and presentation coming up so the following week is going to be super rushed and busy, so I am preparing,
+
+# Week 13 (11/23/2025 - 11/30/2025)
+<img width="1089" height="641" alt="image" src="https://github.com/user-attachments/assets/636a213a-8c9f-4d44-802b-71bc37054319" />
+
+## Tasks
+<img width="1368" height="93" alt="image" src="https://github.com/user-attachments/assets/6703ed53-ec12-4fe8-82b6-89f32b4b437a" />
+
+## Recap
+This week was EXTREMELY busy, since we have milestone 1 and the presentation coming up, it was expected so I was prepared. I implemented one of the functionality for generating a timeline of key skills out to a PDF, it looks great and I think we are looking good for the presentation.
