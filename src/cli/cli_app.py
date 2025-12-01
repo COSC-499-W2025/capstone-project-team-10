@@ -154,6 +154,8 @@ def run_cli():
     if args.github_username:
         param.set("scan.github_username", args.github_username)
         print(f"GitHub username set to: {args.github_username}")
+    else:
+        param.set("scan.github_username", "")
 
     bound_str: str = "Files created between:"
     if lower_bound:

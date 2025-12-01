@@ -35,6 +35,8 @@ class GitGrouping:
         commit_data = repo.get_commits_content()
         self.commits[repo_id] = commit_data
 
+        commit_analyzed = self.commit_analysis(commit_data)
+
         # Extract created and modified dates from Git history
         created_date, modified_date = self.get_repo_dates(str(repo_path))
         
@@ -46,7 +48,7 @@ class GitGrouping:
             "created": created_date,
             "modified": modified_date,
             "extra data": extra_data,
-            "commits": commit_data,
+            "commits": commit_analyzed,
         }
         
         return git_output
@@ -114,3 +116,61 @@ class GitGrouping:
         except Exception as e:
             print(f"[Error] Failed to extract repository dates: {type(e).__name__}: {e}")
             return None, None
+        
+    def commit_analysis(self, commit_data):
+        # Analyze commit data to extract insights from messages and calculate total changes.
+        if not commit_data:
+            return {
+                "total_insertions": 0,
+                "total_deletions": 0,
+                "total_commits": 0,
+                "message_analysis": {}
+            }
+        total_insertions = 0
+        total_deletions = 0
+        messages = []
+    
+        # Process each commit
+        for commit in commit_data:
+            # Sum up insertions and deletions
+            total_insertions += commit.get('insertions', 0)
+            total_deletions += commit.get('deletions', 0)
+        
+            # Collect commit messages
+            msg = commit.get('message', '').strip()
+            if msg:
+                messages.append(msg)
+    
+        output = {
+            "total_insertions": total_insertions,
+            "total_deletions": total_deletions,
+            "total_commits": len(commit_data),
+            "net_change": total_insertions - total_deletions,
+            "message_analysis": self._categorize_messages(messages),
+        }
+
+        return output
+
+    def _categorize_messages(self, messages):
+        #Categorize commit messages by type for analysis
+        output = set()
+        for msg in messages:
+            msg_lower = msg.lower()
+        
+            if any(word in msg_lower for word in ['fix', 'bug', 'patch', 'resolve']):
+                output.add("fix")
+            elif any(word in msg_lower for word in ['add', 'feature', 'new', 'implement']):
+                output.add("feature")
+            elif any(word in msg_lower for word in ['doc', 'readme', 'comment']):
+                output.add("docs")
+            elif any(word in msg_lower for word in ['refactor', 'restructure', 'reorganize']):
+                output.add("refactor")
+            elif any(word in msg_lower for word in ['test', 'spec', 'coverage', 'tests']):
+                output.add("test")
+            elif any(word in msg_lower for word in ['style', 'format', 'lint']):
+                output.add("style")
+            else:
+                output.add("other")
+
+        
+        return output
