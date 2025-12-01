@@ -15,4 +15,5 @@
 ## Additional Notes
 - As stated within Week 12, updating *my* lacking behind modules, and integrating them into the CLI would be one of the highest priorities for the demo video to be published
 - Sorting logs is used to order the logs, which fuel our exportations are working as expected, though being a bit decoupled right now
-- Working more and asking for more help and confirmation should be practiced more, and definitely more for me.
+- Working more and asking for more help and confirmation should be practiced more, and definitely more for me
+- Utmost care to not cause any bugs within the CLI, since that is our entire demonstration material
