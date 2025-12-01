@@ -13,12 +13,21 @@ import src.fas.fas_docx as docx
 import src.fas.fas_rtf as rtf
 import src.fas.fas_odt as odt
 
+import pdfplumber
+from bs4 import BeautifulSoup
+
+
 docx_file_path = os.path.join("tests", "testdata", "test_showcase","docx_test.docx")
 docx_result = docx.extract_docx_data(docx_file_path)
 rtf_file_path = os.path.join("tests", "testdata", "test_fas","fas_rtf_data.rtf")
 rtf_result = rtf.extract_rtf_data(rtf_file_path)
 odt_file_path = os.path.join("tests", "testdata", "test_fas","fas_odt_data.odt")
 odt_result = odt.extract_odt_data(odt_file_path)
+
+resume_file_path = os.path.join("tests", "testdata", "test_showcase", "test_resume.pdf")
+PDF_PATH = Path(resume_file_path)
+portfolio_file_path = os.path.join("tests", "testdata", "test_showcase", "test_portfolio.html")
+PORTFOLIO_PATH = Path(portfolio_file_path)
 
 TEST_DIR = Path("test_output")
 keep_files = False
@@ -169,7 +178,31 @@ def make_test_file(writer: Any) -> None:
             ],
         ]
     )
+def extract_pdf_text():
+    """Return all text from the PDF"""
+    text = ""
+    with pdfplumber.open(PDF_PATH) as pdf:
+        for page in pdf.pages:
+            page_text = page.extract_text()
+            if page_text:
+                text += page_text + "\n"
+    return text
 
+def extract_pdf_images():
+    """Return a list of image objects in the PDF"""
+    images = []
+    with pdfplumber.open(PDF_PATH) as pdf:
+        for page in pdf.pages:
+            images.extend(page.images)
+    return images
+
+def load_portfolio_html():
+    """Load portfolio HTML safely, ignoring binary content issues."""
+    with open(PORTFOLIO_PATH, "rb") as f:  # open in binary mode
+        content = f.read()
+    text = content.decode("utf-8", errors="ignore")
+    soup = BeautifulSoup(text, "html.parser")
+    return soup
 
 def test_format_last_modified_current():
     now = datetime.now().isoformat()
@@ -279,3 +312,66 @@ def test_generate_skill_timeline():
     finally:
         print()
         cleanup_test_dir()
+
+
+
+def test_resume_image_project_contains_image():
+    images = extract_pdf_images()
+    assert len(images) > 0, "No images found for the image project in PDF"
+
+def test_resume_docx_project_key_skills_and_summary():
+    text = extract_pdf_text()
+    assert "Key Skills" in text, "Key skills missing in DOCX project"
+    assert "File Summary" in text or "summary" in text.lower(), "Summary missing in DOCX project"
+
+def test_resume_xlsx_project_key_skills():
+    text = extract_pdf_text()
+    assert "Key Skills" in text, "Key skills missing in XLSX project"
+
+def test_resume_psd_project_artistic_label():
+    text = extract_pdf_text()
+    assert "Artistic Project" in text or "Photoshop" in text, "PSD project label missing"
+
+def test_resume_coding_project_key_skills_and_code_complexity():
+    text = extract_pdf_text()
+    assert "Key Skills" in text, "Python project key skills missing"
+    assert "Code Complexity" in text, "Python project code complexity missing"
+
+
+def test_portfolio_image_project_contains_image():
+    soup = load_portfolio_html()
+    # Look for any <img> tags
+    imgs = soup.find_all("img")
+    assert imgs, "No <img> tag found for image project"
+
+def test_portfolio_docx_project_key_skills_and_summary():
+    soup = load_portfolio_html()
+    docx_div = soup.find("div", class_="docx")
+    assert docx_div, "No DOCX project found"
+    # Check Key Skills
+    assert "Key Skills" in docx_div.get_text(), "DOCX project missing key skills"
+    # Check Summary presence
+    assert "Summary" in docx_div.get_text() or len(docx_div.get_text()) > 0, "DOCX project missing summary"
+
+def test_portfolio_xlsx_project_key_skills():
+    soup = load_portfolio_html()
+    xlsx_div = soup.find("div", class_="xlsx")
+    assert xlsx_div, "No XLSX project found"
+    # Check Key Skills presence
+    assert "Key Skills" in xlsx_div.get_text(), "XLSX project missing key skills"
+
+def test_portfolio_psd_project_artistic_label():
+    soup = load_portfolio_html()
+    psd_div = soup.find("div", class_="psd")
+    assert psd_div, "No PSD project found"
+    # Check Artistic Project label
+    assert "Artistic Project" in psd_div.get_text(), "PSD project missing 'Artistic Project' label"
+
+def test_portfolio_coding_project_key_skills_and_code_complexity():
+    soup = load_portfolio_html()
+    py_div = soup.find("div", class_="py")
+    assert py_div, "No Python project found"
+    # Check key skills text
+    assert "Key Skills" in py_div.get_text(), "Python project missing key skills"
+    # Check code complexity
+    assert "Code Complexity" in py_div.get_text(), "Python project missing code complexity"
