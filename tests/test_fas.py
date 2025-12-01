@@ -112,6 +112,17 @@ class TestFas:
         result = fas.run_fas(TEST_FILE)
         assert result is not None
         assert isinstance(result.importance, (int, float))
+
+    def test_extra_data_exists(self):
+        result = fas.run_fas(TEST_FILE)
+        assert result is not None
+        # Check that extra_data is not None
+        assert result.extra_data is not None
+        # Optionally, check that it's a dict or has expected keys
+        if isinstance(result.extra_data, dict):
+            # Example: check that key_skills or summary exist
+            assert "key_skills" in result.extra_data or "summary" in result.extra_data
+
     def test_extra_data_is_json_serializable(self):
         result = fas.run_fas(TEST_FILE)
         assert result is not None

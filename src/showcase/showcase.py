@@ -1,4 +1,5 @@
 import csv
+import json
 import logging
 import os
 import re
@@ -279,22 +280,23 @@ def generate_resume() -> Path | None:
 
                     case "xlsx" | "xls" | "docx" | "odt" | "rtf":            
                         key_skills = []
+                        summary = ""
                         extra_data_raw = file_analysis.extra_data
 
                         # Convert locally (do not mutate file_analysis.extra_data)
                         if isinstance(extra_data_raw, str):
                             try:
-
-
                                 parsed = ast.literal_eval(extra_data_raw)
                                 if isinstance(parsed, dict):
                                     key_skills = parsed.get("key_skills", []) or []
+                                    summary = parsed.get("summary", "")
                             except (ValueError, SyntaxError):
                                 # conversion failed: string isn't a valid Python literal dict
                                 key_skills = []
                         elif isinstance(extra_data_raw, dict):
                             # In case it's already a dict for some reason, handle it too
                             key_skills = extra_data_raw.get("key_skills", []) or []
+                            summary = extra_data_raw.get("summary", "")
 
                         # Final text to place in PDF
                         skills_text = ", ".join(key_skills) if key_skills else file_analysis.file_type.upper() + " Data Analysis"
@@ -306,28 +308,42 @@ def generate_resume() -> Path | None:
                             new_x=XPos.LMARGIN,
                             new_y=YPos.NEXT,
                         )
+                        if file_analysis.file_type in ["docx", "odt", "rtf"]:
+                            pdf_output.set_font(style="I")
+                            pdf_output.multi_cell(
+                                0,
+                                10,
+                                f"File Summary: {summary}",
+                                new_x=XPos.LMARGIN,
+                                new_y=YPos.NEXT,
+                            )
                     # Add support for coding file extensions
                     case _ if ext in em:
                         key_skills = []
                         extra_data_raw = file_analysis.extra_data
+                        code_complexity = "Not Available"
 
                         # Convert locally (do not mutate file_analysis.extra_data)
                         if isinstance(extra_data_raw, str):
                             try:
-
-
                                 parsed = ast.literal_eval(extra_data_raw)
                                 if isinstance(parsed, dict):
                                     key_skills = parsed.get("key_skills", []) or []
+                                    complexity = parsed.get("complexity")
+                                    if isinstance(complexity, dict):
+                                        code_complexity = complexity.get("estimated", "Not Available")
                             except (ValueError, SyntaxError):
                                 # conversion failed: string isn't a valid Python literal dict
                                 key_skills = []
                         elif isinstance(extra_data_raw, dict):
                             # In case it's already a dict for some reason, handle it too
                             key_skills = extra_data_raw.get("key_skills", []) or []
+                            complexity = extra_data_raw.get("complexity")
+                            if isinstance(complexity, dict):
+                                code_complexity = complexity.get("estimated", "Not Available")
 
                         # Final text to place in PDF
-                        skills_text = ", ".join(key_skills) if key_skills else "Excel Data Analysis"
+                        skills_text = ", ".join(key_skills) if key_skills else extra_data_raw.get("language") + " Programming"
 
                         pdf_output.multi_cell(
                             0,
@@ -336,9 +352,15 @@ def generate_resume() -> Path | None:
                             new_x=XPos.LMARGIN,
                             new_y=YPos.NEXT,
                         )
+                        pdf_output.multi_cell(
+                            0,
+                            10,
+                            f"Code Complexity: {code_complexity}",
+                            new_x=XPos.LMARGIN,
+                            new_y=YPos.NEXT,
+                        )
 
                     case "psd":
-
                         pdf_output.multi_cell(
                             0,
                             10,
@@ -352,7 +374,7 @@ def generate_resume() -> Path | None:
                         pdf_output.multi_cell(
                             0,
                             10,
-                            f"Key Skills demonstrated in this project: {file_analysis.extra_data}",
+                            f"File type not analyzed. File details: {json.dumps(file_analysis.__dict__, indent=2)}",
                             new_x=XPos.LMARGIN,
                             new_y=YPos.NEXT,
                         )
@@ -363,11 +385,23 @@ def generate_resume() -> Path | None:
     except Exception as e:
         print(f"Something went wrong: {e}")
 
+def parse_extra_data(extra_data_raw):
+    if isinstance(extra_data_raw, str):
+        try:
+            parsed = ast.literal_eval(extra_data_raw)
+            return parsed if isinstance(parsed, dict) else {}
+        except (ValueError, SyntaxError):
+            return {}
+    elif isinstance(extra_data_raw, dict):
+        return extra_data_raw
+    return {}
+
 
 def generate_portfolio() -> Path | None:
     """
     Generates an HTML portfolio and zips it, copying resources as needed.
     """
+
     todays_date: str = datetime.now().strftime("%m-%d-%y")
     portfolio_export_path_dir: Path = Path(param.export_folder_path) / (
         todays_date + "-portfolio"
@@ -419,14 +453,89 @@ def generate_portfolio() -> Path | None:
                             / (file_analysis.file_name + "." + file_analysis.file_type),
                         )
                     # Prepare details based on file type
-                    if file_analysis.file_type in image_types:
-                        details = f"<p>Artistic Project:</p><img src='resources/{file_analysis.file_name}.{file_analysis.file_type}' alt='{file_analysis.file_name}' width='300'/>"
-                    elif file_analysis.file_type in collaborative_types:
-                        details = (
-                            f"<p>Project Contributions: {file_analysis.extra_data}</p>"
-                        )
+                    # if file_analysis.file_type in image_types:
+                    #     details = f"<p>Artistic Project:</p><img src='resources/{file_analysis.file_name}.{file_analysis.file_type}' alt='{file_analysis.file_name}' width='300'/>"
+                    # elif file_analysis.file_type in collaborative_types:
+                    #     details = (
+                    #         f"<p>Project Contributions: {file_analysis.extra_data}</p>"
+                    #     )
+                    # else:
+                    #     details = f"<p>Key Skills demonstrated in this project: {file_analysis.extra_data}</p>"
+
+                    extra_dict = parse_extra_data(file_analysis.extra_data)
+                    ext = file_analysis.file_type
+                    details = ""
+                    _, code_type = os.path.splitext(file_analysis.file_path)
+                    code_type = code_type.lower()   
+                    if ext in image_types:
+                        img_meta = extra_dict.get("image", {})
+                        img_format = img_meta.get("format", "Image")
+                        width = img_meta.get("width")
+                        height = img_meta.get("height")
+
+                        project_desc = f"Digital Artwork ({img_format})"
+                        if width and height:
+                            project_desc += f" — {width} x {height}"
+
+                        details = f"""
+                            <p><strong>Artistic Project:</strong> {project_desc}</p>
+                            <img src="resources/{file_analysis.file_name}.{ext}" width="300"/>
+                        """
+                    elif ext in collaborative_types:
+                        details = f"""
+                            <p><strong>Project Contributions:</strong></p>
+                            <pre>{file_analysis.extra_data}</pre>
+                        """
+                    elif ext in ("xlsx", "xls", "docx", "odt", "rtf"):
+                        key_skills = extra_dict.get("key_skills", [])
+                        summary = extra_dict.get("summary", "")
+
+                        skills_text = ", ".join(key_skills) if key_skills else f"{ext.upper()} Data Analysis"
+
+                        details = f"""
+                            <p><strong>Key Skills:</strong> {skills_text}</p>
+                        """
+
+                        if ext in ("docx", "odt", "rtf") and summary:
+                            details += f"""
+                                <p><em>File Summary:</em> {summary}</p>
+                            """
+                    elif code_type in em:
+                        key_skills = extra_dict.get("key_skills", [])
+                        complexity = extra_dict.get("complexity", {})
+                        language = extra_dict.get("language", "Programming")
+
+                        code_complexity = "Not Available"
+                        if isinstance(complexity, dict):
+                            code_complexity = complexity.get("estimated", "Not Available")
+
+                        skills_text = ", ".join(key_skills) if key_skills else f"{language} Programming"
+
+                        details = f"""
+                            <p><strong>Key Skills:</strong> {skills_text}</p>
+                            <p><em>Code Complexity:</em> {code_complexity}</p>
+                        """
+                    elif ext == "psd":
+                        width = extra_dict.get("width")
+                        height = extra_dict.get("height")
+                        layers = extra_dict.get("number_of_layers")
+
+                        psd_desc = "Photoshop Design Project"
+                        if width and height:
+                            psd_desc += f" — {width} x {height}"
+                        if layers:
+                            psd_desc += f" — {layers} Layers"
+
+                        details = f"""
+                            <p><strong>Artistic Project:</strong> {psd_desc}</p>
+                        """
+
                     else:
-                        details = f"<p>Key Skills demonstrated in this project: {file_analysis.extra_data}</p>"
+                        details = f"""
+                            <p><strong>File type not analyzed. File details: {json.dumps(file_analysis.__dict__, indent=2)}</p>
+                        """
+
+
                     # Write entry to HTML
                     portfolio.write(
                         portfolio_entry_template.format(

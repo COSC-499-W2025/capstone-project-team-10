@@ -169,6 +169,9 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                 # }
                 language = reader.filetype
                 libraries = reader.libraries
+                complexity = reader.complexity
+                oop = reader.oop
+
 
             case "git":
                 from src.fas.fas_git_grouping import GitGrouping
@@ -190,6 +193,7 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                     skill = feedback_to_skill(metadata[key])
                     if skill:
                         skills.append(skill)
+                        
 
             metadata["key_skills"] = skills
         elif ext in em:
@@ -200,15 +204,29 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             metadata = {
                 "language": language,
                 "libraries": libraries,
+                "complexity": complexity,
+                "oop": oop,
             }
 
             # Always include the language as a skill
             if language:
                 skills.append(f"{language.capitalize()} programming")
 
-            for lib in libraries:
-                if lib in lsm:
-                    skills.append(lsm[lib])
+            if isinstance(libraries, list):
+                for lib in libraries:
+                    if lib in lsm:
+                        skills.append(lsm[lib])
+
+            if isinstance(oop, dict):
+                if oop.get("classes"):
+                    skills.append("Object-oriented programming (OOP)")
+                if oop.get("functions"):
+                    skills.append("Modular function design")
+
+            if isinstance(complexity, dict):
+                est = complexity.get("estimated")
+                if est and est != "O(1)":
+                    skills.append("Algorithmic complexity analysis")
 
             # Remove duplicates
             metadata["key_skills"] = list(set(skills))
