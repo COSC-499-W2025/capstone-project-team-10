@@ -10,6 +10,8 @@ https://github.com/COSC-499-W2025/capstone-project-team-10/issues/117 - Refactor
 https://github.com/COSC-499-W2025/capstone-project-team-10/issues/88 - Sorting Logs  
 
 ## Burnup Chart
+<img width="1128" height="771" alt="image" src="https://github.com/user-attachments/assets/2e3bd1dd-8e43-4a03-88d7-b4d42d224efe" />
+
 
 ## Completed Tasks
 <img width="1020" height="335" alt="image" src="https://github.com/user-attachments/assets/2069a590-2fc3-4c44-b339-9c31d6e02a93" />
