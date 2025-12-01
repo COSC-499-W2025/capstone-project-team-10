@@ -1,13 +1,16 @@
 from pydriller import Repository as PyDrillerRepo
 from pathlib import Path
 from collections import defaultdict
+from typing import Optional
 
 class Repository:
 
-    def __init__(self, rpath):
+    def __init__(self, rpath, filter_author: Optional[str] = None):
         self.path = rpath
+        self.filter_author = filter_author  # Filter commits by this author, is None if no specificed user
         self.authors = {}
         self.language = {}
+        self.commits_content = []
 
     def extrapolate(self):
         # Extract commit and file information using PyDriller.
@@ -15,8 +18,21 @@ class Repository:
             # Parse commits and authors
             for commit in PyDrillerRepo(self.path).traverse_commits():
                 author = commit.author.name
-                commit_hash = commit.hash
-                self.authors.setdefault(author, []).append(commit_hash)
+                
+                self.authors.setdefault(author)
+                if self.filter_author and author != self.filter_author:
+                    continue
+
+                commit_data = {
+                    'author': author,
+                    'date': commit.author_date,
+                    'message': commit.msg,
+                    'insertions': commit.insertions,
+                    'deletions': commit.deletions,
+                }
+                
+                self.commits_content.append(commit_data)
+
 
             # Parse tracked files and map extensions to languages
             lang_counts = defaultdict(int)
@@ -36,6 +52,7 @@ class Repository:
             print(f"Failed to analyze repository: {type(e).__name__}: {e}")
             self.authors = {}
             self.language = {}
+            self.commits_content = []
 
     def get_authors(self):
         # Return list of all authors.
@@ -44,6 +61,10 @@ class Repository:
     def get_commits_count(self):
         # Return dictionary of authors and their commit counts.
         return {author: len(commits) for author, commits in self.authors.items()}
+    
+    def get_commits_content(self):
+        # Return list of all commit content.
+        return self.commits_content
 
     def get_language_dict(self):
         # Return dictionary of languages and file counts.

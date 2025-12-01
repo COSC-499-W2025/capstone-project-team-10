@@ -3,6 +3,7 @@ import os
 import pytest
 import json
 from src.fas import fas
+from unittest.mock import MagicMock, patch
 
 TESTDATA_DIR = os.path.join("tests", "testdata", "test_fas")
 TEST_FILE = os.path.join(TESTDATA_DIR, "fas_test_data.docx")
@@ -43,17 +44,65 @@ class TestFas:
         result = fas.run_fas("tests/testdata/test_fas/nonexistent_file_123.docx")
         assert result is None
 
-    def test_git_folder_placeholder(self, tmp_path):
-        # A .git folder returns a placeholder FileAnalysis object
+    def test_git_folder(self, tmp_path):
         git_dir = tmp_path / ".git"
         git_dir.mkdir()
-        result = fas.run_fas(str(git_dir))
-        assert result is not None
-        print(result.file_type)
-        print(result.file_name)
-        assert result.file_type == "git"
-        assert result.file_name == "test_git_folder_placeholder0"
-        assert result.extra_data is None
+    
+        # Mock the GitGrouping class and its methods
+        mock_git_grouping = MagicMock()
+        mock_git_output = {
+            "author": ["Test Author"],
+            "title": str(git_dir),
+            "subject": "Git Repo",
+            "created": "2024-01-01T00:00:00",
+            "modified": "2024-01-02T00:00:00",
+            "extra data": [
+                {
+                    "File name": "test.py",
+                    "File type": "py",
+                    "Last modified": "2024-01-01T00:00:00",
+                    "Created time": "2024-01-01T00:00:00",
+                    "Extra data": {"language": "python", "libraries": []}
+                }
+            ],
+            "commits": {
+                "total_insertions": 10,
+                "total_deletions": 5,
+                "total_commits": 1,
+                "net_change": 5,
+                "message_analysis": {"feature"}
+            }
+        }
+        mock_git_grouping.add_repository.return_value = mock_git_output
+    
+        # Patch GitGrouping in the fas module
+        with patch('src.fas.fas_git_grouping.GitGrouping', return_value=mock_git_grouping):
+            result = fas.run_fas(str(git_dir))
+        
+            assert result is not None
+            assert result.file_type == "git"
+        
+            # Check that extra_data contains git grouping information
+            assert result.extra_data is not None
+            assert isinstance(result.extra_data, dict)
+        
+            # Verify the structure returned by GitGrouping.add_repository()
+            assert "author" in result.extra_data
+            assert "title" in result.extra_data
+            assert "subject" in result.extra_data
+            assert result.extra_data["subject"] == "Git Repo"
+            assert "created" in result.extra_data
+            assert "modified" in result.extra_data
+            assert "extra data" in result.extra_data
+            assert "commits" in result.extra_data
+        
+            # Verify commit analysis structure
+            commits = result.extra_data["commits"]
+            assert "total_insertions" in commits
+            assert "total_deletions" in commits
+            assert "total_commits" in commits
+            assert "net_change" in commits
+            assert "message_analysis" in commits
 
     def test_importance_exists(self):
         result = fas.run_fas(TEST_FILE)

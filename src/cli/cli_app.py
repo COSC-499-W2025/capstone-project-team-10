@@ -77,6 +77,12 @@ def add_cli_args(parser: argparse.ArgumentParser):
         "--after",
         type=str,
         help="Only include files created after the specified date (YYYY-MM-DD).",
+    )     
+    parser.add_argument(
+        "-g",
+        "--github_username",
+        type=str,
+        help="Input a github username for specific git repo parsing.",
     )
     # Flags
     parser.add_argument("-q", "--quiet", action="store_true", help="Suppress output.")
@@ -144,6 +150,12 @@ def run_cli():
     if file_types:
         param.set("supported_file_types", list(file_types))
         print(f"Filtering by file types: {file_types}")
+    
+    if args.github_username:
+        param.set("scan.github_username", args.github_username)
+        print(f"GitHub username set to: {args.github_username}")
+    else:
+        param.set("scan.github_username", "")
 
     bound_str: str = "Files created between:"
     if lower_bound:

@@ -146,6 +146,7 @@ python -m src.main <file_path> [options]
 | `-b`, `--before <date>`     | Only include files created before the specified date (`YYYY-MM-DD`).                               | `-b 2023-01-01`                                 |
 | `-a`, `--after <date>`      | Only include files created after the specified date (`YYYY-MM-DD`).                                | `-a 2022-01-01`                                 |
 | `-q`, `--quiet`             | Suppress output (except for log file location).                                                    | `-q`                                            |
+| `-g`, `--github_username`   | When scanning git repos only scan commits related to this username.                                | `-g username`                                            |
 
 ---
 
