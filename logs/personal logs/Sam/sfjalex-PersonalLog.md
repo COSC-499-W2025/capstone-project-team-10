@@ -1,3 +1,17 @@
+# Week 13 (11/24/2025 - 11/30/2025)
+
+![Week Thirteen Tasks](Week13/WeekThirteenTasks.png)
+
+# Features
+
+![Week Thirteen Feature](Week13/WeekThirteenFeature.png)
+
+# Recap
+
+This week I fully implemented the collaborative git repo project, this when coming across a .git file in a given file path that the program is searching will find all commits, analyze them, filter by username for specific contributions if a username is given via a new flag I created in the cli and param. This will search all files contained within the git repo and extract all of those skills and append them to the git repo object as well, so the user now gets an overview of the entire repo with a summary of their contributions, the major areas they targeted, and the skills demonstrated within the repo. This then goes to the overhauled showcase module which produces that summarized form for the user in both resume and portfolio format. Tests for all these changes have been added as well.
+
+Next week as we go into the video demo I will mainly be focused on cleaning up whatever we may have overlooked that is required as well as doing some refactors that I have planned previously regarding creating a text_analysis_helaper module for more efficient code.
+
 # Week 12 (11/17/2025 - 11/23/2025)
 
 ![Week Twelve Tasks](Week12/WeekTwelveTasks.png)
