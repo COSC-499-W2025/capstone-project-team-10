@@ -102,9 +102,8 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             # so that it is consistent with other file types that return dictionaries.
             case "pdf":
                 from src.fas import fas_pdf
-
-                print("Extracting PDF data...")
-                return fas_pdf.extract_pdf_data(file_path)
+                # return fas_pdf.extract_pdf_data(file_path)
+                metadata =  fas_pdf.extract_pdf_data(file_path)
 
             case "docx":
                 from src.fas import fas_docx
@@ -184,7 +183,13 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                 return None
             
 
-        if file_type in ("docx", "odt", "rtf") and isinstance(metadata, dict):
+        if file_type in ("docx", "odt", "rtf", "pdf") and isinstance(metadata, dict):
+
+            # Remove newlines from summary
+            if "summary" in metadata and isinstance(metadata["summary"], str):
+                cleaned_summary = metadata["summary"].replace("\n", " ").replace("\r", " ")
+                cleaned_summary = " ".join(cleaned_summary.split())
+                metadata["summary"] = cleaned_summary
 
             skills = []
 
@@ -193,7 +198,6 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                     skill = feedback_to_skill(metadata[key])
                     if skill:
                         skills.append(skill)
-                        
 
             metadata["key_skills"] = skills
         elif ext in em:
