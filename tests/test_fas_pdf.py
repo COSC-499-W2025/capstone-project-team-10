@@ -115,3 +115,7 @@ class TestPDF:
         assert len(sample_pdf4["text_stats"]) > 0
         assert len(sample_pdf4["text_sentiment"]) > 0
         assert len(sample_pdf4["text_summary"]) > 5
+        assert sample_pdf4["complexity"] != None
+        assert sample_pdf4["depth"] != None
+        assert sample_pdf4["structure"] != None
+        assert sample_pdf4["sentiment_insight"] != None
