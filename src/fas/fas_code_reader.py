@@ -158,13 +158,17 @@ class CodeReader:
         if not self.filetype:
             raise ValueError(f"Error! File is not a programmming file '{self.filepath}'")
         
-        if self.filetype not in LANGUAGE_MAP:
-            raise ValueError(f"Error! Unsupported language '{self.filetype}' for file '{self.filepath}'")
+        # if self.filetype not in LANGUAGE_MAP:
+        #     raise ValueError(f"Error! Unsupported language '{self.filetype}' for file '{self.filepath}'")
+        return
+            
 
     def parse_file(self):
         """Creates Parser for specific coding language"""
         if self.filetype not in LANGUAGE_MAP:
-            raise ValueError(f"Language does not support deep analysis: {self.filetype}")
+            # raise ValueError(f"Language does not support deep analysis: {self.filetype}")
+            return None
+            
         
         parser = Parser(Language(LANGUAGE_MAP[self.filetype]))
         
@@ -372,6 +376,12 @@ class CodeReader:
     def extract(self):
         self.extract_file_type()
         tree = self.parse_file()
+        if tree is None:
+            # Unsupported language
+            self.libraries = []
+            self.complexity = {}
+            self.oop = {}
+            return
         self.libraries = self.extract_imports(tree.root_node)
         self.complexity = self.extract_complexity(tree.root_node)
         self.oop = self.extract_oop(tree.root_node)
