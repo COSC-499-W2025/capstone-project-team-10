@@ -45,6 +45,9 @@ class LogSorter:
             raise ValueError(
                 f"Number of order flags ({len(ascending)}) must match number of parameters ({len(parameters)})")
 
+        if any(not isinstance(x, bool) for x in ascending):
+            raise ValueError(f"One of the ascending flags is wrong or mistyped")
+
         self.params = parameters
         self.ascending = ascending
 
@@ -102,6 +105,17 @@ class LogSorter:
         self.log.to_csv(new_path, index = False)
         return self.log.to_csv(index = False)
 
+    def replace_log(self):
+        """
+        Overwrite the original log file with the sorted data.
+        """
+        # write directly to the original file path
+        self.log.to_csv(self.__log_path, index=False)
+
+
+        # return CSV string (same behavior you already had)
+        return self.log.to_csv(index=False)
+
     def get_sort_params(self):
         """
             Returns the sorting parameters
@@ -109,14 +123,13 @@ class LogSorter:
         return {"Parameters": self.params, "Orders": self.ascending}
 
 r"""
-sorter = LogSorter(r"C:\Users\pqbao\GitHub\capstone-project-team-10\tests\testdata\test_log_sorter\test_log.log")   # Loads the data - just go over to src.tests.testdata.test_log_sorter, and grab the absolute path, append it here
+sorter = LogSorter(r"C:\Users\pqbao\AppData\Roaming\Capstone Project Team 10\logs\4.log")   # Loads the data - just go over to src.tests.testdata.test_log_sorter, and grab the absolute path, append it here
 print(sorter.get_available_columns())   # Prints the columns that the .csv holds
-sorter.set_sort_parameters(['Created time'], [True])    # Sort by, 'Created time' first, and by Ascending (for 'Created time')
+sorter.set_sort_parameters(['Importance'], [True])    # Sort by, 'Created time' first, and by Ascending (for 'Created time')
 print(sorter.get_preview()) # Get the preview, to see the new columns (it might obfuscate since df is abbreviated
 sorter.sort()   # Initialize the sort
 print(sorter.get_sort_params()) # Prints out the params
-sorter.return_csv() # Returns the .csv beside the test file%
+sorter.replace_log() # Returns the .csv beside the test file%
 # Try it out for yourself - the example output test_log_sorted.log is right beside the file.
 """
-
 
