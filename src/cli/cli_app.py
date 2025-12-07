@@ -9,7 +9,11 @@ import src.log.log as log
 import src.param.param as param
 import src.zip.zip_app as zip
 from src.log.log_sorter import LogSorter
-from src.showcase.showcase import generate_portfolio, generate_resume, generate_skill_timeline
+from src.showcase.showcase import (
+    generate_portfolio,
+    generate_resume,
+    generate_skill_timeline,
+)
 
 
 def prompt_file_perms():
@@ -24,7 +28,14 @@ def sort_sequence(log_path):
     sorter = LogSorter(log_path)
     print(f"Available columns: {sorter.get_available_columns()}")
     column_criteria = input("Column criteria (comma separated): ").strip().split(",")
-    ordering_criteria = [{"A": True, "D": False}[c.strip().upper()] if c.strip() else True for c in input("Ordering criteria (comma separated, <A for Ascending, D for Descending>, leave None for all Ascending): ").strip().split(",")]
+    ordering_criteria = [
+        {"A": True, "D": False}[c.strip().upper()] if c.strip() else True
+        for c in input(
+            "Ordering criteria (comma separated, <A for Ascending, D for Descending>, leave None for all Ascending): "
+        )
+        .strip()
+        .split(",")
+    ]
     print("Appending sort criteria...")
     sorter.set_sort_parameters(column_criteria, ordering_criteria)
     print(sorter.get_sort_params())
@@ -100,7 +111,7 @@ def add_cli_args(parser: argparse.ArgumentParser):
         "--after",
         type=str,
         help="Only include files created after the specified date (YYYY-MM-DD).",
-    )     
+    )
     parser.add_argument(
         "-g",
         "--github_username",
@@ -137,6 +148,8 @@ def run_cli():
     if args.zip:
         print("Processing Zip File")
         file_path = extract_chosen_zip(args.zip)
+        if not file_path:
+            sys.exit(1)
     elif args.file_path:
         file_path = args.file_path
     else:
@@ -179,7 +192,7 @@ def run_cli():
     if file_types:
         param.set("supported_file_types", list(file_types))
         print(f"Filtering by file types: {file_types}")
-    
+
     if args.github_username:
         param.set("scan.github_username", args.github_username)
         print(f"GitHub username set to: {args.github_username}")
@@ -194,25 +207,29 @@ def run_cli():
             bound_str += " and"
         bound_str += f" before {upper_bound.strftime('%Y-%m-%d')}"
     print(bound_str)
-    fss.search(
-        fss.FSS_Search(
-            file_path,
-            path_exclusions,
-            file_types,
-            lower_bound,
-            upper_bound,
+
+    if file_path and Path(file_path).exists() and Path(file_path).is_dir():
+        fss.search(
+            fss.FSS_Search(
+                file_path,
+                path_exclusions,
+                file_types,
+                lower_bound,
+                upper_bound,
+            )
         )
-    )
 
     print("Scan complete.")
     print(f"Log file located at: {param.get('logging.current_log_file')}")
 
     if args.sort:
-        sort_sequence(param.get('logging.current_log_file'))
+        sort_sequence(param.get("logging.current_log_file"))
 
     def __sort_warning():
         if not args.sort:
-            print("Note that the logs are not sorted - your resume and portfolio will be generated based on the analysis order. Check out -s for more.")
+            print(
+                "Note that the logs are not sorted - your resume and portfolio will be generated based on the analysis order. Check out -s for more."
+            )
 
     if args.resume_entries:
         # check that the included path is valid
