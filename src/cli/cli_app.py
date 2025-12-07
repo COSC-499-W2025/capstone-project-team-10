@@ -8,6 +8,7 @@ import src.fss.fss as fss
 import src.log.log as log
 import src.param.param as param
 import src.zip.zip_app as zip
+from src.log.log_sorter import LogSorter
 from src.showcase.showcase import generate_portfolio, generate_resume, generate_skill_timeline
 
 
@@ -17,6 +18,20 @@ def prompt_file_perms():
     if response.lower() != "y":
         print("Permission denied. Exiting.")
         sys.exit(1)
+
+
+def sort_sequence(log_path):
+    sorter = LogSorter(log_path)
+    print(f"Available columns: {sorter.get_available_columns()}")
+    column_criteria = input("Column criteria (comma separated): ").strip().split(",")
+    ordering_criteria = [{"A": True, "D": False}[c.strip().upper()] if c.strip() else True for c in input("Ordering criteria (comma separated, <A for Ascending, D for Descending>, leave None for all Ascending): ").strip().split(",")]
+    print("Appending sort criteria...")
+    sorter.set_sort_parameters(column_criteria, ordering_criteria)
+    print(sorter.get_sort_params())
+    print(f"Preview of the first 5 rows:\n {sorter.get_preview()}")
+    sorter.sort()
+    sorter.replace_log()
+    print("Sorting finished")
 
 
 def extract_chosen_zip(zip_file_path: str) -> Path | None:
@@ -91,6 +106,12 @@ def add_cli_args(parser: argparse.ArgumentParser):
         "--github_username",
         type=str,
         help="Input a github username for specific git repo parsing.",
+    )
+    parser.add_argument(
+        "-s",
+        "--sort",
+        action="store_true",
+        help="Initiate the sorting sequence after the logs are completed.",
     )
     # Flags
     parser.add_argument("-q", "--quiet", action="store_true", help="Suppress output.")
@@ -184,7 +205,14 @@ def run_cli():
     )
 
     print("Scan complete.")
-    print(f"Log file located at:{param.get('logging.current_log_file')}")
+    print(f"Log file located at: {param.get('logging.current_log_file')}")
+
+    if args.sort:
+        sort_sequence(param.get('logging.current_log_file'))
+
+    def __sort_warning():
+        if not args.sort:
+            print("Note that the logs are not sorted - your resume and portfolio will be generated based on the analysis order. Check out -s for more.")
 
     if args.resume_entries:
         # check that the included path is valid
@@ -194,6 +222,7 @@ def run_cli():
             and Path(args.resume_entries).is_dir()
         ):
             param.export_folder_path = args.resume_entries
+        __sort_warning()
         print("Generating Resume PDF...")
         file_path = generate_resume()
         if file_path:
@@ -209,6 +238,7 @@ def run_cli():
             and Path(args.portfolio_entries).is_dir()
         ):
             param.export_folder_path = args.portfolio_entries
+        __sort_warning()
         print("Generating Portfolio Website...")
         file_path = generate_portfolio()
         if file_path:
