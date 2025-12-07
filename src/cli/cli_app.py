@@ -208,7 +208,7 @@ def run_cli():
         bound_str += f" before {upper_bound.strftime('%Y-%m-%d')}"
     print(bound_str)
 
-    if file_path and Path(file_path).exists() and Path(file_path).is_dir():
+    if file_path and Path(file_path).exists():
         fss.search(
             fss.FSS_Search(
                 file_path,
@@ -218,6 +218,9 @@ def run_cli():
                 upper_bound,
             )
         )
+    else:
+        print(f"Provided path does not exist: {file_path}")
+        sys.exit(1)
 
     print("Scan complete.")
     print(f"Log file located at: {param.get('logging.current_log_file')}")
