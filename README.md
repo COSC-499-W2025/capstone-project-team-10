@@ -138,21 +138,22 @@ python -m src.main <file_path> [command-line-options] --cli
 
 #### Options
 
-| Option                            | Description                                                                                                                     | Example                                         |
-| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------| ----------------------------------------------- |
-| `--zip <zipfile>`                 | Extract the specified zip file and scan its contents.                                                                           | `--zip myprojects.zip`                          |
-| `--exclude-paths <paths>`         | Space-separated list of absolute paths to exclude from the scan.                                                                | `--exclude-paths /path/to/folder /path/to/file` |
-| `--file-types <types>`            | Space-separated list of file types to include (by extension, e.g. `py`, `md`, `pdf`).                                           | `--file-types py md pdf`                        |
-| `-y`, `--yes`                     | Automatically grant file access permission (skip interactive prompt).                                                           | `-y`                                            |
-| `-r`, `--resume_entries`          | Generate a PDF resume from scanned projects. Optionally specify a directory to save the result.                                 | `-r` or `-r /path/to/save`                      |
-| `-p`, `--portfolio_entries`       | Generate a web portfolio from scanned projects. Optionally specify a directory to save the result.                              | `-p` or `-p /path/to/save`                      |
-| `-t`, `--skill_timeline_entries`  | Generate a PDF of key skills from scanned projects, ordered chronologically. Optionally specify a directory to save the result. | `-t` or `-t /path/to/save`                      |
-| `-i`, `--no_image`             | Disable rendering of project images when generating resumes and portfolio pages. Disabled by default. Only use with -r or -p      | `-i -r` or `-p -i`                                    |
-| `-c`, `--clean`                   | Start a new log file instead of resuming the last one.                                                                          | `-c`                                            |
-| `-b`, `--before <date>`           | Only include files created before the specified date (`YYYY-MM-DD`).                                                            | `-b 2023-01-01`                                 |
-| `-a`, `--after <date>`            | Only include files created after the specified date (`YYYY-MM-DD`).                                                             | `-a 2022-01-01`                                 |
-| `-q`, `--quiet`                   | Suppress output (except for log file location).                                                                                 | `-q`                                            |
-| `-g`, `--github_username`         | When scanning git repos only scan commits related to this username.                                                             | `-g username`                                   |
+| Option                           | Description                                                                                                                     | Example                                         |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `--zip <zipfile>`                | Extract the specified zip file and scan its contents.                                                                           | `--zip myprojects.zip`                          |
+| `--exclude-paths <paths>`        | Space-separated list of absolute paths to exclude from the scan.                                                                | `--exclude-paths /path/to/folder /path/to/file` |
+| `--file-types <types>`           | Space-separated list of file types to include (by extension, e.g. `py`, `md`, `pdf`).                                           | `--file-types py md pdf`                        |
+| `-y`, `--yes`                    | Automatically grant file access permission (skip interactive prompt).                                                           | `-y`                                            |
+| `-r`, `--resume_entries`         | Generate a PDF resume from scanned projects. Optionally specify a directory to save the result.                                 | `-r` or `-r /path/to/save`                      |
+| `-p`, `--portfolio_entries`      | Generate a web portfolio from scanned projects. Optionally specify a directory to save the result.                              | `-p` or `-p /path/to/save`                      |
+| `-t`, `--skill_timeline_entries` | Generate a PDF of key skills from scanned projects, ordered chronologically. Optionally specify a directory to save the result. | `-t` or `-t /path/to/save`                      |
+| `-i`, `--no_image`               | Disable rendering of project images when generating resumes and portfolio pages. Enabled by default. Only use with -r or -p     | `-i -r` or `-p -i`                              |
+| `-c`, `--clean`                  | Start a new log file instead of resuming the last one.                                                                          | `-c`                                            |
+| `-s`, `--sort`                   | Indicates to prompt the sort after a log creation                                                                               | `python -m src.main /path/to/save -s --cli`     |
+| `-b`, `--before <date>`          | Only include files created before the specified date (`YYYY-MM-DD`).                                                            | `-b 2023-01-01`                                 |
+| `-a`, `--after <date>`           | Only include files created after the specified date (`YYYY-MM-DD`).                                                             | `-a 2022-01-01`                                 |
+| `-q`, `--quiet`                  | Suppress output (except for log file location).                                                                                 | `-q`                                            |
+| `-g`, `--github_username`        | When scanning git repos only scan commits related to this username.                                                             | `-g username`                                   |
 
 ---
 
