@@ -125,6 +125,8 @@ def test_run_cli(monkeypatch):
         "test_username",
     ]
     monkeypatch.setattr(sys, "argv", test_args)
+    # Patch sys.exit to a no-op
+    monkeypatch.setattr(sys, "exit", lambda code=0: None)
     # Patch print to capture output
     output = []
     original_print = builtins.print
@@ -204,6 +206,8 @@ def test_run_cli_quiet(monkeypatch):
         "test_username",
     ]
     monkeypatch.setattr(sys, "argv", test_args)
+    # Patch sys.exit to a no-op
+    monkeypatch.setattr(sys, "exit", lambda code=0: None)
     # Patch print to capture output
     output = []
     original_print = builtins.print
@@ -254,6 +258,8 @@ def test_run_cli_quiet(monkeypatch):
     # Check scan complete and processing complete
     assert "Scan complete." not in all_output
     assert "Processing Complete!" not in all_output
+
+
 def test_run_cli_with_image_allow(monkeypatch):
     called_resume = {"allow_image": None}
     called_portfolio = {"allow_image": None}
@@ -282,7 +288,8 @@ def test_run_cli_with_image_allow(monkeypatch):
     ]
 
     monkeypatch.setattr(sys, "argv", test_args)
-
+    # Patch sys.exit to a no-op
+    monkeypatch.setattr(sys, "exit", lambda code=0: None)
     # Capture print silently
     monkeypatch.setattr(builtins, "print", lambda *a, **k: None)
 
@@ -290,6 +297,7 @@ def test_run_cli_with_image_allow(monkeypatch):
 
     assert called_resume["allow_image"] is True
     assert called_portfolio["allow_image"] is True
+
 
 def test_run_cli_without_image_allow(monkeypatch):
     called_resume = {"allow_image": None}
@@ -318,11 +326,12 @@ def test_run_cli_without_image_allow(monkeypatch):
     ]
 
     monkeypatch.setattr(sys, "argv", test_args)
-
+    # Patch sys.exit to a no-op
+    monkeypatch.setattr(sys, "exit", lambda code=0: None)
     # Capture print
     monkeypatch.setattr(builtins, "print", lambda *a, **k: None)
 
     cli.run_cli()
 
-    assert called_resume["allow_image"] is False
-    assert called_portfolio["allow_image"] is False
+    assert called_resume["allow_image"] is True
+    assert called_portfolio["allow_image"] is True

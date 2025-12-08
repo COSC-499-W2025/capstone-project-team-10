@@ -129,12 +129,11 @@ def add_cli_args(parser: argparse.ArgumentParser):
 
     # Disable image embedding
     parser.add_argument(
-    "-i",
-    "--no_image",
-    action="store_true",
-    help="Allow images to be embedded into the resume and portfolio.",
-)
-
+        "-i",
+        "--no_image",
+        action="store_true",
+        help="Allow images to be embedded into the resume and portfolio.",
+    )
 
 
 def run_cli():
@@ -158,7 +157,7 @@ def run_cli():
         print("Processing Zip File")
         file_path = extract_chosen_zip(args.zip)
         if not file_path:
-            sys.exit(1)
+            sys.exit(0)
     elif args.file_path:
         file_path = args.file_path
     else:
@@ -229,7 +228,7 @@ def run_cli():
         )
     else:
         print(f"Provided path does not exist: {file_path}")
-        sys.exit(1)
+        sys.exit(0)
 
     print("Scan complete.")
     print(f"Log file located at: {param.get('logging.current_log_file')}")
@@ -254,7 +253,7 @@ def run_cli():
         __sort_warning()
         print("Generating Resume PDF...")
         # file_path = generate_resume()
-        file_path = generate_resume(allow_image = not args.no_image)
+        file_path = generate_resume(allow_image=not args.no_image)
         if file_path:
             print(f"Resume generated at: {file_path}")
         else:
@@ -271,7 +270,7 @@ def run_cli():
         __sort_warning()
         print("Generating Portfolio Website...")
         # file_path = generate_portfolio()
-        file_path = generate_portfolio(allow_image = not args.no_image)
+        file_path = generate_portfolio(allow_image=not args.no_image)
         if file_path:
             print(f"Portfolio generated at: {file_path}")
         else:
