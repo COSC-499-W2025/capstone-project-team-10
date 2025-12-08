@@ -1,3 +1,17 @@
+# Week 14 (12/01/2025 - 12/07/2025)
+
+![Week Fourteen Tasks](Week14/WeekFourteenTasks.png)
+
+# Features
+
+![Week Fourteen Feature](Week14/WeekFourteenFeature.png)
+
+# Recap
+
+This week I compiled and completed the team contract, writing out what our baseline requirments are as well as what is expected of each given group member in all given aspects of the project. As well I had prepared for and participated in the milestone demo with the group to ensure we were prepared for our presentation before our class time.
+
+Over the winter break I intend to keep researching and working on the project, working towards fulfilling milestone 2 requirements given the long period of time this affords me.
+
 # Week 13 (11/24/2025 - 11/30/2025)
 
 ![Week Thirteen Tasks](Week13/WeekThirteenTasks.png)
