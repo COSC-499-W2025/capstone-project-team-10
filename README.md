@@ -111,7 +111,11 @@ at least two reviewers must leave comments on a PR before merging
 3. Install dependencies:
    pip install -r requirements.txt
 
-4. Run the app or tests as needed.
+4. Install nltk
+    Run the python script at utils/setup_nltk_data.py
+    This will install all dependencies for the nltk library
+
+5. Run the app or tests as needed, the app must be run as a module.
 
 ## Running the app
 
@@ -124,7 +128,7 @@ python src/main.py --cli
 
 ```sh
 
-python -m src.main <file_path> [options]
+python -m src.main <file_path> [command-line-options] --cli
 
 ```
 
@@ -163,7 +167,7 @@ python -m src.main /path/to/projects
 ##### Scan and Exclude Paths
 
 ```sh
-python -m src.main /path/to/projects --exclude-paths .git node_modules
+python -m src.main /path/to/projects --exclude-paths /path/to/sub/projects /path/to/sub/projects2
 ```
 
 ##### Scan Only Python and Markdown Files
@@ -298,15 +302,16 @@ Each component under test shall have its own "test\_" file to make readability a
 
 ### Running the Unit tests
 
+Use the following command to run the test suite
 ```sh
 python -m pytest -q
 ```
 
-## Building
+## Building (Incomplete)
 
 This Project uses pyinstaller for its build path. This should have been installed if you ran the setup correctly
 
-### Building the app
+### Building the app (Incomplete)
 
 The following command will need to be run on each operating system the app will be compiled for when releasing
 The resulting app is packaged with the python interpretter making the end user experience very clean. It also makes the file size abnormally large
@@ -319,3 +324,77 @@ pyinstaller --onefile --add-data "resources:resources" src/main.py --windowed
 ## Other Notes
 
 To run the text_analysis.py make sure you run setup_nltk_data.py first.
+
+
+## Milestone 1 Compliance
+
+### [X] Require the user to give consent for data access before proceeding
+    - The User must indicate consent via the CLI flag `-y` or `--yes` to proceed without prompt
+    - if the user does not include the -y flag they will be prompted to give consent before proceeding
+
+### [X] Parse a specified zipped folder containing nested folders and files
+    - The CLI flag `--zip <zipfile>` allows the user to specify a zip file to extract and scan
+
+### [X] Return an error if the specified file is in the wrong format
+    - If the specified file is not a zip file an error message is returned and the program exits
+    
+### [X] Request user permission before using external services (e.g., LLM) and provide implications on data privacy about the user's data
+    - There are no external services used in Milestone 1
+
+### [X] Have alternative analyses in place if sending data to an external service is not permitted
+    - All analyses are done locally in Milestone 1
+
+### [X] Store user configurations for future use
+    - User configurations are stored using the param system, and stored in json format
+
+### [X] Distinguish individual projects from collaborative projects
+    - Collaborative projects are identified by the presence of multiple authors in git commit history
+    - Users can filter out their own commits using the -g flag to set their own username
+
+### [X] For a coding project, identify the programming language and framework used
+    - Programming languages are identified by file extension
+    - frameworks/libraries are identified by the imports used in the code files
+
+### [X] Extrapolate individual contributions for a given collaboration project
+    - An individuals contributions to git projects are distinguished from othe contributors in the project such as 
+        - number of commits,
+        - lines added/removed, 
+        - and commit objectives
+
+### [X] Extract key contribution metrics in a project, displaying information about the duration of the project and activity type contribution frequency (e.g., code vs test vs design vs document), and other important information
+    - Contribution metrics are extracted from git commit history, including number of commits, lines added/removed, and commit objectives
+    - Files tracked by the git project that were worked on by the user are scanned and included as skill indicators. 
+
+### [X] Extract key skills from a given project
+    - Skills are extracted using a combination of Natural Language processing and keyword matching from a predefined skill set (For programming libraries and frameworks)
+
+### [X] Output all the key information for a project
+    - Key information is saved to a log file in csv for further processing
+
+### [X] Store project information into a database
+    - Project information is stored in a local csv log that are managed by the log service. This acts as a simple database for storing project information
+
+### [X] Retrieve previously generated portfolio information
+    - Previously generated portfolios are saved to the users drive, and may be retrieved by the user
+    - Portfolio may be regenerated from previous logs
+
+### [X] Retrieve previously generated résumé item
+    - Previously generated resumes are saved to the users drive, and may be retrieved by the user
+    - Resumes may be generated from previous logs
+
+### [X] Rank importance of each project based on user's contributions
+    - Git projects receive an importance based on the users contributions
+
+### [X] Summarize the top ranked projects
+    - Projects can be sorted and displayed by importance
+
+### [X] Delete previously generated insights and ensure files that are shared across multiple reports do not get affected
+    - The user may start a new log file using the -c or --clean flag, this will create a new log file and not affect any previously generated insights, or allow previous results to affect the current scan
+
+### [X] Produce a chronological list of projects
+    - The user may generate a chronological list of projects using the -t or --skill_timeline_entries flag
+
+### [X] Produce a chronological list of skills exercised
+    - The user may generate a chronological list of projects using the -t or --skill_timeline_entries flag
+
+#### Tickets for "Functional Requirements" Have been closed if they have been met by current functionality
