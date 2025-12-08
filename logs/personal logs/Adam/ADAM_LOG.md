@@ -1,3 +1,46 @@
+# Week 14 (11/30/2025 - 12/07/2025):
+
+## Completed tasks
+
+All in review features will be merged by the end of the week
+
+![Week 14 Tasks completed](Week14/image.png)
+![alt text](image.png)
+
+## Features
+
+Nothing In progress - Winter break
+
+## Recap
+
+#### 1. PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/144
+
+- Created MD documentation for milestone compliance in the readme.md
+
+#### 2. Video Demo.
+
+- Recorded CLI --zip usage, error handling and -y/permission prompt usage
+
+##### Tickets: 
+
+1. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/137
+2. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/136
+
+
+### For next week:
+
+Nothing - Winter Break
+
+## Additional Context
+
+No problems with my work
+
+## Team Survey:
+
+Survey completed
+
+
+
 # Week 13 (11/23/2025 - 11/30/2025):
 
 ## Completed tasks
