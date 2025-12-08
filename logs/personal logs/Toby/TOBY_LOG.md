@@ -1,3 +1,30 @@
+# Week 14 (11/23/2025 - 11/30/2025)
+
+![Week 14 - Task Completed](W14/Done.png)
+![Week 14 - Task Completed](W14/Done1.png)
+
+
+## Features
+
+![Week 14 - In Progress](W14/Features.png)
+![Week 14 - In Progress](W14/Features1.png)
+
+## Recap
+
+- For week 14, I worked on the adding image arguments for our app since resume should be able to configure if image is embedded or not
+  - Fix bug for summary printing out multiple \n or \r
+  - Fix code reader to run unsupported language
+  - Fix FSS should exclude correctly for directories
+- I am preparing for final exam for week 15 and 16. See you on term 2!
+
+## Additional Context
+## Team Survey:
+
+
+![Week 14 - Team Survey](W14/Team_Survey.png)
+![Week 14 - Team Survey](W14/Team_Survey_(1).png)
+![Week 14 - Team Survey](W14/Team_Survey_(2).png)
+![Week 14 - Team Survey](W14/Team_Survey_(3).png)
 # Week 13 (11/23/2025 - 11/30/2025)
 
 ![Week 13 - Task Completed](W13/Done.png)
