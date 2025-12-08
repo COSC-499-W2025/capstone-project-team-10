@@ -1,3 +1,14 @@
+# Week 14 (11/24/2025 = 11/30/2025)
+
+![Week 14 Tasks](Week14/Week14Tasks.png)
+
+## Features
+
+![Week 14 KanBan](Week14/Week14KanBan.png)
+
+## Recap
+We finished milestone 1 and all the deliverables this week. I completed the team log and we had our presentation this week. I also worked on adding feedback to the pdf module which is complete, but we wanted to avoid merging until after the milestone to ensure the build is stable. I also created a new issue to consolidate functions from the fas_docs.py module to the text_analysis.py module which I will work on over the holidays. I will also try to draft some new issues for the next milestone.
+
 # Week 13 (11/24/2025 = 11/30/2025)
 
 ![Week 13 Tasks](Week13/Week13Tasks.png)
