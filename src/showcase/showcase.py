@@ -85,7 +85,7 @@ def generate_all():
     generate_skill_timeline()
 
 
-def generate_resume(allow_image: bool = False) -> Path | None:
+def generate_resume(allow_image: bool = True) -> Path | None:
     """
     Generates a PDF resume from the log file.
     """
@@ -399,7 +399,7 @@ def parse_extra_data(extra_data_raw):
     return {}
 
 
-def generate_portfolio(allow_image: bool = False) -> Path | None:
+def generate_portfolio(allow_image: bool = True) -> Path | None:
     """
     Generates an HTML portfolio and zips it, copying resources as needed.
     """
