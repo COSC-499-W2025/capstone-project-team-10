@@ -127,6 +127,15 @@ def add_cli_args(parser: argparse.ArgumentParser):
     # Flags
     parser.add_argument("-q", "--quiet", action="store_true", help="Suppress output.")
 
+    # Disable image embedding
+    parser.add_argument(
+    "-i",
+    "--no_image",
+    action="store_true",
+    help="Allow images to be embedded into the resume and portfolio.",
+)
+
+
 
 def run_cli():
     # Setup supported CLI args
@@ -244,7 +253,8 @@ def run_cli():
             param.export_folder_path = args.resume_entries
         __sort_warning()
         print("Generating Resume PDF...")
-        file_path = generate_resume()
+        # file_path = generate_resume()
+        file_path = generate_resume(allow_image = not args.no_image)
         if file_path:
             print(f"Resume generated at: {file_path}")
         else:
@@ -260,7 +270,8 @@ def run_cli():
             param.export_folder_path = args.portfolio_entries
         __sort_warning()
         print("Generating Portfolio Website...")
-        file_path = generate_portfolio()
+        # file_path = generate_portfolio()
+        file_path = generate_portfolio(allow_image = not args.no_image)
         if file_path:
             print(f"Portfolio generated at: {file_path}")
         else:

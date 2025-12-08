@@ -85,7 +85,7 @@ def generate_all():
     generate_skill_timeline()
 
 
-def generate_resume() -> Path | None:
+def generate_resume(allow_image: bool = True) -> Path | None:
     """
     Generates a PDF resume from the log file.
     """
@@ -194,7 +194,8 @@ def generate_resume() -> Path | None:
                             )
 
                         # Embed the image itself
-                        pdf_output.image(file_analysis.file_path, w=100)
+                        if allow_image:
+                            pdf_output.image(file_analysis.file_path, w=100)
 
                     case file_type if file_type in collaborative_types:
 
@@ -398,7 +399,7 @@ def parse_extra_data(extra_data_raw):
     return {}
 
 
-def generate_portfolio() -> Path | None:
+def generate_portfolio(allow_image: bool = True) -> Path | None:
     """
     Generates an HTML portfolio and zips it, copying resources as needed.
     """
@@ -478,10 +479,11 @@ def generate_portfolio() -> Path | None:
                         if width and height:
                             project_desc += f" — {width} x {height}"
 
-                        details = f"""
-                            <p><strong>Artistic Project:</strong> {project_desc}</p>
-                            <img src="resources/{file_analysis.file_name}.{ext}" width="300"/>
-                        """
+                        if allow_image:
+                            details = f"""
+                                <p><strong>Artistic Project:</strong> {project_desc}</p>
+                                <img src="resources/{file_analysis.file_name}.{ext}" width="300"/>
+                            """
                     elif ext in collaborative_types:
                         key_skills = []
                         extra_data_skills = []
