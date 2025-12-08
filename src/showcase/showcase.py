@@ -1,17 +1,22 @@
 import csv
+import json
 import logging
 import os
 import re
 import shutil
 from datetime import datetime, timedelta
 from pathlib import Path
+import ast
 
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 
 import src.log.log as log
 import src.param.param as param
+from src.log.log_sorter import LogSorter
 from src.fas.fas import FileAnalysis
+
+from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
 
 # Template for resume entry in PDF
 resume_entry_template = """
@@ -77,9 +82,10 @@ def generate_all():
     """
     generate_resume()
     generate_portfolio()
+    generate_skill_timeline()
 
 
-def generate_resume() -> Path | None:
+def generate_resume(allow_image: bool = True) -> Path | None:
     """
     Generates a PDF resume from the log file.
     """
@@ -139,33 +145,238 @@ def generate_resume() -> Path | None:
                 pdf_output.set_font("Noto", size=12)
                 # Add details based on file type
                 file_analysis.extra_data = clean_text(file_analysis.extra_data)
+                _, ext = os.path.splitext(file_analysis.file_path)
+                ext = ext.lower()       
                 match file_analysis.file_type:
                     case file_type if file_type in image_types:
-                        # Add image project description and image
+                        
+                        # Convert extra_data to dict if it is a string
+                        extra_data_raw = file_analysis.extra_data
+                        extra_data_dict = {}
+
+                        if isinstance(extra_data_raw, str):
+                            try:
+                                extra_data_dict = ast.literal_eval(extra_data_raw)
+                            except (ValueError, SyntaxError):
+                                extra_data_dict = {}
+                        elif isinstance(extra_data_raw, dict):
+                            extra_data_dict = extra_data_raw
+
+                        # Basic generic description
+                        project_desc = "Digital Artwork / Image Project"
+
+                        # Optionally, include size or format for a bit more info
+                        image_meta = extra_data_dict.get("image", {})
+                        img_format = image_meta.get("format")
+                        if img_format:
+                            project_desc += f" ({img_format})"
+
+                        # Short project description
                         pdf_output.multi_cell(
                             0,
                             10,
-                            f"Artistic Project: [Insert Description]",
+                            f"Artistic Project: {project_desc}",
                             new_x=XPos.LMARGIN,
                             new_y=YPos.NEXT,
                         )
-                        pdf_output.image(file_analysis.file_path, w=100)
+
+                        # Image dimensions (optional)
+                        image_meta = extra_data_dict.get("image", {})
+                        width = image_meta.get("width")
+                        height = image_meta.get("height")
+                        if width and height:
+                            pdf_output.multi_cell(
+                                0,
+                                10,
+                                f"Image Dimensions: {width} x {height}",
+                                new_x=XPos.LMARGIN,
+                                new_y=YPos.NEXT,
+                            )
+
+                        # Embed the image itself
+                        if allow_image:
+                            pdf_output.image(file_analysis.file_path, w=100)
+
                     case file_type if file_type in collaborative_types:
+
+                        key_skills = []
+                        extra_data_skills = []
+                        commits = []
+                        author = []
+                        extra_data_raw = file_analysis.extra_data
+
+                        # Get key skills of git project
+                        if isinstance(extra_data_raw, str):
+                            try:
+                                parsed = ast.literal_eval(extra_data_raw)
+                                if isinstance(parsed, dict):
+                                    key_skills = parsed.get("key_skills", []) or []
+                                    extra_data_skills = parsed.get("extra data", []) or []
+                                    commits = parsed.get("commits", []) or []
+                                    author = parsed.get("author", []) or []
+                            except (ValueError, SyntaxError):
+                                key_skills = []
+                                commits = []
+                        elif isinstance(extra_data_raw, dict):
+                            key_skills = extra_data_raw.get("key_skills", []) or []
+                            extra_data_skills = extra_data_raw.get("extra data", []) or []
+                            commits = extra_data_raw.get("commits", []) or []
+                            author = extra_data_raw.get("author", []) or []
+
+                        total_commits = commits.get("total_commits", 0)
+                        total_insertions = commits.get("total_insertions", 0)
+                        total_deletions = commits.get("total_deletions", 0)
+                        net_change = commits.get("net_change", 0)
+                        message_analysis_raw= commits.get("message_analysis", "N/A")
+
+                        if message_analysis_raw != "N/A":
+                            if isinstance(message_analysis_raw, str):
+                                try:
+                                    # Try to parse if it's a string representation of a set
+                                    parsed_set = ast.literal_eval(message_analysis_raw)
+                                    if isinstance(parsed_set, (set, list)):
+                                        message_analysis = ", ".join(sorted(parsed_set))
+                                    else:
+                                        message_analysis = message_analysis_raw
+                                except (ValueError, SyntaxError):
+                                    message_analysis = message_analysis_raw
+                            elif isinstance(message_analysis_raw, (set, list)):
+                                message_analysis = ", ".join(sorted(message_analysis_raw))
+                            else:
+                                message_analysis = str(message_analysis_raw)
+                        else:
+                            message_analysis = "N/A"
+
+                        # Extract key_skills from extra_data_skills (which is a list of file dicts)
+                        all_project_skills = []
+                        if isinstance(extra_data_skills, list):
+                            for file_dict in extra_data_skills:
+                                if isinstance(file_dict, dict):
+                                    file_extra_data = file_dict.get("Extra data", {})
+                                    if isinstance(file_extra_data, dict):
+                                        file_skills = file_extra_data.get("key_skills", [])
+                                        if file_skills:
+                                            all_project_skills.extend(file_skills)
+    
+                        # Remove duplicates and join
+                        all_project_skills = list(set(all_project_skills))
+                        skills_text = ", ".join(key_skills) if key_skills else file_analysis.file_type.upper() + " Data Analysis"
+                        project_skills_text = ", ".join(all_project_skills) if all_project_skills else "N/A"
+
+                        commit_summary = f"Total Commits: {total_commits} \nTotal Insertions: +{total_insertions} \nTotal Deletions: -{total_deletions} \nNet Change: {net_change} \nCommit objectives: {message_analysis}"
+                        # If there is more than one author it becomes a collaborative project
+                        project_text = "Project Contributions: "
+                        author_text = "Author: "
+                        if len(author) >= 2:
+                            project_text = "Collaborative Project Contributions: "
+                            author_text = "Authors: "
+
                         # Add collaborative project details
                         pdf_output.multi_cell(
                             0,
                             10,
-                            f"Project Contributions: {file_analysis.extra_data}",
+                            f"{author_text} {author} \n{project_text} {skills_text} \nCommit analysis: {commit_summary} \nKey skills demonstrated in this project: {project_skills_text}",
                             new_x=XPos.LMARGIN,
                             new_y=YPos.NEXT,
                         )
-                        # TODO: Expand to include more details about the files in the git project
+
+                    case "xlsx" | "xls" | "docx" | "odt" | "rtf":            
+                        key_skills = []
+                        summary = ""
+                        extra_data_raw = file_analysis.extra_data
+
+                        # Convert locally (do not mutate file_analysis.extra_data)
+                        if isinstance(extra_data_raw, str):
+                            try:
+                                parsed = ast.literal_eval(extra_data_raw)
+                                if isinstance(parsed, dict):
+                                    key_skills = parsed.get("key_skills", []) or []
+                                    summary = parsed.get("summary", "")
+                            except (ValueError, SyntaxError):
+                                # conversion failed: string isn't a valid Python literal dict
+                                key_skills = []
+                        elif isinstance(extra_data_raw, dict):
+                            # In case it's already a dict for some reason, handle it too
+                            key_skills = extra_data_raw.get("key_skills", []) or []
+                            summary = extra_data_raw.get("summary", "")
+
+                        # Final text to place in PDF
+                        skills_text = ", ".join(key_skills) if key_skills else file_analysis.file_type.upper() + " Data Analysis"
+
+                        pdf_output.multi_cell(
+                            0,
+                            10,
+                            f"Key Skills demonstrated in this project: {skills_text}",
+                            new_x=XPos.LMARGIN,
+                            new_y=YPos.NEXT,
+                        )
+                        if file_analysis.file_type in ["docx", "odt", "rtf"]:
+                            pdf_output.set_font(style="I")
+                            pdf_output.multi_cell(
+                                0,
+                                10,
+                                f"File Summary: {summary}",
+                                new_x=XPos.LMARGIN,
+                                new_y=YPos.NEXT,
+                            )
+                    # Add support for coding file extensions
+                    case _ if ext in em:
+                        key_skills = []
+                        extra_data_raw = file_analysis.extra_data
+                        code_complexity = "Not Available"
+
+                        # Convert locally (do not mutate file_analysis.extra_data)
+                        if isinstance(extra_data_raw, str):
+                            try:
+                                parsed = ast.literal_eval(extra_data_raw)
+                                if isinstance(parsed, dict):
+                                    key_skills = parsed.get("key_skills", []) or []
+                                    complexity = parsed.get("complexity")
+                                    if isinstance(complexity, dict):
+                                        code_complexity = complexity.get("estimated", "Not Available")
+                            except (ValueError, SyntaxError):
+                                # conversion failed: string isn't a valid Python literal dict
+                                key_skills = []
+                        elif isinstance(extra_data_raw, dict):
+                            # In case it's already a dict for some reason, handle it too
+                            key_skills = extra_data_raw.get("key_skills", []) or []
+                            complexity = extra_data_raw.get("complexity")
+                            if isinstance(complexity, dict):
+                                code_complexity = complexity.get("estimated", "Not Available")
+
+                        # Final text to place in PDF
+                        skills_text = ", ".join(key_skills) if key_skills else extra_data_raw.get("language") + " Programming"
+
+                        pdf_output.multi_cell(
+                            0,
+                            10,
+                            f"Key Skills demonstrated in this project: {skills_text}",
+                            new_x=XPos.LMARGIN,
+                            new_y=YPos.NEXT,
+                        )
+                        pdf_output.multi_cell(
+                            0,
+                            10,
+                            f"Code Complexity: {code_complexity}",
+                            new_x=XPos.LMARGIN,
+                            new_y=YPos.NEXT,
+                        )
+
+                    case "psd":
+                        pdf_output.multi_cell(
+                            0,
+                            10,
+                            f"Artistic Project: Photoshop Project",
+                            new_x=XPos.LMARGIN,
+                            new_y=YPos.NEXT,
+                        )
+
                     case _:
                         # Add key skills for text files
                         pdf_output.multi_cell(
                             0,
                             10,
-                            f"Key Skills demonstrated in this project: {file_analysis.extra_data}",
+                            f"File type not analyzed. File details: {json.dumps(file_analysis.__dict__, indent=2)}",
                             new_x=XPos.LMARGIN,
                             new_y=YPos.NEXT,
                         )
@@ -176,11 +387,23 @@ def generate_resume() -> Path | None:
     except Exception as e:
         print(f"Something went wrong: {e}")
 
+def parse_extra_data(extra_data_raw):
+    if isinstance(extra_data_raw, str):
+        try:
+            parsed = ast.literal_eval(extra_data_raw)
+            return parsed if isinstance(parsed, dict) else {}
+        except (ValueError, SyntaxError):
+            return {}
+    elif isinstance(extra_data_raw, dict):
+        return extra_data_raw
+    return {}
 
-def generate_portfolio() -> Path | None:
+
+def generate_portfolio(allow_image: bool = True) -> Path | None:
     """
     Generates an HTML portfolio and zips it, copying resources as needed.
     """
+
     todays_date: str = datetime.now().strftime("%m-%d-%y")
     portfolio_export_path_dir: Path = Path(param.export_folder_path) / (
         todays_date + "-portfolio"
@@ -232,14 +455,165 @@ def generate_portfolio() -> Path | None:
                             / (file_analysis.file_name + "." + file_analysis.file_type),
                         )
                     # Prepare details based on file type
-                    if file_analysis.file_type in image_types:
-                        details = f"<p>Artistic Project:</p><img src='resources/{file_analysis.file_name}.{file_analysis.file_type}' alt='{file_analysis.file_name}' width='300'/>"
-                    elif file_analysis.file_type in collaborative_types:
-                        details = (
-                            f"<p>Project Contributions: {file_analysis.extra_data}</p>"
-                        )
+                    # if file_analysis.file_type in image_types:
+                    #     details = f"<p>Artistic Project:</p><img src='resources/{file_analysis.file_name}.{file_analysis.file_type}' alt='{file_analysis.file_name}' width='300'/>"
+                    # elif file_analysis.file_type in collaborative_types:
+                    #     details = (
+                    #         f"<p>Project Contributions: {file_analysis.extra_data}</p>"
+                    #     )
+                    # else:
+                    #     details = f"<p>Key Skills demonstrated in this project: {file_analysis.extra_data}</p>"
+
+                    extra_dict = parse_extra_data(file_analysis.extra_data)
+                    ext = file_analysis.file_type
+                    details = ""
+                    _, code_type = os.path.splitext(file_analysis.file_path)
+                    code_type = code_type.lower()   
+                    if ext in image_types:
+                        img_meta = extra_dict.get("image", {})
+                        img_format = img_meta.get("format", "Image")
+                        width = img_meta.get("width")
+                        height = img_meta.get("height")
+
+                        project_desc = f"Digital Artwork ({img_format})"
+                        if width and height:
+                            project_desc += f" — {width} x {height}"
+
+                        if allow_image:
+                            details = f"""
+                                <p><strong>Artistic Project:</strong> {project_desc}</p>
+                                <img src="resources/{file_analysis.file_name}.{ext}" width="300"/>
+                            """
+                    elif ext in collaborative_types:
+                        key_skills = []
+                        extra_data_skills = []
+                        commits = []
+                        author = []
+                        extra_data_raw = file_analysis.extra_data
+
+                        # Get key skills of git project
+                        if isinstance(extra_data_raw, str):
+                            try:
+                                parsed = ast.literal_eval(extra_data_raw)
+                                if isinstance(parsed, dict):
+                                    key_skills = parsed.get("key_skills", []) or []
+                                    extra_data_skills = parsed.get("extra data", []) or []
+                                    commits = parsed.get("commits", []) or []
+                                    author = parsed.get("author", []) or []
+                            except (ValueError, SyntaxError):
+                                key_skills = []
+                                commits = []
+                        elif isinstance(extra_data_raw, dict):
+                            key_skills = extra_data_raw.get("key_skills", []) or []
+                            extra_data_skills = extra_data_raw.get("extra data", []) or []
+                            commits = extra_data_raw.get("commits", []) or []
+                            author = extra_data_raw.get("author", []) or []
+
+                        total_commits = commits.get("total_commits", 0)
+                        total_insertions = commits.get("total_insertions", 0)
+                        total_deletions = commits.get("total_deletions", 0)
+                        net_change = commits.get("net_change", 0)
+                        message_analysis_raw= commits.get("message_analysis", "N/A")
+
+                        if message_analysis_raw != "N/A":
+                            if isinstance(message_analysis_raw, str):
+                                try:
+                                    # Try to parse if it's a string representation of a set
+                                    parsed_set = ast.literal_eval(message_analysis_raw)
+                                    if isinstance(parsed_set, (set, list)):
+                                        message_analysis = ", ".join(sorted(parsed_set))
+                                    else:
+                                        message_analysis = message_analysis_raw
+                                except (ValueError, SyntaxError):
+                                    message_analysis = message_analysis_raw
+                            elif isinstance(message_analysis_raw, (set, list)):
+                                message_analysis = ", ".join(sorted(message_analysis_raw))
+                            else:
+                                message_analysis = str(message_analysis_raw)
+                        else:
+                            message_analysis = "N/A"
+
+                        # Extract key_skills from extra_data_skills (which is a list of file dicts)
+                        all_project_skills = []
+                        if isinstance(extra_data_skills, list):
+                            for file_dict in extra_data_skills:
+                                if isinstance(file_dict, dict):
+                                    file_extra_data = file_dict.get("Extra data", {})
+                                    if isinstance(file_extra_data, dict):
+                                        file_skills = file_extra_data.get("key_skills", [])
+                                        if file_skills:
+                                            all_project_skills.extend(file_skills)
+    
+                        # Remove duplicates and join
+                        all_project_skills = list(set(all_project_skills))
+                        skills_text = ", ".join(key_skills) if key_skills else file_analysis.file_type.upper() + " Data Analysis"
+                        project_skills_text = ", ".join(all_project_skills) if all_project_skills else "N/A"
+
+                        commit_summary = f"Total Commits: {total_commits} \nTotal Insertions: +{total_insertions} \nTotal Deletions: -{total_deletions} \nNet Change: {net_change} \nCommit objectives: {message_analysis}"
+                        # If there is more than one author it becomes a collaborative project
+                        project_text = "Project Contributions: "
+                        author_text = "Author: "
+                        if len(author) >= 2:
+                            project_text = "Collaborative Project Contributions: "
+                            author_text = "Authors: "
+                            
+                        details = f"""
+                            <p>{author_text} {author}</p>
+                            <p><strong>{project_text}</strong></p>
+                            <pre>{skills_text}</pre>
+                            <pre>Commit analysis: {commit_summary}</pre>
+                            <pre>Key skills demonstrated in this project: {project_skills_text}</pre>
+                        """
+                    elif ext in ("xlsx", "xls", "docx", "odt", "rtf"):
+                        key_skills = extra_dict.get("key_skills", [])
+                        summary = extra_dict.get("summary", "")
+
+                        skills_text = ", ".join(key_skills) if key_skills else f"{ext.upper()} Data Analysis"
+
+                        details = f"""
+                            <p><strong>Key Skills:</strong> {skills_text}</p>
+                        """
+
+                        if ext in ("docx", "odt", "rtf") and summary:
+                            details += f"""
+                                <p><em>File Summary:</em> {summary}</p>
+                            """
+                    elif code_type in em:
+                        key_skills = extra_dict.get("key_skills", [])
+                        complexity = extra_dict.get("complexity", {})
+                        language = extra_dict.get("language", "Programming")
+
+                        code_complexity = "Not Available"
+                        if isinstance(complexity, dict):
+                            code_complexity = complexity.get("estimated", "Not Available")
+
+                        skills_text = ", ".join(key_skills) if key_skills else f"{language} Programming"
+
+                        details = f"""
+                            <p><strong>Key Skills:</strong> {skills_text}</p>
+                            <p><em>Code Complexity:</em> {code_complexity}</p>
+                        """
+                    elif ext == "psd":
+                        width = extra_dict.get("width")
+                        height = extra_dict.get("height")
+                        layers = extra_dict.get("number_of_layers")
+
+                        psd_desc = "Photoshop Design Project"
+                        if width and height:
+                            psd_desc += f" — {width} x {height}"
+                        if layers:
+                            psd_desc += f" — {layers} Layers"
+
+                        details = f"""
+                            <p><strong>Artistic Project:</strong> {psd_desc}</p>
+                        """
+
                     else:
-                        details = f"<p>Key Skills demonstrated in this project: {file_analysis.extra_data}</p>"
+                        details = f"""
+                            <p><strong>File type not analyzed. File details: {json.dumps(file_analysis.__dict__, indent=2)}</p>
+                        """
+
+
                     # Write entry to HTML
                     portfolio.write(
                         portfolio_entry_template.format(
@@ -262,3 +636,173 @@ def generate_portfolio() -> Path | None:
     except Exception as e:
         print(f"Failed to read log file: {e}")
         return
+
+def generate_skill_timeline() -> Path | None:
+    """
+    Generates a chronological skills timeline from the sorted log file.
+    """
+    logging.getLogger("fpdf").setLevel(logging.ERROR)
+    logging.getLogger("fontTools").setLevel(logging.ERROR)
+
+    todays_date = datetime.now().strftime("%m-%d-%y")
+    export_path: Path = Path(param.export_folder_path) / (todays_date + "-skills_timeline.pdf")
+    file_number: int = 0
+
+    # Ensure unique filename
+    while export_path.exists():
+        file_number += 1
+        export_path = Path(param.export_folder_path) / (
+            f"{todays_date}-skills_timeline-{file_number}.pdf"
+        )
+
+    # Determine which log file to read
+    if not log.current_log_file:
+        print("No current log file available.")
+        return None
+
+    log_file = Path(log.current_log_file)
+
+    if not log_file.exists():
+        print(f"Log file not found: {log_file}")
+        return None
+    
+    sorter = LogSorter(str(log_file))
+    sorter.set_sort_parameters(["Last modified"], [False])
+    sorter.sort()                
+    sorter.return_csv()
+
+    log_file = log_file.with_name(
+        f"{log_file.stem}_sorted{log_file.suffix}"
+    )
+    # Ensure export folder exists
+    if not export_path.parent.exists():
+        print(f"Export folder does not exist: {export_path.parent}")
+        return None
+
+    try:
+        with open(log_file, "r", encoding="utf-8", newline="") as lf, \
+             open(export_path, "w", encoding="utf-8") as out:
+
+            reader = csv.DictReader(lf)
+
+            pdf = FPDF()
+            pdf.add_page()
+
+            pdf.add_font("Noto", "", "src/showcase/fonts/noto.ttf", uni=True)
+            pdf.add_font("Noto", "B", "src/showcase/fonts/notob.ttf", uni=True)
+            pdf.add_font("Noto", "I", "src/showcase/fonts/notoi.ttf", uni=True)
+            pdf.add_font("Noto", "BI", "src/showcase/fonts/notobi.ttf", uni=True)
+
+            pdf.set_font("Noto", "B", size=16)
+            pdf.multi_cell(
+              0,
+              10,
+              "Skill Timeline", 
+              new_x=XPos.LMARGIN, 
+              new_y=YPos.NEXT,
+            )
+            pdf.ln(4)
+
+            next(reader, None)
+
+            for row in reader:
+                # Build FileAnalysis from row
+                fa = FileAnalysis(
+                    row.get("File path analyzed", ""),
+                    row.get("File name", ""),
+                    row.get("File type", ""),
+                    row.get("Last modified", ""),
+                    row.get("Created time", ""),
+                    row.get("Extra data", ""),
+                )
+
+                extra_data_raw = fa.extra_data
+                skills: list[str] = []
+
+                if isinstance(extra_data_raw, dict):
+                    # direct dict stored in memory
+                    candidate = (
+                        extra_data_raw.get("key_skills")
+                        or extra_data_raw.get("skills")
+                    )
+                    if isinstance(candidate, list):
+                        skills = [str(s).strip() for s in candidate if str(s).strip()]
+                    elif isinstance(candidate, str) and candidate.strip():
+                        skills = [candidate.strip()]
+
+                elif isinstance(extra_data_raw, str):
+                    text = extra_data_raw.strip()
+                    if text:
+                        # try parsing string literal
+                        try:
+                            parsed = ast.literal_eval(text)
+                        except Exception:
+                            # treat raw string as a single skill description
+                            skills = [clean_text(text)]
+                        else:
+                            if isinstance(parsed, dict):
+                                candidate = (
+                                    parsed.get("key_skills")
+                                    or parsed.get("skills")
+                                )
+                                if isinstance(candidate, list):
+                                    skills = [
+                                        str(s).strip() for s in candidate if str(s).strip()
+                                    ]
+                                elif isinstance(candidate, str) and candidate.strip():
+                                    skills = [candidate.strip()]
+                            elif isinstance(parsed, list):
+                                skills = [str(s).strip() for s in parsed if str(s).strip()]
+                            else:
+                                # fallback: treat as single item
+                                skills = [clean_text(text)]
+
+                # Skip log rows with no skills
+                if not skills:
+                    continue
+
+                date_str = fa.created_time
+                if not date_str or date_str == "N/A":
+                    date_str = fa.last_modified
+
+                # Try formatting nicely
+                if date_str and date_str != "N/A":
+                    try:
+                        dt = datetime.fromisoformat(date_str)
+                        date_display = dt.strftime("%Y-%m-%d")
+                    except Exception:
+                        date_display = date_str
+                else:
+                    date_display = "N/A"
+
+                # --- Write timeline item ---
+                pdf.set_font("Noto", "B", size=12)
+                header_line = (
+                    f"{date_display} - {fa.file_name} "
+                    f"({fa.file_type.upper()})"
+                )
+                pdf.multi_cell(
+                    0,
+                    8,
+                    clean_text(header_line),
+                    new_x=XPos.LMARGIN,
+                    new_y=YPos.NEXT,
+                )
+
+                pdf.set_font("Noto", "", size=11)
+                skills_text = ", ".join(skills)
+                pdf.multi_cell(
+                    0,
+                    6,
+                    f"Skills: {clean_text(skills_text)}",
+                    new_x=XPos.LMARGIN,
+                    new_y=YPos.NEXT,
+                )
+                pdf.ln(3)
+
+        pdf.output(str(export_path))
+        return export_path
+
+    except Exception as e:
+        print(f"Failed to generate skills timeline: {e}")
+        return None

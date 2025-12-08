@@ -1,3 +1,4 @@
+import csv
 import os
 from datetime import date, datetime
 from pathlib import Path
@@ -26,10 +27,7 @@ class FSS_Search:
 def search(search: FSS_Search):
     exclude_flag = True
     num_of_files_scanned = 0
-
-    if not search.excluded_path:
-        # If there is not included exclusion, the flag will be set to false to skip comparisons
-        exclude_flag = False
+    excluded_set = set()
 
     if not os.path.exists(search.input_path):
         # invalid returns -1
@@ -39,17 +37,54 @@ def search(search: FSS_Search):
 
     if exclude_flag:
         # ensures that the excluded paths input is a set
-        excluded_set = set()
-        for e_path in search.excluded_path:
-            e_path = os.path.abspath(e_path)
-            excluded_set.add(e_path)
+        if isinstance(search.excluded_path, set):
+            for e_path in search.excluded_path:
+                e_path = os.path.abspath(e_path)
+                excluded_set.add(e_path)
 
-            # if exclusion includes a dir, it will add all files within the dir to exclusion
-            if os.path.isdir(e_path):
-                for root, dirs, files in os.walk(e_path):
-                    for file in files:
-                        excluded_set.add(os.path.join(root, file))
-        search.excluded_path = excluded_set
+                # if exclusion includes a dir, it will add all files within the dir to exclusion
+                if os.path.isdir(e_path):
+                    for root, dirs, files in os.walk(e_path):
+                        for file in files:
+                            excluded_set.add(os.path.join(root, file))
+            search.excluded_path = excluded_set
+        else:
+            exclude_flag = False
+            search.excluded_path = set()
+
+    # Scan files from the previous log
+    current_log: Path = Path(log.current_log_file)
+    if current_log.exists() and current_log.is_file():
+        with open(current_log, "r", encoding="utf-8") as log_file:
+            reader = csv.reader(log_file)
+            next(reader)  # Skip header
+            for file_details in reader:
+                file_analysis: fas.FileAnalysis = fas.FileAnalysis(
+                    file_details[0],
+                    file_details[1],
+                    file_details[2],
+                    file_details[3],
+                    file_details[4],
+                    file_details[5],
+                    float(file_details[6].strip()),
+                )
+                file = Path(file_analysis.file_path)
+                if file.exists():
+                    if file_analysis.file_path in search.excluded_path:
+                        continue
+                    if datetime.fromtimestamp(
+                        file.stat().st_mtime
+                    ) <= datetime.fromisoformat(file_analysis.last_modified):
+                        exclude_flag = True
+                        search.excluded_path.add(file_analysis.file_path)
+                        continue
+                    print(f"Scanning previously found file: {file_analysis.file_path}")
+                    new_file_result = fas.run_fas(file_analysis.file_path)
+                    if new_file_result:
+                        num_of_files_scanned += 1
+                        log.update(new_file_result)
+                        exclude_flag = True
+                        search.excluded_path.add(file_analysis.file_path)
 
     if os.path.isfile(search.input_path):
         if not search.excluded_path:
@@ -64,38 +99,33 @@ def search(search: FSS_Search):
             return 0
 
     for root, dirs, files in os.walk(search.input_path, topdown=True):
-        # Remove excluded dirs
-        dirs[:] = [d for d in dirs if os.path.join(root, d) not in search.excluded_path]
+        root_abs = os.path.abspath(root)
 
-        for dir in dirs[:]:
-            dir_path = os.path.join(root, dir)
-            if exclude_flag and dir_path in search.excluded_path:
-                continue
-            if dir == ".git":
-                git_file_result: fas.FileAnalysis | None = fas.run_fas(dir_path)
-                print(f"Scanning .git directory at: {dir_path}")
-                if git_file_result:
-                    log.write(git_file_result)
-                    num_of_files_scanned += 1
-                dirs.remove(dir)
+        # Skip this directory entirely if it is under an excluded path
+        if any(root_abs.startswith(excluded) for excluded in excluded_set):
+            continue
 
+        # Remove dirs that are under excluded paths
+        dirs[:] = [d for d in dirs if not any(os.path.abspath(os.path.join(root_abs, d)).startswith(excluded) for excluded in excluded_set)]
+
+        # Remove files under excluded paths
+        files[:] = [f for f in files if not any(os.path.abspath(os.path.join(root_abs, f)).startswith(excluded) for excluded in excluded_set)]
+
+        # Now process remaining files
         for file in files:
             if file.startswith(".") and file != ".gitignore":
-                continue  # Skip hidden files
-            file_path = os.path.join(root, file)
-            # Check conditions
-            if exclude_flag and file_path in search.excluded_path:
                 continue
+            file_path = os.path.join(root_abs, file)
+
             if search.file_types and not file_type_check(file_path, search.file_types):
                 continue
 
             if (search.time_lower_bound or search.time_upper_bound) and not time_check(
-                list([search.time_lower_bound, search.time_upper_bound]),
+                [search.time_lower_bound, search.time_upper_bound],
                 Path(file_path),
                 "create",
             ):
                 continue
-
             # TODO add in FAS and return value, pass in file and set of repo paths for grouping
             # Given no exclusion this is where details about scanned files can be extracted.
             file_result: fas.FileAnalysis | None = fas.run_fas(file_path)
@@ -104,5 +134,4 @@ def search(search: FSS_Search):
                 log.write(file_result)
                 # Pass file result to GUI/CLI if necessary
             num_of_files_scanned += 1
-
     return num_of_files_scanned

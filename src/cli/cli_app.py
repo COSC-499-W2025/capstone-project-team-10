@@ -8,7 +8,12 @@ import src.fss.fss as fss
 import src.log.log as log
 import src.param.param as param
 import src.zip.zip_app as zip
-from src.showcase.showcase import generate_portfolio, generate_resume
+from src.log.log_sorter import LogSorter
+from src.showcase.showcase import (
+    generate_portfolio,
+    generate_resume,
+    generate_skill_timeline,
+)
 
 
 def prompt_file_perms():
@@ -17,6 +22,27 @@ def prompt_file_perms():
     if response.lower() != "y":
         print("Permission denied. Exiting.")
         sys.exit(1)
+
+
+def sort_sequence(log_path):
+    sorter = LogSorter(log_path)
+    print(f"Available columns: {sorter.get_available_columns()}")
+    column_criteria = input("Column criteria (comma separated): ").strip().split(",")
+    ordering_criteria = [
+        {"A": True, "D": False}[c.strip().upper()] if c.strip() else True
+        for c in input(
+            "Ordering criteria (comma separated, <A for Ascending, D for Descending>, leave None for all Ascending): "
+        )
+        .strip()
+        .split(",")
+    ]
+    print("Appending sort criteria...")
+    sorter.set_sort_parameters(column_criteria, ordering_criteria)
+    print(sorter.get_sort_params())
+    print(f"Preview of the first 5 rows:\n {sorter.get_preview()}")
+    sorter.sort()
+    sorter.replace_log()
+    print("Sorting finished")
 
 
 def extract_chosen_zip(zip_file_path: str) -> Path | None:
@@ -61,6 +87,14 @@ def add_cli_args(parser: argparse.ArgumentParser):
         help="Output a web portfolio with project descriptions. Optional: Include a directory path to change where the result is saved",
     )
     parser.add_argument(
+        "-t",
+        "--skill_timeline_entries",
+        nargs="?",
+        const=True,
+        default=None,
+        help="Output a pdf with with key skills ordered chronologically. Optional: Include a directory path to change where the result is saved",
+    )
+    parser.add_argument(
         "-c",
         "--clean",
         action="store_true",
@@ -78,8 +112,29 @@ def add_cli_args(parser: argparse.ArgumentParser):
         type=str,
         help="Only include files created after the specified date (YYYY-MM-DD).",
     )
+    parser.add_argument(
+        "-g",
+        "--github_username",
+        type=str,
+        help="Input a github username for specific git repo parsing.",
+    )
+    parser.add_argument(
+        "-s",
+        "--sort",
+        action="store_true",
+        help="Initiate the sorting sequence after the logs are completed.",
+    )
     # Flags
     parser.add_argument("-q", "--quiet", action="store_true", help="Suppress output.")
+
+    # Disable image embedding
+    parser.add_argument(
+    "-i",
+    "--no_image",
+    action="store_true",
+    help="Allow images to be embedded into the resume and portfolio.",
+)
+
 
 
 def run_cli():
@@ -102,6 +157,8 @@ def run_cli():
     if args.zip:
         print("Processing Zip File")
         file_path = extract_chosen_zip(args.zip)
+        if not file_path:
+            sys.exit(1)
     elif args.file_path:
         file_path = args.file_path
     else:
@@ -145,6 +202,12 @@ def run_cli():
         param.set("supported_file_types", list(file_types))
         print(f"Filtering by file types: {file_types}")
 
+    if args.github_username:
+        param.set("scan.github_username", args.github_username)
+        print(f"GitHub username set to: {args.github_username}")
+    else:
+        param.set("scan.github_username", "")
+
     bound_str: str = "Files created between:"
     if lower_bound:
         bound_str += f" after {lower_bound.strftime('%Y-%m-%d')}"
@@ -153,18 +216,32 @@ def run_cli():
             bound_str += " and"
         bound_str += f" before {upper_bound.strftime('%Y-%m-%d')}"
     print(bound_str)
-    fss.search(
-        fss.FSS_Search(
-            file_path,
-            path_exclusions,
-            file_types,
-            lower_bound,
-            upper_bound,
+
+    if file_path and Path(file_path).exists():
+        fss.search(
+            fss.FSS_Search(
+                file_path,
+                path_exclusions,
+                file_types,
+                lower_bound,
+                upper_bound,
+            )
         )
-    )
+    else:
+        print(f"Provided path does not exist: {file_path}")
+        sys.exit(1)
 
     print("Scan complete.")
-    print(f"Log file located at:{param.get('logging.current_log_file')}")
+    print(f"Log file located at: {param.get('logging.current_log_file')}")
+
+    if args.sort:
+        sort_sequence(param.get("logging.current_log_file"))
+
+    def __sort_warning():
+        if not args.sort:
+            print(
+                "Note that the logs are not sorted - your resume and portfolio will be generated based on the analysis order. Check out -s for more."
+            )
 
     if args.resume_entries:
         # check that the included path is valid
@@ -174,8 +251,10 @@ def run_cli():
             and Path(args.resume_entries).is_dir()
         ):
             param.export_folder_path = args.resume_entries
+        __sort_warning()
         print("Generating Resume PDF...")
-        file_path = generate_resume()
+        # file_path = generate_resume()
+        file_path = generate_resume(allow_image = not args.no_image)
         if file_path:
             print(f"Resume generated at: {file_path}")
         else:
@@ -189,12 +268,29 @@ def run_cli():
             and Path(args.portfolio_entries).is_dir()
         ):
             param.export_folder_path = args.portfolio_entries
+        __sort_warning()
         print("Generating Portfolio Website...")
-        file_path = generate_portfolio()
+        # file_path = generate_portfolio()
+        file_path = generate_portfolio(allow_image = not args.no_image)
         if file_path:
             print(f"Portfolio generated at: {file_path}")
         else:
             print("Portfolio generation failed.")
+
+    if args.skill_timeline_entries:
+        # check that the included path is valid
+        if (
+            isinstance(args.skill_timeline_entries, str)
+            and Path(args.skill_timeline_entries).exists()
+            and Path(args.skill_timeline_entries).is_dir()
+        ):
+            param.export_folder_path = args.skill_timeline_entries
+        print("Generating timeline of skills...")
+        file_path = generate_skill_timeline()
+        if file_path:
+            print(f"Skill time generated at: {file_path}")
+        else:
+            print("Skill timeline generation failed.")
 
     if args.quiet:
         builtins.print = _original_print

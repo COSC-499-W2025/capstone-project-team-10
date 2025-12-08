@@ -8,7 +8,8 @@
         "scan_system_files": false,
         "supported_file_types": [],
         "excluded_file_types": [],
-        "excluded_file_paths": []
+        "excluded_file_paths": [],
+        "github_username": ""
     },
     "logging": {
         "log_max_count": 10,

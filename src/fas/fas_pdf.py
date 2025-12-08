@@ -1,7 +1,8 @@
 import os
+import re
 import pdfplumber as plum
 import fitz
-from typing import Dict, Any
+from typing import Dict, Any, cast
 
 def extract_pdf_data(path: str) -> Dict[str, Any]:
     """
@@ -28,8 +29,11 @@ def extract_pdf_data(path: str) -> Dict[str, Any]:
             # Iterate over each page with plumber
             for page_num, page in enumerate(pdf_p.pages, 1):
 
-                # Extract text using plumber
-                page_text = page.extract_text()
+                # Get fitz page number from plumber page number
+                page_fitz = pdf_f[page_num - 1]
+
+                # Extract text using fitz
+                page_text = cast(str,page_fitz.get_text("text", flags=0))
                 if page_text:
                     text_parts.append(page_text)
                     # Split on whitespace and filter out single-character symbols
@@ -47,9 +51,6 @@ def extract_pdf_data(path: str) -> Dict[str, Any]:
                         'rows': len(table),
                         'columns': len(table[0]) if table and table[0] else 0
                     })
-
-                # Get fitz page number from plumber page number
-                page_fitz = pdf_f[page_num - 1]
 
                 # Extract Images using fitz
                 image_list = page_fitz.get_images()
@@ -79,6 +80,8 @@ def extract_pdf_data(path: str) -> Dict[str, Any]:
                         })
 
             text = "\n".join(text_parts)
+            text = re.sub(r'\n\s*\n', '\n', text)
+            text = text.encode('utf-8', errors='ignore').decode('utf-8')
             char_count = len(text)
             line_count = text.count('\n')
    
@@ -100,6 +103,8 @@ def extract_pdf_data(path: str) -> Dict[str, Any]:
                     "hyperlinks": len(hyperlinks)
                 }
             }
+
+        print(metadata['text'])
         return metadata
 
     except FileNotFoundError:

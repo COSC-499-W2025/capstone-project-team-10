@@ -43,10 +43,10 @@ class DummyZip:
 
 
 class DummyShowcase:
-    def generate_resume(self):
+    def generate_resume(self, allow_image=False):
         return Path("/tmp/resume.pdf")
 
-    def generate_portfolio(self):
+    def generate_portfolio(self, allow_image=False):
         return Path("/tmp/portfolio.zip")
 
 
@@ -121,6 +121,8 @@ def test_run_cli(monkeypatch):
         "--after",
         "2022-01-01",
         "--yes",
+        "-g",
+        "test_username",
     ]
     monkeypatch.setattr(sys, "argv", test_args)
     # Patch print to capture output
@@ -147,11 +149,11 @@ def test_run_cli(monkeypatch):
     assert "Filtering by file types:" in all_output
 
     # Check Resume is created
-    assert "/tmp/resume.pdf" in all_output
+    assert "resume.pdf" in all_output
     assert "Resume generated at:" in all_output
 
     # Check Portfolio is created
-    assert "/tmp/portfolio.zip" in all_output
+    assert "portfolio.zip" in all_output
     assert "Portfolio generated at:" in all_output
 
     # Check that the bounds string is correct
@@ -159,8 +161,12 @@ def test_run_cli(monkeypatch):
     assert "2023-01-01" in all_output
 
     # Check that the zip extraction message is present
-    assert "/tmp/unzipped" in all_output
+    assert "unzipped" in all_output
     assert "File unzipped at:" in all_output
+
+    # Check that the github username was taken in and correct
+    assert "GitHub" in all_output
+    assert "test_username" in all_output
 
     # Check that the log file location is printed
     assert "Log file located at:" in all_output
@@ -194,6 +200,8 @@ def test_run_cli_quiet(monkeypatch):
         "2022-01-01",
         "--yes",
         "-q",
+        "-g",
+        "test_username",
     ]
     monkeypatch.setattr(sys, "argv", test_args)
     # Patch print to capture output
@@ -221,11 +229,11 @@ def test_run_cli_quiet(monkeypatch):
     assert "Filtering by file types:" not in all_output
 
     # Check Resume is created
-    assert "/tmp/resume.pdf" not in all_output
+    assert "resume.pdf" not in all_output
     assert "Resume generated at:" not in all_output
 
     # Check Portfolio is created
-    assert "/tmp/portfolio.zip" not in all_output
+    assert "portfolio.zip" not in all_output
     assert "Portfolio generated at:" not in all_output
 
     # Check that the bounds string is correct
@@ -233,8 +241,12 @@ def test_run_cli_quiet(monkeypatch):
     assert "2023-01-01" not in all_output
 
     # Check that the zip extraction message is present
-    assert "/tmp/unzipped" not in all_output
+    assert "unzipped" not in all_output
     assert "File unzipped at:" not in all_output
+
+    # Check that the github username was taken in and is correct
+    assert "GitHub" not in all_output
+    assert "test_username" not in all_output
 
     # Check that the log file location is printed
     assert "Log file located at:" not in all_output
@@ -242,3 +254,75 @@ def test_run_cli_quiet(monkeypatch):
     # Check scan complete and processing complete
     assert "Scan complete." not in all_output
     assert "Processing Complete!" not in all_output
+def test_run_cli_with_image_allow(monkeypatch):
+    called_resume = {"allow_image": None}
+    called_portfolio = {"allow_image": None}
+
+    # Mock resume & portfolio to capture allow_image param
+    def mock_resume(allow_image=False):
+        called_resume["allow_image"] = allow_image
+        return Path("/tmp/resume.pdf")
+
+    def mock_portfolio(allow_image=False):
+        called_portfolio["allow_image"] = allow_image
+        return Path("/tmp/portfolio.zip")
+
+    monkeypatch.setattr(cli, "generate_resume", mock_resume)
+    monkeypatch.setattr(cli, "generate_portfolio", mock_portfolio)
+
+    test_args = [
+        "cli_app.py",
+        "/tmp/file",
+        "--resume_entries",
+        "/tmp",
+        "--portfolio_entries",
+        "/tmp",
+        "--image_allow",
+        "--yes",
+    ]
+
+    monkeypatch.setattr(sys, "argv", test_args)
+
+    # Capture print silently
+    monkeypatch.setattr(builtins, "print", lambda *a, **k: None)
+
+    cli.run_cli()
+
+    assert called_resume["allow_image"] is True
+    assert called_portfolio["allow_image"] is True
+
+def test_run_cli_without_image_allow(monkeypatch):
+    called_resume = {"allow_image": None}
+    called_portfolio = {"allow_image": None}
+
+    # Mock resume & portfolio to capture allow_image param
+    def mock_resume(allow_image=False):
+        called_resume["allow_image"] = allow_image
+        return Path("/tmp/resume.pdf")
+
+    def mock_portfolio(allow_image=False):
+        called_portfolio["allow_image"] = allow_image
+        return Path("/tmp/portfolio.zip")
+
+    monkeypatch.setattr(cli, "generate_resume", mock_resume)
+    monkeypatch.setattr(cli, "generate_portfolio", mock_portfolio)
+
+    test_args = [
+        "cli_app.py",
+        "/tmp/file",
+        "--resume_entries",
+        "/tmp",
+        "--portfolio_entries",
+        "/tmp",
+        "--yes",
+    ]
+
+    monkeypatch.setattr(sys, "argv", test_args)
+
+    # Capture print
+    monkeypatch.setattr(builtins, "print", lambda *a, **k: None)
+
+    cli.run_cli()
+
+    assert called_resume["allow_image"] is False
+    assert called_portfolio["allow_image"] is False

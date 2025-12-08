@@ -1,5 +1,5 @@
 """
-Utility module for file extensions
+Utility mappings module for programming file extensions
 """
 
 CODING_FILE_EXTENSIONS = {
@@ -110,13 +110,4 @@ CODING_FILE_EXTENSIONS = {
     '.ada': 'ada',
     '.adb': 'ada',
     '.ads': 'ada',
-}
-
-SHEBANG_MAPPINGS = {
-    'python': 'python',
-    'bash': 'bash',
-    'sh': 'shell',
-    'node': 'javascript',
-    'ruby': 'ruby',
-    'perl': 'perl',
 }
