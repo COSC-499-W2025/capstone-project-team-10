@@ -111,10 +111,13 @@ class TestPDF:
         assert "question" in sample_pdf4["text"] # Check if ti is correctly displayed in word
 
     def test_text_analysis(self,sample_pdf4):
-        assert len(sample_pdf4["keywords"]) > 0
-        assert len(sample_pdf4["text_stats"]) > 0
-        assert len(sample_pdf4["text_sentiment"]) > 0
-        assert len(sample_pdf4["text_summary"]) > 5
+        assert len(sample_pdf4["top_keywords"]) > 0
+        assert sample_pdf4["unique_words"] != 0
+        assert sample_pdf4["sentence_count"] != 0
+        assert sample_pdf4["lexical_diversity"] != 0
+        assert sample_pdf4["filtered_word_count"] != 0
+        assert sample_pdf4["sentiment"] != None
+        assert len(sample_pdf4["summary"]) > 5
         assert sample_pdf4["complexity"] != None
         assert sample_pdf4["depth"] != None
         assert sample_pdf4["structure"] != None

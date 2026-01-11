@@ -4,7 +4,6 @@ import pdfplumber as plum
 import fitz
 import math
 from fas.fas_text_analysis import TextSummary
-from src.fas.fas_docx import generate_complexity_feedback, generate_length_vocab_feedback, generate_sentence_feedback, generate_sentiment_feedback
 from typing import Dict, Any, cast
 
 def extract_pdf_data(path: str) -> Dict[str, Any]:
@@ -107,21 +106,10 @@ def extract_pdf_data(path: str) -> Dict[str, Any]:
                 }
             }
 
-            ta = TextSummary(text) if text.strip() else None
+            analyzer = TextSummary(text) if text.strip() else None
 
-            if ta:
-                keywords = ta.getCommonWords(10)
-                stats = ta.getStatistics()
-                sentiment = ta.getSentiment()
-                summary = ta.getSummary(int(math.sqrt(line_count + 1)) + 1)
-                metadata["keywords"] = keywords
-                metadata["text_stats"] = stats
-                metadata["text_sentiment"] = sentiment
-                metadata["text_summary"] = summary
-                metadata["complexity"] = generate_complexity_feedback(stats["lexical_diversity"])
-                metadata["depth"] = generate_length_vocab_feedback(stats)
-                metadata["structure"] = generate_sentence_feedback(stats)
-                metadata["sentiment_insight"] = generate_sentiment_feedback(sentiment)
+            if analyzer:
+                metadata.update(analyzer.generate_text_analysis_data(10, 6))
 
         return metadata
 
