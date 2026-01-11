@@ -1,3 +1,16 @@
+# Week 15 (11/24/2025 = 11/30/2025)
+
+![Week 15 Tasks](Week15/Week15Tasks.png)
+
+## Features
+
+![Week 15 KanBan](Week15/Week15KanBan1.png)
+![Week 15 KanBan](Week15/Week15KanBan2.png)
+
+## Recap
+We reconvened after the break and discussed our progress and the new milestone requirements for milestone 2. I completed an issue from before the break to include
+deeper analysis in the fas_pdf.py module such as sentiment feedback, lexical diverstiy feedback, etc. This was already implemented but not merged into the dev branch. I also refactored the fas_test_analysis.py module to consolidate code from many different files into text_analysis.py to reduce code and keep concerns in their local modules. I included the refactored fas_pdf.py module and updated it so that it fixed both issues.
+
 # Week 14 (11/24/2025 = 11/30/2025)
 
 ![Week 14 Tasks](Week14/Week14Tasks.png)
