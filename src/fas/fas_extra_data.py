@@ -1,5 +1,3 @@
-# src/fas/fas_extra_data.py
-
 import os
 from typing import Any, Optional
 

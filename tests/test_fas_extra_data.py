@@ -104,7 +104,7 @@ class TestFasExtraData:
     # PDF / DOCX-style metadata post-processing
     # ------------------------------------------------------------
 
-    def test_text_metadata_skill_extraction_and_summary_cleanup(self, tmp_path, monkeypatch):
+    def test_text_metadata_skill_extraction_and_summary_cleanup(self, tmp_path):
         test_file = tmp_path / "test.pdf"
         test_file.write_text("fake pdf")
 
@@ -114,21 +114,18 @@ class TestFasExtraData:
             "sentiment_insight": "Overall positive sentiment",
         }
 
-        fake_pdf_module = MagicMock()
-        fake_pdf_module.extract_pdf_data.return_value = fake_metadata.copy()
-
-        monkeypatch.setitem(
-            __import__("sys").modules,
-            "src.fas.fas_pdf",
-            fake_pdf_module,
-        )
-
-        data = get_file_extra_data(str(test_file), "pdf")
+        with patch(
+            "src.fas.fas_pdf.extract_pdf_data",
+            return_value=fake_metadata.copy(),
+        ):
+            data = get_file_extra_data(str(test_file), "pdf")
 
         assert data is not None
         assert "\n" not in data["summary"]
         assert "Advanced Vocabulary" in data["key_skills"]
         assert "Positive Tone" in data["key_skills"]
+
+
 
     # ------------------------------------------------------------
     # Unsupported file types
