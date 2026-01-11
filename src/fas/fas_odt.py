@@ -28,43 +28,8 @@ def extract_odt_data(path):
 
         # If text exists, add text analysis
         if analyzer:
-            # Get statistics
-            stats = analyzer.getStatistics()
-            metadata.update({
-                "filtered_word_count": stats['word_count'],
-                "unique_words": stats['unique_words'],
-                "sentence_count": stats['sentence_count'],
-                "lexical_diversity": stats['lexical_diversity']
-            })
-
-            # Add top 10 keywords
-            metadata["top_keywords"] = analyzer.getCommonWords(10)
-
-            # Add sentiment analysis
-            sentiment = analyzer.getSentiment()
-            metadata["sentiment"] = sentiment['sentiment']
-            metadata["sentiment_score"] = sentiment['compound_score']
-
-            # Add named entities
-            entities = analyzer.getNamedEntities()
-            metadata["named_entities"] = list(entities)
-
-            # Add 3 sentence summary
-            metadata["summary"] = analyzer.getSummary(num_sentences=3)
-
-            # Add simple insight about word choice in document
-            metadata["complexity"] = generate_complexity_feedback(stats['lexical_diversity'])
-
-            # Add isnight based on length and vocab used
-            metadata["depth"] = generate_length_vocab_feedback(stats)
-
-            #Add insight based on sentence structure
-            metadata["structure"] = generate_sentence_feedback(stats)
-
-            # Add insight based on sentiment
-            metadata["sentiment_insight"] = generate_sentiment_feedback(sentiment)
-
-
+            metadata.update(analyzer.generate_text_analysis_data(10, 3))
+            
         return metadata
     except Exception as e:
         return {"error": str(e)}
