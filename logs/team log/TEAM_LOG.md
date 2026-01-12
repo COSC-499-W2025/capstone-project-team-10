@@ -248,3 +248,5 @@ Please refer to [Team Log 13](https://github.com/COSC-499-W2025/capstone-project
 
 Please refer to [Team Log 14](https://github.com/COSC-499-W2025/capstone-project-team-10/blob/02-logs/logs/team%20log/Week%2014/team_log.md) (or team_log.md within the Week 14 folder)
 
+# Sprint for 1/5/25 -> 1/11/25
+Please refer to [Team Log T2 - 1](https://github.com/COSC-499-W2025/capstone-project-team-10/blob/02-logs/logs/team%20log/T2%20-%20Week%201/team_log.md) (or team_log.md within the T2 - Week 1 folder)
