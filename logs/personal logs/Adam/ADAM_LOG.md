@@ -28,6 +28,13 @@ PR:
 
 As we await finalized M2 and M3 requirements I will be doing project planning and creating a guide for how we can move forward improving our app.
 
+Tickets and requirement adherence must be checked to ensure that we can move forward with milestone 2 and 3. I will be
+
+- Selecting Code to be rewritten and creating tickets for it
+- Creating Issues for new features and functionality that is needed in the backend
+- Creating Issues for Non-compliance
+- Creating Goals for GUI functionality (Outside of Course Requirements)
+
 Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/164
 
 ## Additional Context
