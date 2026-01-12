@@ -1,3 +1,17 @@
+# Term 2 Week 1 (01/05/2026 - 01/11/2026)
+
+![Term Two Week One Tasks](Term2Week1/WeekOneTasks.png)
+
+# Features
+
+![Term Two Week One Feature](Term2Week1/WeekOneFeature.png)
+
+# Recap
+
+This week we got back to work and got a head start on designing our GUI, which we had each group member come up with their own design mock which we will deliberate and combine into our finalized vision on our coming meeting next week. As such I prepared a mock up on figma for our design that encompases everything that I believe we need in our design.
+
+Next week I plan to refactor and complete the Markdown analysis as it is not up to the standard of all our other analysis modules and the output is not configured to fit the resume or portfolio outputs as well, which I intend to rectify.
+
 # Week 14 (12/01/2025 - 12/07/2025)
 
 ![Week Fourteen Tasks](Week14/WeekFourteenTasks.png)
