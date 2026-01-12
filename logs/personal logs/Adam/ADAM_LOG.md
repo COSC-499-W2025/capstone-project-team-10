@@ -1,3 +1,51 @@
+# Term 2 Week 1 (01/05/2026 - 01/11/2026):
+
+## Completed tasks
+
+All in review features will be merged by the end of the week
+
+![Term 2 Week 1 Tasks completed](T2W1/image.png)
+
+## Features
+
+![Term 2 Week 2 Inprogress](T2W1/image2.png)
+
+## Recap
+
+#### 1. Created draft design for GUI.
+
+The team was all asked to come up with ideas for how our GUI was going to look, this week we will be combining all the best ideas to make a
+final design for the GUI layout
+
+PR:
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/160
+
+##### Tickets: 
+
+1. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/158
+
+### For next week:
+
+As we await finalized M2 and M3 requirements I will be doing project planning and creating a guide for how we can move forward improving our app.
+
+Tickets and requirement adherence must be checked to ensure that we can move forward with milestone 2 and 3. I will be
+
+- Selecting Code to be rewritten and creating tickets for it
+- Creating Issues for new features and functionality that is needed in the backend
+- Creating Issues for Non-compliance
+- Creating Goals for GUI functionality (Outside of Course Requirements)
+
+Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/164
+
+## Additional Context
+
+No problems with my work
+
+## Team Survey:
+
+Survey completed
+
+
 # Week 14 (11/30/2025 - 12/07/2025):
 
 ## Completed tasks
