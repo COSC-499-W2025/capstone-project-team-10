@@ -1,3 +1,32 @@
+# T2 - Week 1 (1/5/2025 - 1/11/2025)
+
+![T2 - Week 1 - Task Completed](T2-W1/Done.png)
+![T2 - Week 1 - Task Completed](T2-W1/Done1.png)
+
+
+## Features
+
+![T2 - Week 1 - In Progress](T2-W1/Features.png)
+![T2 - Week 1 - In Progress](T2-W1/Features1.png)
+
+## Recap
+
+- For term 2 week 1, I worked on the refactor of FAS extra data and mock design for the GUI (Milestone 2)
+  - Since FAS extra data is getting bigger with more file types, it should be a seperate feature, which I made this week
+  + Things that went well: The GUI is design with figma so it looks way better than expected
+  - Things that did not went well: The refactor means that I have to redesign the test cases which is a lot (I still got it done)
+- I will start work on milestone 2 starting next week with the given guidelines
+
+
+## Additional Context
+## Team Survey:
+
+
+![Week 14 - Team Survey](W14/Team_Survey.png)
+![Week 14 - Team Survey](W14/Team_Survey_(1).png)
+![Week 14 - Team Survey](W14/Team_Survey_(2).png)
+![Week 14 - Team Survey](W14/Team_Survey_(3).png)
+
 # Week 14 (11/23/2025 - 11/30/2025)
 
 ![Week 14 - Task Completed](W14/Done.png)
