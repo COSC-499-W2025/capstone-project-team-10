@@ -109,3 +109,16 @@ class TestPDF:
         assert "fi" in sample_pdf4["text"] # Check if fi is correctly found
         assert "firearm" in sample_pdf4["text"] # Check if fi is correctly displayed in word
         assert "question" in sample_pdf4["text"] # Check if ti is correctly displayed in word
+
+    def test_text_analysis(self,sample_pdf4):
+        assert len(sample_pdf4["top_keywords"]) > 0
+        assert sample_pdf4["unique_words"] != 0
+        assert sample_pdf4["sentence_count"] != 0
+        assert sample_pdf4["lexical_diversity"] != 0
+        assert sample_pdf4["filtered_word_count"] != 0
+        assert sample_pdf4["sentiment"] != None
+        assert len(sample_pdf4["summary"]) > 5
+        assert sample_pdf4["complexity"] != None
+        assert sample_pdf4["depth"] != None
+        assert sample_pdf4["structure"] != None
+        assert sample_pdf4["sentiment_insight"] != None

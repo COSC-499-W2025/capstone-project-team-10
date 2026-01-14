@@ -2,6 +2,8 @@ import os
 import re
 import pdfplumber as plum
 import fitz
+import math
+from fas.fas_text_analysis import TextSummary
 from typing import Dict, Any, cast
 
 def extract_pdf_data(path: str) -> Dict[str, Any]:
@@ -104,7 +106,11 @@ def extract_pdf_data(path: str) -> Dict[str, Any]:
                 }
             }
 
-        print(metadata['text'])
+            analyzer = TextSummary(text) if text.strip() else None
+
+            if analyzer:
+                metadata.update(analyzer.generate_text_analysis_data(10, 6))
+
         return metadata
 
     except FileNotFoundError:

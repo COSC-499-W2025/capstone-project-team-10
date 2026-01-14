@@ -143,7 +143,7 @@ class TextSummary:
         top_indices.sort()
         
         return ' '.join(self.sentences[i] for i in top_indices)
-    
+
     def getStatistics(self) -> dict[str, int | float]:
         """
         Calculate basic text statistics.
@@ -160,3 +160,108 @@ class TextSummary:
                 len(unique_words) / len(self.words_lower), 3
             ) if self.words_lower else 0
         }
+    
+    def generate_complexity_feedback(self, lexical_diversity):
+        # Assess document complexity based on vocabulary diversity.
+        if lexical_diversity >= 0.6:
+            return "High - Advanced vocabulary, excellent vocabulary, varied and diverse word choices."
+        elif lexical_diversity >= 0.4:
+            return "Medium - Standard vocabulary, good use of varied but standard word choices."
+        else:
+            return "Low - Simple vocabulary, try using more varied vocabulary to engage readers."
+
+
+    def generate_length_vocab_feedback(self, stats):
+        # Length and vocabulary feedback
+        if stats["word_count"] < 100:
+            return "Consider adding more detail to fully develop your ideas."
+        elif stats["word_count"] > 1000:
+            if stats["lexical_diversity"] >= 0.6:
+                return "Extensive detail and depth used to explore your ideas."
+            if stats["lexical_diversity"] >= 0.4:
+                return (
+                    "Extensive depth and sufficient detail to explore your topic and ideas."
+                )
+            if stats["lexical_diversity"] < 0.4:
+                return "Extensive length but consider adding more depth to your writing on the topics at hand."
+        elif stats["word_count"] >= 100 & stats["word_count"] < 1000:
+            if stats["lexical_diversity"] >= 0.6:
+                return "Average length and excellent depth and detail used to explore your ideas."
+            if stats["lexical_diversity"] >= 0.4:
+                return (
+                    "Average length and sufficient detail to explore your topic and ideas."
+                )
+            if stats["lexical_diversity"] < 0.4:
+                return "Average length but consider adding more depth to your writing on the topics at hand."
+        else:
+            return None
+
+
+    def generate_sentence_feedback(self, stats):
+        # Sentence structure
+        avg_sentence_length = (
+            stats["word_count"] / stats["sentence_count"]
+            if stats["sentence_count"] > 0
+            else 0
+        )
+        if avg_sentence_length > 30:
+            return "Consider breaking up complex sentences for better readability."
+        elif avg_sentence_length < 10:
+            return "Consider combining related ideas for better flow."
+        else:
+            return "Well formed and approprite sentences that demonstrates understanding of writing conventions."
+
+
+    def generate_sentiment_feedback(self, sentiment):
+        # Sentiment feedback
+        # Default Threshold is +- 0.05
+        if sentiment["compound_score"] < -0.05:
+            return "Overall negative sentiment within your writing. Consider reframing content more positively if and where appropriate or more neutrally if aiming for a professional level output"
+        elif sentiment["compound_score"] > 0.05:
+            return "Overall positive sentiment within your writing. Consider reframing content more neutrally if aiming for a professional writing piece."
+        else:
+            return "Overall neutral sentiment within your writing. Professional standard sentiment of writing, if you are aiming for a more positive or negative sentiment consider changing your word choices."
+
+    
+    def generate_text_analysis_data(self, num_keywords: int = 10, num_sentences: int = 3) -> dict:
+        """
+        Final generation function to return all text data in a single dict.
+        Args:
+            num_keywords: the number of unique keywords
+            num_sentences: the number of sentences in the text summary
+        Returns:
+            A dictionary containing all analysis data:
+            - filtered_word_count: Count of words excluding stop words
+            - unique_words: Count of unique words
+            - sentence_count: Number of sentences
+            - lexical_diversity: Ratio of unique words to total words
+            - top_keywords: List of (word, frequency) tuples
+            - sentiment: Sentiment classification (positive/negative/neutral)
+            - sentiment_score: Compound sentiment score
+            - named_entities: List of (entity_name, entity_type) tuples
+            - summary: Extractive summary string
+            - complexity: Feedback about vocabulary complexity
+            - depth: Feedback about length and vocabulary
+            - structure: Feedback about sentence structure
+            - sentiment_insight: Feedback about sentiment
+        """
+        stats = self.getStatistics()
+        sentiment = self.getSentiment()
+        analysis = {
+            "filtered_word_count": stats['word_count'],
+            "unique_words": stats['unique_words'],
+            "sentence_count": stats['sentence_count'],
+            "lexical_diversity": stats['lexical_diversity'],
+            "top_keywords": self.getCommonWords(num_keywords),
+            "sentiment": sentiment['sentiment'],
+            "sentiment_score": sentiment['compound_score'],
+            "named_entities": list(self.getNamedEntities()),
+            "summary": self.getSummary(num_sentences=num_sentences),      
+        }
+
+        analysis["complexity"] = self.generate_complexity_feedback(stats['lexical_diversity'])
+        analysis["depth"] = self.generate_length_vocab_feedback(stats)
+        analysis["structure"] = self.generate_sentence_feedback(stats)
+        analysis["sentiment_insight"] = self.generate_sentiment_feedback(sentiment)
+
+        return analysis
