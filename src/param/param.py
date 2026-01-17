@@ -6,6 +6,7 @@ import platform
 # For Builds and Versioning
 project_name = "Capstone Project Team 10"
 project_version = "1.0.0"
+eula_date = "January 1st 2026"
 program_file_path: str = ""
 log_max_count: int = 10
 log_file_naming_regex: str = r"(\d+)\.log$"

@@ -1,0 +1,15 @@
+END USER LICENSE AGREEMENT (EULA)
+
+By using this software ("the Program"), you acknowledge and agree to the following terms:
+
+1. **Access to Files**  
+   You grant the Program permission to access files stored on your computer as necessary for its operation.
+
+2. **User Consent for Data Transfer**  
+   The Program will not transmit, upload, or otherwise transfer any data from your computer to external servers or third parties without first seeking and obtaining your explicit consent.
+
+3. **Privacy and Security**  
+   The Program is designed to respect your privacy. All file access and data handling will be performed in accordance with your instructions and preferences.
+
+4. **Acceptance**  
+   By clicking "Yes", you indicate your acceptance of this agreement.
