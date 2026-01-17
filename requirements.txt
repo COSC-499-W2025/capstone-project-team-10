@@ -27,3 +27,4 @@ tree-sitter-typescript
 tree-sitter-go
 tree-sitter-rust
 beautifulsoup4
+fastapi
