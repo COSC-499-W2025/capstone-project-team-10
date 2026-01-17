@@ -54,21 +54,33 @@ def _make_json_safe(value):
     # fallback: convert to string
     return str(value)
 
+# def get_file_type(file_path: str) -> str:
+#     # First, try to get the file extension
+#     # file_path should be a string
+#     file_name = file_path.split(os.path.sep)[-1]
+#     ext = file_name.split(".")[-1].lower()
+#     if ext:
+#         return ext
+
+#     # Fallback to mimetype
+#     mime_type, _ = mimetypes.guess_type(file_path)
+#     if mime_type:
+#         return mime_type.split("/")[-1]
+
+#     return "unknown"
+
 def get_file_type(file_path: str) -> str:
-    # First, try to get the file extension
-    # file_path should be a string
-    file_name = file_path.split(os.path.sep)[-1]
-    ext = file_name.split(".")[-1].lower()
-    if ext:
-        return ext
+    # Special-case: git repository folder
+    if os.path.isdir(file_path) and os.path.basename(file_path) == ".git":
+        return "git"
 
-    # Fallback to mimetype
-    mime_type, _ = mimetypes.guess_type(file_path)
-    if mime_type:
-        return mime_type.split("/")[-1]
+    file_name = os.path.basename(file_path)
 
-    return "unknown"
+    # No extension or dotfile → unknown
+    if "." not in file_name or file_name.startswith("."):
+        return "unknown"
 
+    return file_name.rsplit(".", 1)[-1].lower()
 
 def get_last_modified_time(file_path: str) -> str:
     st = os.stat(file_path)

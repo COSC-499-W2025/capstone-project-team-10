@@ -130,3 +130,42 @@ class TestFas:
             json_str = json.dumps(result.extra_data)
         except (TypeError, ValueError) as e:
             pytest.fail(f"extra_data is not JSON serializable: {e}")
+            
+    def test_file_without_extension_is_unknown(self, tmp_path):
+        file_path = tmp_path / "pdf"
+        file_path.write_text("not a real pdf")
+
+        result = fas.run_fas(str(file_path))
+
+        assert result is not None
+        assert result.file_type == "unknown"
+
+
+    def test_file_with_extension_detected_correctly(self, tmp_path):
+        file_path = tmp_path / "test.md"
+        file_path.write_text("# Header")
+
+        result = fas.run_fas(str(file_path))
+
+        assert result is not None
+        assert result.file_type == "md"
+
+
+    def test_dotfile_is_unknown(self, tmp_path):
+        file_path = tmp_path / ".gitignore"
+        file_path.write_text("*.pyc")
+
+        result = fas.run_fas(str(file_path))
+
+        assert result is not None
+        assert result.file_type == "unknown"
+
+
+    def test_makefile_style_name_is_unknown(self, tmp_path):
+        file_path = tmp_path / "Makefile"
+        file_path.write_text("all:\n\techo hello")
+
+        result = fas.run_fas(str(file_path))
+
+        assert result is not None
+        assert result.file_type == "unknown"
