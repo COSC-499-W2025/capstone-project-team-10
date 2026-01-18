@@ -1,3 +1,53 @@
+# Term 2 Week 1 (01/11/2026 - 01/18/2026):
+
+## Completed tasks
+
+All in review features will be merged by the end of the week
+
+![Term 2 Week 1 Tasks completed](T2W2/image.png)
+
+## Features
+
+![Term 2 Week 2 Inprogress](T2W2/image-1.png)
+
+## Recap
+
+#### 1. Creating EULA prompt screen for the GUI
+
+A blocking EULA prompt screen was developed to start the program
+
+PR:
+[https://github.com/COSC-499-W2025/capstone-project-team-10/pull/177](PR #177 - Gui user agreement pop-up)
+
+#### 2. Project Planning
+
+Developed a compliance framework for judging the teams progress against Milestone 2 requirements
+
+PR:
+[https://github.com/COSC-499-W2025/capstone-project-team-10/pull/181](PR #181 - Milestone 2 Compliance planning)
+
+##### Tickets: 
+
+1. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/170
+2. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/164
+
+### For next week:
+
+For next week I will be doing rework for the showcase so that we comply with persistence requirements and can plan how we are going to implement resume editing. This requires researching libraries, and different methods of editing PDFs or generating them. 
+
+##### Tickets:
+
+1. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/182
+2. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/183
+
+## Additional Context
+
+No problems with my work
+
+## Team Survey:
+
+Survey completed
+
 # Term 2 Week 1 (01/05/2026 - 01/11/2026):
 
 ## Completed tasks
