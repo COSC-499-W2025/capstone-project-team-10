@@ -113,9 +113,7 @@ def extract_pdf_data(path: str) -> Dict[str, Any]:
 
         return metadata
 
-    except FileNotFoundError:
-        print(f"FAS_PDF: File could not be found at {path}")
-        return {}
+    except FileNotFoundError as e:
+        return {"error": str(e)}
     except Exception as e:
-        print(f"FAS_PDF: Error analyzing file: {str(e)} at {path}")
-        return {}
+        return {"error": str(e)}
