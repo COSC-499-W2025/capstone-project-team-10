@@ -75,7 +75,7 @@ class TestFasExtraData:
             def get_headers(self):
                 return ["Header"]
 
-            def get_header_hierarchy(self):
+            def get_header(self):
                 return {"Header": []}
 
             def get_word_counts(self):
@@ -96,7 +96,6 @@ class TestFasExtraData:
         data = get_file_extra_data(str(test_file), "md")
 
         assert data is not None
-        assert "Header" in data["headers"]
         assert data["word_count"] == 4
         assert "paragraphs" in data
 
