@@ -4,7 +4,7 @@ There will be 3 machines set up with the terminal open and with the python virtu
 
 ### Introduction
 
-> "Today you are testing a command-line tool that scans code projects to generate a resume, portfolio, or a timeline of skills identified in those projects. We have chosen some tasks that we're going to ask you to fulfill, you will be typing commands into this terminal to interact with the software. We are testing the tool, not your coding skills. If you get stuck, try refering to the help menu."
+> "Today you are testing a command-line prototype that scans code projects to generate a resume, portfolio, or a timeline of skills identified in those projects. We have chosen some tasks that we're going to ask you to fulfill, you will be typing commands into this terminal to interact with the software. We are testing the tool, not your coding skills. If you get stuck, try refering to the help menu."
 
 ### Tasks:
 
