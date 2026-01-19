@@ -51,8 +51,7 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                 from src.fas.fas_md import Markdown
                 md = Markdown(file_path)
                 return {
-                    "headers": md.get_headers(),
-                    "header_hierarchy": md.get_header_hierarchy(),
+                    "header_hierarchy": md.get_header(),
                     "word_count": md.get_word_counts(),
                     "code_blocks": md.get_code_blocks(),
                     "paragraphs": md.get_paragraphs(),

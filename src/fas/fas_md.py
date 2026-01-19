@@ -1,19 +1,11 @@
 import mrkdwn_analysis
+from src.fas.fas_text_analysis import TextSummary
+from src.fas.fas_extra_data import _extract_text_skills
 
 
 class Markdown:
-    """
-    A class that holds a MarkdownAnalyzer instance, that converts some of its output to readily processing formats,
-    and as a base to add more that is needed by the program, that MarkdownAnalysis does not provide.
-    """
 
     def __init__(self, path):
-        """
-        Holds
-
-        (MarkdownAnalyzer) instance
-        (Path) string Path of the .md
-        """
         self.analyzer = mrkdwn_analysis.MarkdownAnalyzer(path)
         self.md_path = path
 
@@ -21,28 +13,7 @@ class Markdown:
         # Utilize the identify_headers() to extract the information of all headers
         return self.analyzer.identify_headers()
 
-    def get_header_hierarchy(self) -> list:
-        r"""
-        Convert mrkdown-analysis identify_headers() output
-        into a nested dictionary based on header levels.
-
-        Output:
-            (dict(list)) that is nested, based on the levels of headings size, into a nested dictionary. Should be easily processed by the machine
-
-        Example:
-            print(test_markdown.get_header_hierarchy())
-            >>
-            [
-                {
-                    "title": "Project Overview",
-                    "children": [
-                    {
-                        "title": "Introduction",
-                        "children": [
-                                {"title": "Background", "children": []},
-                                {"title": "Objectives", "children": []}
-            ...
-        """
+    def get_header(self) -> list[str]:
         headers = self.get_headers().get("Header", [])
         root = []
         if not headers:
@@ -62,41 +33,54 @@ class Markdown:
             stack[-1][1].append(node)
             stack.append((level, node["children"]))
 
-        return root
+        # Return only top-level header titles as strings
+        return [item["title"] for item in root]
 
     def get_word_counts(self) -> int:
         # Output: (int) number of word counts within the .md
         return self.analyzer.count_words()
 
-    def get_code_blocks(self) -> dict:
-        # Return all the code blocks within the .md
-        return self.analyzer.identify_code_blocks()
+    def get_code_blocks(self) -> set[str]:
+        # Returns unique code languages used in markdown file
+        code_dict = self.analyzer.identify_code_blocks()
+        languages = set()
+    
+        if isinstance(code_dict, dict):
+            code_blocks = code_dict.get('Code block', [])
+        
+            if isinstance(code_blocks, list):
+                for block in code_blocks:
+                    if isinstance(block, dict) and 'language' in block:
+                        lang = block['language']
+                        if lang:
+                            languages.add(lang)
+    
+        return languages
 
     def get_paragraphs(self):
-        """
-        Return all the paragraphs within the .md
+        # Returns key skills present in the markdown file from the dict
+        paragraphs_dict = self.analyzer.identify_paragraphs()
 
-        Output:
-            (dict) as shown in the example
+        if isinstance(paragraphs_dict, dict):
+            text = paragraphs_dict.get('Paragraph', '') or \
+                   paragraphs_dict.get('paragraphs', '')
 
-        Example:
-            print(test_markdown.get_paragraphs())
-            >>
-            {'Paragraph':
-            ['This document tests **mrkdown-analysis** parsing capabilities.',
-            '`mrkdown-analysis` aims to:',
-            'Markdown is a lightweight format.  \nExample inline code: `print("Hello, world!")`',
-            '![Chart Example](https://dummyimage.com/600x400/000/fff&text=Chart+Placeholder)']}
-        """
-        return self.analyzer.identify_paragraphs()
-
-    # Note - there is so much more that markdown-analysis can do - but there's also a few that it cannot do.
-    # Have to congregate a meetings to discuss what (more) is needed to extract from an .md, but for now, this should do.
-
-
-"""
-# Usage
-test_markdown = Markdown("test_markdown.md")
-hierarchy = test_markdown.get_paragraphs()
-print(hierarchy)
-"""
+            if isinstance(text, list):
+                text = ' '.join(str(p) for p in text)
+            else:
+                text = str(text) if text else ''
+        else:
+            text = str(paragraphs_dict) if paragraphs_dict else ''
+        
+        analyzer = TextSummary(text) if text.strip() else None
+        if analyzer:
+            output = analyzer.generate_text_analysis_data(10, 3)
+            output = {
+                'complexity': output.get('complexity', ''),
+                'depth': output.get('depth', ''),
+                'structure': output.get('structure', ''),
+                'sentiment_insight': output.get('sentiment_insight', '')
+            }
+            output = _extract_text_skills(output)
+            return output
+        return None
