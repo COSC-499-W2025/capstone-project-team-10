@@ -1,15 +1,17 @@
 from pathlib import Path
 from unittest.mock import MagicMock, patch
+import os
 
 import pytest
 
 from src.fas.fas_md import Markdown
 
+md_path = os.path.join("tests", "testdata", "test_md", "test_markdown.md")
 
 class TestMarkdown:
     @pytest.fixture(scope="module")
     def md(self):
-        return Markdown(Path("tests/testdata/test_md/test_markdown.md"))
+        return Markdown(Path(md_path))
 
     # Test for headers
     def test_headers(self, md):
