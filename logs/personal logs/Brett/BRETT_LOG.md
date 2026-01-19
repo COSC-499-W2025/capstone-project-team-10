@@ -1,4 +1,18 @@
-# Week 15 (11/24/2025 = 11/30/2025)
+# Week 16 (1/12/2026 = 1/18/2026) ** TERM 2 **
+
+![Week 16 Tasks](Week16/Week16Tasks.png)
+
+## Features
+
+![Week 16 KanBan](Week16/Week16KanBan1.png)
+![Week 16 KanBan](Week16/Week16KanBan2.png)
+![Week 16 KanBan](Week16/Week16KanBan3.png)
+
+## Recap
+We started working on the GUI and tasks for milestone 2. I created a skeleton for the fastAPI, but we are not using this directly and are instead mimicking it with functions to my understanding. I also made a minor bugfix to the pdf module to avoid crashing the program when an error was generated from the module. Finally, I added functionality to the GUI to support selecting files using the system's os file system and a drag and drop feature. Next week I want to continue adding new features to the GUI and work on integrating it with our backend systems. I have also been working on further improving our coding analysis module as I think it can also be improved to provide stronger analysis.
+
+
+# Week 15 (1/5/2026 = 1/11/2026) ** TERM 2 **
 
 ![Week 15 Tasks](Week15/Week15Tasks.png)
 
@@ -11,7 +25,7 @@
 We reconvened after the break and discussed our progress and the new milestone requirements for milestone 2. I completed an issue from before the break to include
 deeper analysis in the fas_pdf.py module such as sentiment feedback, lexical diverstiy feedback, etc. This was already implemented but not merged into the dev branch. I also refactored the fas_test_analysis.py module to consolidate code from many different files into text_analysis.py to reduce code and keep concerns in their local modules. I included the refactored fas_pdf.py module and updated it so that it fixed both issues.
 
-# Week 14 (11/24/2025 = 11/30/2025)
+# Week 14 (12/1/2025 = 12/7/2025)
 
 ![Week 14 Tasks](Week14/Week14Tasks.png)
 
