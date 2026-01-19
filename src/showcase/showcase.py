@@ -683,6 +683,33 @@ def generate_portfolio(allow_image: bool = True) -> Path | None:
                         details = f"""
                             <p><strong>Artistic Project:</strong> {psd_desc}</p>
                         """
+                    elif ext in ("md", "markdown"):
+                        header = extra_dict.get("header_hierarchy", [])
+                        header_text = header[0] if header else "Markdown Document"
+    
+                        word_count = extra_dict.get("word_count", 0)
+    
+                        code_blocks_raw = extra_dict.get("code_blocks", "")
+                        if isinstance(code_blocks_raw, str):
+                            try:
+                                code_blocks = list(ast.literal_eval(code_blocks_raw))
+                            except (ValueError, SyntaxError):
+                                code_blocks = []
+                        elif isinstance(code_blocks_raw, (set, list)):
+                            code_blocks = list(code_blocks_raw)
+                        else:
+                            code_blocks = []
+    
+                        languages_text = ", ".join(code_blocks) if code_blocks else "No code blocks"
+                        
+                        paragraphs = extra_dict.get("paragraphs", [])
+                        skills_text = ", ".join(paragraphs) if paragraphs else "Document Analysis"
+
+                        details = f"""
+                            <p><strong>Project:</strong> {header_text}</p>
+                            <p><strong>Word Count:</strong> {word_count} | <strong>Languages:</strong> {languages_text}</p>
+                            <p><strong>Key Skills:</strong> {skills_text}</p>
+                        """
 
                     else:
                         details = f"""
