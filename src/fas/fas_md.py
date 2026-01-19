@@ -1,5 +1,6 @@
 import mrkdwn_analysis
 from src.fas.fas_text_analysis import TextSummary
+from src.fas.fas_extra_data import _extract_text_skills
 
 
 class Markdown:
@@ -38,12 +39,47 @@ class Markdown:
         # Output: (int) number of word counts within the .md
         return self.analyzer.count_words()
 
-    def get_code_blocks(self) -> dict:
-        # Return all the code blocks within the .md
-        return self.analyzer.identify_code_blocks()
+    def get_code_blocks(self) -> set[str]:
+        # Returns unique code languages used in markdown file
+        code_dict = self.analyzer.identify_code_blocks()
+        languages = set()
+    
+        if isinstance(code_dict, dict):
+            code_blocks = code_dict.get('Code block', [])
+        
+            if isinstance(code_blocks, list):
+                for block in code_blocks:
+                    if isinstance(block, dict) and 'language' in block:
+                        lang = block['language']
+                        if lang:
+                            languages.add(lang)
+    
+        return languages
 
     def get_paragraphs(self):
-        text = self.analyzer.identify_paragraphs()
+        # Returns key skills present in the markdown file from the dict
+        paragraphs_dict = self.analyzer.identify_paragraphs()
+
+        if isinstance(paragraphs_dict, dict):
+            text = paragraphs_dict.get('Paragraph', '') or \
+                   paragraphs_dict.get('paragraphs', '')
+
+            if isinstance(text, list):
+                text = ' '.join(str(p) for p in text)
+            else:
+                text = str(text) if text else ''
+        else:
+            text = str(paragraphs_dict) if paragraphs_dict else ''
+        
         analyzer = TextSummary(text) if text.strip() else None
-        sentiment = analyzer.getSentiment()
-        return
+        if analyzer:
+            output = analyzer.generate_text_analysis_data(10, 3)
+            output = {
+                'complexity': output.get('complexity', ''),
+                'depth': output.get('depth', ''),
+                'structure': output.get('structure', ''),
+                'sentiment_insight': output.get('sentiment_insight', '')
+            }
+            output = _extract_text_skills(output)
+            return output
+        return None
