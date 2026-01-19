@@ -1,3 +1,30 @@
+# T2 - Week 2 (1/11/2025 - 1/18/2025)
+
+![T2 - Week 2 - Task Completed](T2-W2/Done.png)
+
+
+## Features
+
+![T2 - Week 2 - In Progress](T2-W2/Features.png)
+![T2 - Week 2 - In Progress](T2-W2/Features1.png)
+
+## Recap
+
+- For term 2 week 2, I worked on fixing FAS file extension bug and GUI
+  - Since FAS think that a file named "pdf" with no extension is a pdf file so I fix that
+  + Things that went well: The bug fix is easy and clean, I get to know more edge cases
+  - Things that did not went well: Making GUI with python as a desktop app is way harder than webapp since we dont have that much library to work with.
+- I will continue working on the GUI for week 3.
+
+
+## Additional Context
+## Team Survey:
+
+
+![Week 14 - Team Survey](W14/Team_Survey_(1).png)
+![Week 14 - Team Survey](W14/Team_Survey_(2).png)
+![Week 14 - Team Survey](W14/Team_Survey_(3).png)
+
 # T2 - Week 1 (1/5/2025 - 1/11/2025)
 
 ![T2 - Week 1 - Task Completed](T2-W1/Done.png)
@@ -27,7 +54,7 @@
 ![Week 14 - Team Survey](W14/Team_Survey_(2).png)
 ![Week 14 - Team Survey](W14/Team_Survey_(3).png)
 
-# Week 14 (11/23/2025 - 11/30/2025)
+# Week 14 (11/30/2025 - 12/7/2025)
 
 ![Week 14 - Task Completed](W14/Done.png)
 ![Week 14 - Task Completed](W14/Done1.png)
