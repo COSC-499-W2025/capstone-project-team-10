@@ -87,8 +87,13 @@ This week was EXTREMELY busy, since we have milestone 1 and the presentation com
 
 # Term 2 Week 2 (1/11/2026 - 1/18/2026)
 
-## Tasks
-<img width="453" height="117" alt="image" src="https://github.com/user-attachments/assets/e61781f7-617f-44b0-a894-18931f23bb0d" />
+### Tasks
+Issue https://github.com/COSC-499-W2025/capstone-project-team-10/issues/167: PR https://github.com/COSC-499-W2025/capstone-project-team-10/pull/187
+### Reviews
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/185  
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/184  
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/181  
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/177  
 
 ## Recap
 This week I worked on making preparations for peer testing next week, I have laid out a document as to how the stations will be setup, what our introduction will be, and what tasks will be given out to the testers. Next week we will flesh out and get everything ready for peer testing while we also work on implementing some of the GUI features.
