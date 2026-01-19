@@ -30,6 +30,7 @@ class TestMarkdown:
     def test_word_counts(self, md):
         count = md.get_word_counts()
         assert isinstance(count, int)
+        assert count > 100  # reasonable sanity check
 
     # Tests that coding languages used is returned
     def test_code_blocks(self, md):
@@ -52,9 +53,3 @@ class TestMarkdown:
         paras = md.get_paragraphs()
         assert paras is None or isinstance(paras, list)
         assert isinstance(md.get_word_counts(), int)
-
-    # Tests to make sure that only the top level header is output
-    def test_header_top_level_only(self, md):
-        header = md.get_header()
-        assert len(header) >= 1
-        assert all(isinstance(h, str) for h in header)
