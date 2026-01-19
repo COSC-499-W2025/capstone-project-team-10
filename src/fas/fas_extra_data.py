@@ -73,7 +73,11 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
             _clean_summary(metadata)
             metadata["key_skills"] = _extract_text_skills(metadata)
 
-        return metadata
+        # Returns None if metadata is empty
+        if metadata == {}:
+            return None
+        else:
+            return metadata
 
     except ModuleNotFoundError:
         print(f"No handler found for file type: {file_type}")
