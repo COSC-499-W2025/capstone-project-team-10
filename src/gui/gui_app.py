@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 import shutil
 import src.gui.gui_eula_mgr.gui_perms_prompt as perms_prompt
+import src.gui.gui_file_selection as file_selection
 import src.param.param as param
 
 class MainWindow(QMainWindow):
@@ -18,6 +19,8 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.main_content)
 
         self.eula_prompt = None 
+        self.file_selector = None
+
 
     def show_eula_prompt(self, eula_folder, persisted_eula):
         # Remove old EULA prompt if it exists
@@ -33,6 +36,16 @@ class MainWindow(QMainWindow):
         )
         self.stack.addWidget(self.eula_prompt)
         self.stack.setCurrentWidget(self.eula_prompt)
+
+    def show_file_selector(self):
+        if self.file_selector is not None:
+            self.stack.removeWidget(self.file_selector)
+            self.file_selector.deleteLater()
+            self.file_selector = None
+
+        self.file_selector = file_selection.FileSelectionWidget()
+        self.stack.addWidget(self.file_selector)
+        self.stack.setCurrentWidget(self.file_selector)
 
     def restore_main_content(self):
         self.stack.setCurrentWidget(self.main_content)
@@ -52,5 +65,7 @@ def run_gui():
         window.show_eula_prompt(eula_folder, persisted_eula)
     #Other Content Loading ->
     
+    window.show_file_selector()
+
     window.show()
     sys.exit(app.exec_())
