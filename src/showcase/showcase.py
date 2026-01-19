@@ -370,6 +370,82 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                             new_x=XPos.LMARGIN,
                             new_y=YPos.NEXT,
                         )
+                    
+                    case "md" | "markdown":
+                        header = ""
+                        word_count = 0
+                        code_blocks = []
+                        paragraphs = []
+                        extra_data_raw = file_analysis.extra_data
+
+                        # Convert locally (do not mutate file_analysis.extra_data)
+                        if isinstance(extra_data_raw, str):
+                            try:
+                                parsed = ast.literal_eval(extra_data_raw)
+                                if isinstance(parsed, dict):
+                                    header_hierarchy = parsed.get("header_hierarchy", []) or []
+                                    header = header_hierarchy[0] if header_hierarchy else ""
+                                    word_count = parsed.get("word_count", 0)
+                
+                                    # Handle code_blocks which is a string representation of a set
+                                    code_blocks_raw = parsed.get("code_blocks", "")
+                                    if isinstance(code_blocks_raw, str):
+                                        try:
+                                            code_blocks = list(ast.literal_eval(code_blocks_raw))
+                                        except (ValueError, SyntaxError):
+                                            code_blocks = []
+                                    elif isinstance(code_blocks_raw, (set, list)):
+                                        code_blocks = list(code_blocks_raw)
+                
+                                    paragraphs = parsed.get("paragraphs", []) or []
+                            except (ValueError, SyntaxError):
+                                # conversion failed: string isn't a valid Python literal dict
+                                header = ""
+                        elif isinstance(extra_data_raw, dict):
+                            # In case it's already a dict for some reason, handle it too
+                            header_hierarchy = extra_data_raw.get("header_hierarchy", []) or []
+                            header = header_hierarchy[0] if header_hierarchy else ""
+                            word_count = extra_data_raw.get("word_count", 0)
+        
+                            code_blocks_raw = extra_data_raw.get("code_blocks", "")
+                            if isinstance(code_blocks_raw, str):
+                                try:
+                                    code_blocks = list(ast.literal_eval(code_blocks_raw))
+                                except (ValueError, SyntaxError):
+                                    code_blocks = []
+                            elif isinstance(code_blocks_raw, (set, list)):
+                                code_blocks = list(code_blocks_raw)
+        
+                            paragraphs = extra_data_raw.get("paragraphs", []) or []
+
+                        # Final text to place in PDF
+                        header_text = header if header else "Markdown Document"
+                        languages_text = ", ".join(code_blocks) if code_blocks else "No code blocks"
+                        skills_text = ", ".join(paragraphs) if paragraphs else "Document Analysis"
+
+                        pdf_output.multi_cell(
+                            0,
+                            10,
+                            f"Project: {header_text}",
+                            new_x=XPos.LMARGIN,
+                            new_y=YPos.NEXT,
+                        )
+    
+                        pdf_output.multi_cell(
+                            0,
+                            10,
+                            f"Word Count: {word_count} | Languages: {languages_text}",
+                            new_x=XPos.LMARGIN,
+                            new_y=YPos.NEXT,
+                        )
+    
+                        pdf_output.multi_cell(
+                            0,
+                            10,
+                            f"Key Skills demonstrated in this project: {skills_text}",
+                            new_x=XPos.LMARGIN,
+                            new_y=YPos.NEXT,
+                        )
 
                     case _:
                         # Add key skills for text files

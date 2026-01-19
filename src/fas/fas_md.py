@@ -13,7 +13,7 @@ class Markdown:
         # Utilize the identify_headers() to extract the information of all headers
         return self.analyzer.identify_headers()
 
-    def get_header_hierarchy(self) -> list:
+    def get_header(self) -> list[str]:
         headers = self.get_headers().get("Header", [])
         root = []
         if not headers:
@@ -33,7 +33,8 @@ class Markdown:
             stack[-1][1].append(node)
             stack.append((level, node["children"]))
 
-        return root
+        # Return only top-level header titles as strings
+        return [item["title"] for item in root]
 
     def get_word_counts(self) -> int:
         # Output: (int) number of word counts within the .md
