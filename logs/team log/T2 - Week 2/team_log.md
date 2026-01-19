@@ -1,13 +1,16 @@
-# Sprint for 1/5/25 -> 1/11/25
+# Sprint for 1/11/25 -> 1/18/25
 
 
 ## Milestone Goals
 
-[https://github.com/COSC-499-W2025/capstone-project-team-10/pull/177](PR #177 - Gui user agreement pop-up)
-[https://github.com/COSC-499-W2025/capstone-project-team-10/pull/181](PR #181 - Milestone 2 Compliance planning)
-[https://github.com/COSC-499-W2025/capstone-project-team-10/pull/184](PR #184 - Finalized GUI Draft)
-[https://github.com/COSC-499-W2025/capstone-project-team-10/pull/185](PR #185 - Fix FAS file extension bug)
-[https://github.com/COSC-499-W2025/capstone-project-team-10/pull/186](PR #186 - Fixed fas_pdf.py halting scan on error.)
+- [PR #177 - Gui user agreement pop-up](https://github.com/COSC-499-W2025/capstone-project-team-10/pull/177)
+- [PR #181 - Milestone 2 Compliance planning](https://github.com/COSC-499-W2025/capstone-project-team-10/pull/181)
+- [PR #184 - Finalized GUI Draft](https://github.com/COSC-499-W2025/capstone-project-team-10/pull/184)
+- [PR #185 - Fix FAS file extension bug](https://github.com/COSC-499-W2025/capstone-project-team-10/pull/185)
+- [PR #186 - Fixed fas_pdf.py halting scan on error.](https://github.com/COSC-499-W2025/capstone-project-team-10/pull/186)
+- [PR #187 - Created peer testing plan doc](https://github.com/COSC-499-W2025/capstone-project-team-10/pull/187)
+- [PR #188 - GUI file selection](https://github.com/COSC-499-W2025/capstone-project-team-10/pull/188)
+- [PR #189 - Markdown analysis improvement](https://github.com/COSC-499-W2025/capstone-project-team-10/pull/189)
 
 
 ## Burnup Chart
