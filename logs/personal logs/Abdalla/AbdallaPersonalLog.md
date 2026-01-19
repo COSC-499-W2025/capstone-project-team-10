@@ -84,3 +84,11 @@ I worked on reimplementing the delta scan feature in the FSS, It had to go throu
 
 ## Recap
 This week was EXTREMELY busy, since we have milestone 1 and the presentation coming up, it was expected so I was prepared. I implemented one of the functionality for generating a timeline of key skills out to a PDF, it looks great and I think we are looking good for the presentation.
+
+# Term 2 Week 2 (1/11/2026 - 1/18/2026)
+
+## Tasks
+<img width="453" height="117" alt="image" src="https://github.com/user-attachments/assets/e61781f7-617f-44b0-a894-18931f23bb0d" />
+
+## Recap
+This week I worked on making preparations for peer testing next week, I have laid out a document as to how the stations will be setup, what our introduction will be, and what tasks will be given out to the testers. Next week we will flesh out and get everything ready for peer testing while we also work on implementing some of the GUI features.
