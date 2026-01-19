@@ -1,3 +1,23 @@
+# Term 2 Week 2 (01/12/2026 - 01/18/2026)
+
+![Term Two Week Two Tasks](Term2Week2/WeekTwoTasks.png)
+
+# Features
+
+![Term Two Week Two Feature](Term2Week2/WeekTwoFeature.png)
+
+# Recap
+
+This week I focused on refacotring and improving the markdown analysis module. This allows it to produce useful results for the user in the outputs of both the resume and portfolio. This involved refactoring the existing markdown analysis to interact with the other analysis modules to prevent code duplication as well as setting up new sections in the showcase module for the markdown output.
+
+Next week, as of right now, I intend to work on the GUI since we have out finalized design draft completed, as well as preparing for the in class testing by contributing whatever is necessary, either the standardized test data or finalizing our preperation for it.
+
+Code Reviews:
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/177 - GUI User Agreement Pop-Up
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/181 - Milestone 2 Compliance Checklist
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/186 - FAS PDF Module Bug Fix
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/184 - Finalized GUI Draft
+
 # Term 2 Week 1 (01/05/2026 - 01/11/2026)
 
 ![Term Two Week One Tasks](Term2Week1/WeekOneTasks.png)
