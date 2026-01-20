@@ -1,3 +1,10 @@
+# Section Links
+[Term 1](#term-1)  
+
+[Term 2](#term-2)  
+[Week 2](#week-2-1112026---1182026)
+
+# Term 1
 # Week 3 (9/14/2025 -  9/21/2025)
 <img width="1091" height="635" alt="image" src="https://github.com/user-attachments/assets/2fbc4c9b-41a3-4435-bd3f-871841d5ce0f" />
 
@@ -85,7 +92,9 @@ I worked on reimplementing the delta scan feature in the FSS, It had to go throu
 ## Recap
 This week was EXTREMELY busy, since we have milestone 1 and the presentation coming up, it was expected so I was prepared. I implemented one of the functionality for generating a timeline of key skills out to a PDF, it looks great and I think we are looking good for the presentation.
 
-# Term 2 Week 2 (1/11/2026 - 1/18/2026)
+# Term 2 
+
+## Week 2 (1/11/2026 - 1/18/2026)
 
 ### Tasks
 Issue https://github.com/COSC-499-W2025/capstone-project-team-10/issues/167: PR https://github.com/COSC-499-W2025/capstone-project-team-10/pull/187
@@ -95,5 +104,5 @@ https://github.com/COSC-499-W2025/capstone-project-team-10/pull/184
 https://github.com/COSC-499-W2025/capstone-project-team-10/pull/181  
 https://github.com/COSC-499-W2025/capstone-project-team-10/pull/177  
 
-## Recap
+### Recap
 This week I worked on making preparations for peer testing next week, I have laid out a document as to how the stations will be setup, what our introduction will be, and what tasks will be given out to the testers. Next week we will flesh out and get everything ready for peer testing while we also work on implementing some of the GUI features.
