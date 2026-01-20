@@ -9,6 +9,15 @@ class Markdown:
         self.analyzer = mrkdwn_analysis.MarkdownAnalyzer(path)
         self.md_path = path
 
+    def analyze_markdown(path):
+        md = Markdown(path)
+        return {
+                    "header_hierarchy": md.get_header(),
+                    "word_count": md.get_word_counts(),
+                    "code_blocks": md.get_code_blocks(),
+                    "paragraphs": md.get_paragraphs(),
+                }
+
     def get_headers(self) -> dict[str, list[str]]:
         # Utilize the identify_headers() to extract the information of all headers
         return self.analyzer.identify_headers()

@@ -49,13 +49,7 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
 
             case "md" | "markdown":
                 from src.fas.fas_md import Markdown
-                md = Markdown(file_path)
-                return {
-                    "header_hierarchy": md.get_header(),
-                    "word_count": md.get_word_counts(),
-                    "code_blocks": md.get_code_blocks(),
-                    "paragraphs": md.get_paragraphs(),
-                }
+                return Markdown.analyze_markdown(file_path)
 
             case _ if ext in em:
                 return _analyze_code_file(file_path)
