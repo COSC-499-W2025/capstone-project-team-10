@@ -1,5 +1,6 @@
 import sys
 
+import src.log.log as log
 import src.param.param as param
 from src.cli.cli_app import run_cli
 from src.gui.gui_app import run_gui
@@ -8,6 +9,8 @@ from src.gui.gui_app import run_gui
 def main():
     # Intiialize Params
     param.init()
+    # Initialize Log System
+    log.resume_log_file()
     if len(sys.argv) > 1 and sys.argv.__contains__("--cli"):
         run_cli()
     else:

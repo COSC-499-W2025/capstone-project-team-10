@@ -1,3 +1,4 @@
+import ast
 import csv
 import json
 import logging
@@ -6,16 +7,15 @@ import re
 import shutil
 from datetime import datetime, timedelta
 from pathlib import Path
-import ast
+from typing import Optional
 
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 
 import src.log.log as log
 import src.param.param as param
-from src.log.log_sorter import LogSorter
 from src.fas.fas import FileAnalysis
-
+from src.log.log_sorter import LogSorter
 from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
 
 # Template for resume entry in PDF
@@ -85,7 +85,9 @@ def generate_all():
     generate_skill_timeline()
 
 
-def generate_resume(allow_image: bool = True) -> Path | None:
+def generate_resume(
+    allow_image: bool = True, output_file_path: Optional[Path] = None
+) -> Path | None:
     """
     Generates a PDF resume from the log file.
     """
@@ -94,12 +96,15 @@ def generate_resume(allow_image: bool = True) -> Path | None:
     todays_date: str = datetime.now().strftime("%m-%d-%y")
     export_path: Path = Path(param.export_folder_path) / (todays_date + "-resume.pdf")
     file_number: int = 0
-    # Ensure unique file name by incrementing if file exists
-    while export_path.exists():
-        file_number += 1
-        export_path = Path(param.export_folder_path) / (
-            todays_date + f"-resume-{file_number}.pdf"
-        )
+    if output_file_path is None:
+        # Ensure unique file name by incrementing if file exists
+        while export_path.exists():
+            file_number += 1
+            export_path = Path(param.export_folder_path) / (
+                todays_date + f"-resume-{file_number}.pdf"
+            )
+    if output_file_path is not None and isinstance(output_file_path, Path):
+        export_path = output_file_path
 
     log_file: Path = Path(log.current_log_file)
     # Check if export directory exists
@@ -146,10 +151,9 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                 # Add details based on file type
                 file_analysis.extra_data = clean_text(file_analysis.extra_data)
                 _, ext = os.path.splitext(file_analysis.file_path)
-                ext = ext.lower()       
+                ext = ext.lower()
                 match file_analysis.file_type:
                     case file_type if file_type in image_types:
-                        
                         # Convert extra_data to dict if it is a string
                         extra_data_raw = file_analysis.extra_data
                         extra_data_dict = {}
@@ -198,7 +202,6 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                             pdf_output.image(file_analysis.file_path, w=100)
 
                     case file_type if file_type in collaborative_types:
-
                         key_skills = []
                         extra_data_skills = []
                         commits = []
@@ -211,7 +214,9 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                                 parsed = ast.literal_eval(extra_data_raw)
                                 if isinstance(parsed, dict):
                                     key_skills = parsed.get("key_skills", []) or []
-                                    extra_data_skills = parsed.get("extra data", []) or []
+                                    extra_data_skills = (
+                                        parsed.get("extra data", []) or []
+                                    )
                                     commits = parsed.get("commits", []) or []
                                     author = parsed.get("author", []) or []
                             except (ValueError, SyntaxError):
@@ -219,7 +224,9 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                                 commits = []
                         elif isinstance(extra_data_raw, dict):
                             key_skills = extra_data_raw.get("key_skills", []) or []
-                            extra_data_skills = extra_data_raw.get("extra data", []) or []
+                            extra_data_skills = (
+                                extra_data_raw.get("extra data", []) or []
+                            )
                             commits = extra_data_raw.get("commits", []) or []
                             author = extra_data_raw.get("author", []) or []
 
@@ -227,7 +234,7 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                         total_insertions = commits.get("total_insertions", 0)
                         total_deletions = commits.get("total_deletions", 0)
                         net_change = commits.get("net_change", 0)
-                        message_analysis_raw= commits.get("message_analysis", "N/A")
+                        message_analysis_raw = commits.get("message_analysis", "N/A")
 
                         if message_analysis_raw != "N/A":
                             if isinstance(message_analysis_raw, str):
@@ -241,7 +248,9 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                                 except (ValueError, SyntaxError):
                                     message_analysis = message_analysis_raw
                             elif isinstance(message_analysis_raw, (set, list)):
-                                message_analysis = ", ".join(sorted(message_analysis_raw))
+                                message_analysis = ", ".join(
+                                    sorted(message_analysis_raw)
+                                )
                             else:
                                 message_analysis = str(message_analysis_raw)
                         else:
@@ -254,14 +263,24 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                                 if isinstance(file_dict, dict):
                                     file_extra_data = file_dict.get("Extra data", {})
                                     if isinstance(file_extra_data, dict):
-                                        file_skills = file_extra_data.get("key_skills", [])
+                                        file_skills = file_extra_data.get(
+                                            "key_skills", []
+                                        )
                                         if file_skills:
                                             all_project_skills.extend(file_skills)
-    
+
                         # Remove duplicates and join
                         all_project_skills = list(set(all_project_skills))
-                        skills_text = ", ".join(key_skills) if key_skills else file_analysis.file_type.upper() + " Data Analysis"
-                        project_skills_text = ", ".join(all_project_skills) if all_project_skills else "N/A"
+                        skills_text = (
+                            ", ".join(key_skills)
+                            if key_skills
+                            else file_analysis.file_type.upper() + " Data Analysis"
+                        )
+                        project_skills_text = (
+                            ", ".join(all_project_skills)
+                            if all_project_skills
+                            else "N/A"
+                        )
 
                         commit_summary = f"Total Commits: {total_commits} \nTotal Insertions: +{total_insertions} \nTotal Deletions: -{total_deletions} \nNet Change: {net_change} \nCommit objectives: {message_analysis}"
                         # If there is more than one author it becomes a collaborative project
@@ -280,7 +299,7 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                             new_y=YPos.NEXT,
                         )
 
-                    case "xlsx" | "xls" | "docx" | "odt" | "rtf":            
+                    case "xlsx" | "xls" | "docx" | "odt" | "rtf":
                         key_skills = []
                         summary = ""
                         extra_data_raw = file_analysis.extra_data
@@ -301,7 +320,11 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                             summary = extra_data_raw.get("summary", "")
 
                         # Final text to place in PDF
-                        skills_text = ", ".join(key_skills) if key_skills else file_analysis.file_type.upper() + " Data Analysis"
+                        skills_text = (
+                            ", ".join(key_skills)
+                            if key_skills
+                            else file_analysis.file_type.upper() + " Data Analysis"
+                        )
 
                         pdf_output.multi_cell(
                             0,
@@ -333,7 +356,9 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                                     key_skills = parsed.get("key_skills", []) or []
                                     complexity = parsed.get("complexity")
                                     if isinstance(complexity, dict):
-                                        code_complexity = complexity.get("estimated", "Not Available")
+                                        code_complexity = complexity.get(
+                                            "estimated", "Not Available"
+                                        )
                             except (ValueError, SyntaxError):
                                 # conversion failed: string isn't a valid Python literal dict
                                 key_skills = []
@@ -342,10 +367,16 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                             key_skills = extra_data_raw.get("key_skills", []) or []
                             complexity = extra_data_raw.get("complexity")
                             if isinstance(complexity, dict):
-                                code_complexity = complexity.get("estimated", "Not Available")
+                                code_complexity = complexity.get(
+                                    "estimated", "Not Available"
+                                )
 
                         # Final text to place in PDF
-                        skills_text = ", ".join(key_skills) if key_skills else extra_data_raw.get("language") + " Programming"
+                        skills_text = (
+                            ", ".join(key_skills)
+                            if key_skills
+                            else extra_data_raw.get("language") + " Programming"
+                        )
 
                         pdf_output.multi_cell(
                             0,
@@ -370,7 +401,7 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                             new_x=XPos.LMARGIN,
                             new_y=YPos.NEXT,
                         )
-                    
+
                     case "md" | "markdown":
                         header = ""
                         word_count = 0
@@ -383,45 +414,59 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                             try:
                                 parsed = ast.literal_eval(extra_data_raw)
                                 if isinstance(parsed, dict):
-                                    header_hierarchy = parsed.get("header_hierarchy", []) or []
-                                    header = header_hierarchy[0] if header_hierarchy else ""
+                                    header_hierarchy = (
+                                        parsed.get("header_hierarchy", []) or []
+                                    )
+                                    header = (
+                                        header_hierarchy[0] if header_hierarchy else ""
+                                    )
                                     word_count = parsed.get("word_count", 0)
-                
+
                                     # Handle code_blocks which is a string representation of a set
                                     code_blocks_raw = parsed.get("code_blocks", "")
                                     if isinstance(code_blocks_raw, str):
                                         try:
-                                            code_blocks = list(ast.literal_eval(code_blocks_raw))
+                                            code_blocks = list(
+                                                ast.literal_eval(code_blocks_raw)
+                                            )
                                         except (ValueError, SyntaxError):
                                             code_blocks = []
                                     elif isinstance(code_blocks_raw, (set, list)):
                                         code_blocks = list(code_blocks_raw)
-                
+
                                     paragraphs = parsed.get("paragraphs", []) or []
                             except (ValueError, SyntaxError):
                                 # conversion failed: string isn't a valid Python literal dict
                                 header = ""
                         elif isinstance(extra_data_raw, dict):
                             # In case it's already a dict for some reason, handle it too
-                            header_hierarchy = extra_data_raw.get("header_hierarchy", []) or []
+                            header_hierarchy = (
+                                extra_data_raw.get("header_hierarchy", []) or []
+                            )
                             header = header_hierarchy[0] if header_hierarchy else ""
                             word_count = extra_data_raw.get("word_count", 0)
-        
+
                             code_blocks_raw = extra_data_raw.get("code_blocks", "")
                             if isinstance(code_blocks_raw, str):
                                 try:
-                                    code_blocks = list(ast.literal_eval(code_blocks_raw))
+                                    code_blocks = list(
+                                        ast.literal_eval(code_blocks_raw)
+                                    )
                                 except (ValueError, SyntaxError):
                                     code_blocks = []
                             elif isinstance(code_blocks_raw, (set, list)):
                                 code_blocks = list(code_blocks_raw)
-        
+
                             paragraphs = extra_data_raw.get("paragraphs", []) or []
 
                         # Final text to place in PDF
                         header_text = header if header else "Markdown Document"
-                        languages_text = ", ".join(code_blocks) if code_blocks else "No code blocks"
-                        skills_text = ", ".join(paragraphs) if paragraphs else "Document Analysis"
+                        languages_text = (
+                            ", ".join(code_blocks) if code_blocks else "No code blocks"
+                        )
+                        skills_text = (
+                            ", ".join(paragraphs) if paragraphs else "Document Analysis"
+                        )
 
                         pdf_output.multi_cell(
                             0,
@@ -430,7 +475,7 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                             new_x=XPos.LMARGIN,
                             new_y=YPos.NEXT,
                         )
-    
+
                         pdf_output.multi_cell(
                             0,
                             10,
@@ -438,7 +483,7 @@ def generate_resume(allow_image: bool = True) -> Path | None:
                             new_x=XPos.LMARGIN,
                             new_y=YPos.NEXT,
                         )
-    
+
                         pdf_output.multi_cell(
                             0,
                             10,
@@ -463,6 +508,7 @@ def generate_resume(allow_image: bool = True) -> Path | None:
     except Exception as e:
         print(f"Something went wrong: {e}")
 
+
 def parse_extra_data(extra_data_raw):
     if isinstance(extra_data_raw, str):
         try:
@@ -475,7 +521,9 @@ def parse_extra_data(extra_data_raw):
     return {}
 
 
-def generate_portfolio(allow_image: bool = True) -> Path | None:
+def generate_portfolio(
+    allow_image: bool = True, output_file_path: Optional[Path] = None
+) -> Path | None:
     """
     Generates an HTML portfolio and zips it, copying resources as needed.
     """
@@ -544,7 +592,7 @@ def generate_portfolio(allow_image: bool = True) -> Path | None:
                     ext = file_analysis.file_type
                     details = ""
                     _, code_type = os.path.splitext(file_analysis.file_path)
-                    code_type = code_type.lower()   
+                    code_type = code_type.lower()
                     if ext in image_types:
                         img_meta = extra_dict.get("image", {})
                         img_format = img_meta.get("format", "Image")
@@ -573,7 +621,9 @@ def generate_portfolio(allow_image: bool = True) -> Path | None:
                                 parsed = ast.literal_eval(extra_data_raw)
                                 if isinstance(parsed, dict):
                                     key_skills = parsed.get("key_skills", []) or []
-                                    extra_data_skills = parsed.get("extra data", []) or []
+                                    extra_data_skills = (
+                                        parsed.get("extra data", []) or []
+                                    )
                                     commits = parsed.get("commits", []) or []
                                     author = parsed.get("author", []) or []
                             except (ValueError, SyntaxError):
@@ -581,7 +631,9 @@ def generate_portfolio(allow_image: bool = True) -> Path | None:
                                 commits = []
                         elif isinstance(extra_data_raw, dict):
                             key_skills = extra_data_raw.get("key_skills", []) or []
-                            extra_data_skills = extra_data_raw.get("extra data", []) or []
+                            extra_data_skills = (
+                                extra_data_raw.get("extra data", []) or []
+                            )
                             commits = extra_data_raw.get("commits", []) or []
                             author = extra_data_raw.get("author", []) or []
 
@@ -589,7 +641,7 @@ def generate_portfolio(allow_image: bool = True) -> Path | None:
                         total_insertions = commits.get("total_insertions", 0)
                         total_deletions = commits.get("total_deletions", 0)
                         net_change = commits.get("net_change", 0)
-                        message_analysis_raw= commits.get("message_analysis", "N/A")
+                        message_analysis_raw = commits.get("message_analysis", "N/A")
 
                         if message_analysis_raw != "N/A":
                             if isinstance(message_analysis_raw, str):
@@ -603,7 +655,9 @@ def generate_portfolio(allow_image: bool = True) -> Path | None:
                                 except (ValueError, SyntaxError):
                                     message_analysis = message_analysis_raw
                             elif isinstance(message_analysis_raw, (set, list)):
-                                message_analysis = ", ".join(sorted(message_analysis_raw))
+                                message_analysis = ", ".join(
+                                    sorted(message_analysis_raw)
+                                )
                             else:
                                 message_analysis = str(message_analysis_raw)
                         else:
@@ -616,14 +670,24 @@ def generate_portfolio(allow_image: bool = True) -> Path | None:
                                 if isinstance(file_dict, dict):
                                     file_extra_data = file_dict.get("Extra data", {})
                                     if isinstance(file_extra_data, dict):
-                                        file_skills = file_extra_data.get("key_skills", [])
+                                        file_skills = file_extra_data.get(
+                                            "key_skills", []
+                                        )
                                         if file_skills:
                                             all_project_skills.extend(file_skills)
-    
+
                         # Remove duplicates and join
                         all_project_skills = list(set(all_project_skills))
-                        skills_text = ", ".join(key_skills) if key_skills else file_analysis.file_type.upper() + " Data Analysis"
-                        project_skills_text = ", ".join(all_project_skills) if all_project_skills else "N/A"
+                        skills_text = (
+                            ", ".join(key_skills)
+                            if key_skills
+                            else file_analysis.file_type.upper() + " Data Analysis"
+                        )
+                        project_skills_text = (
+                            ", ".join(all_project_skills)
+                            if all_project_skills
+                            else "N/A"
+                        )
 
                         commit_summary = f"Total Commits: {total_commits} \nTotal Insertions: +{total_insertions} \nTotal Deletions: -{total_deletions} \nNet Change: {net_change} \nCommit objectives: {message_analysis}"
                         # If there is more than one author it becomes a collaborative project
@@ -632,7 +696,7 @@ def generate_portfolio(allow_image: bool = True) -> Path | None:
                         if len(author) >= 2:
                             project_text = "Collaborative Project Contributions: "
                             author_text = "Authors: "
-                            
+
                         details = f"""
                             <p>{author_text} {author}</p>
                             <p><strong>{project_text}</strong></p>
@@ -644,7 +708,11 @@ def generate_portfolio(allow_image: bool = True) -> Path | None:
                         key_skills = extra_dict.get("key_skills", [])
                         summary = extra_dict.get("summary", "")
 
-                        skills_text = ", ".join(key_skills) if key_skills else f"{ext.upper()} Data Analysis"
+                        skills_text = (
+                            ", ".join(key_skills)
+                            if key_skills
+                            else f"{ext.upper()} Data Analysis"
+                        )
 
                         details = f"""
                             <p><strong>Key Skills:</strong> {skills_text}</p>
@@ -661,9 +729,15 @@ def generate_portfolio(allow_image: bool = True) -> Path | None:
 
                         code_complexity = "Not Available"
                         if isinstance(complexity, dict):
-                            code_complexity = complexity.get("estimated", "Not Available")
+                            code_complexity = complexity.get(
+                                "estimated", "Not Available"
+                            )
 
-                        skills_text = ", ".join(key_skills) if key_skills else f"{language} Programming"
+                        skills_text = (
+                            ", ".join(key_skills)
+                            if key_skills
+                            else f"{language} Programming"
+                        )
 
                         details = f"""
                             <p><strong>Key Skills:</strong> {skills_text}</p>
@@ -686,9 +760,9 @@ def generate_portfolio(allow_image: bool = True) -> Path | None:
                     elif ext in ("md", "markdown"):
                         header = extra_dict.get("header_hierarchy", [])
                         header_text = header[0] if header else "Markdown Document"
-    
+
                         word_count = extra_dict.get("word_count", 0)
-    
+
                         code_blocks_raw = extra_dict.get("code_blocks", "")
                         if isinstance(code_blocks_raw, str):
                             try:
@@ -699,11 +773,15 @@ def generate_portfolio(allow_image: bool = True) -> Path | None:
                             code_blocks = list(code_blocks_raw)
                         else:
                             code_blocks = []
-    
-                        languages_text = ", ".join(code_blocks) if code_blocks else "No code blocks"
-                        
+
+                        languages_text = (
+                            ", ".join(code_blocks) if code_blocks else "No code blocks"
+                        )
+
                         paragraphs = extra_dict.get("paragraphs", [])
-                        skills_text = ", ".join(paragraphs) if paragraphs else "Document Analysis"
+                        skills_text = (
+                            ", ".join(paragraphs) if paragraphs else "Document Analysis"
+                        )
 
                         details = f"""
                             <p><strong>Project:</strong> {header_text}</p>
@@ -715,7 +793,6 @@ def generate_portfolio(allow_image: bool = True) -> Path | None:
                         details = f"""
                             <p><strong>File type not analyzed. File details: {json.dumps(file_analysis.__dict__, indent=2)}</p>
                         """
-
 
                     # Write entry to HTML
                     portfolio.write(
@@ -740,6 +817,7 @@ def generate_portfolio(allow_image: bool = True) -> Path | None:
         print(f"Failed to read log file: {e}")
         return
 
+
 def generate_skill_timeline() -> Path | None:
     """
     Generates a chronological skills timeline from the sorted log file.
@@ -748,7 +826,9 @@ def generate_skill_timeline() -> Path | None:
     logging.getLogger("fontTools").setLevel(logging.ERROR)
 
     todays_date = datetime.now().strftime("%m-%d-%y")
-    export_path: Path = Path(param.export_folder_path) / (todays_date + "-skills_timeline.pdf")
+    export_path: Path = Path(param.export_folder_path) / (
+        todays_date + "-skills_timeline.pdf"
+    )
     file_number: int = 0
 
     # Ensure unique filename
@@ -768,24 +848,23 @@ def generate_skill_timeline() -> Path | None:
     if not log_file.exists():
         print(f"Log file not found: {log_file}")
         return None
-    
+
     sorter = LogSorter(str(log_file))
     sorter.set_sort_parameters(["Last modified"], [False])
-    sorter.sort()                
+    sorter.sort()
     sorter.return_csv()
 
-    log_file = log_file.with_name(
-        f"{log_file.stem}_sorted{log_file.suffix}"
-    )
+    log_file = log_file.with_name(f"{log_file.stem}_sorted{log_file.suffix}")
     # Ensure export folder exists
     if not export_path.parent.exists():
         print(f"Export folder does not exist: {export_path.parent}")
         return None
 
     try:
-        with open(log_file, "r", encoding="utf-8", newline="") as lf, \
-             open(export_path, "w", encoding="utf-8") as out:
-
+        with (
+            open(log_file, "r", encoding="utf-8", newline="") as lf,
+            open(export_path, "w", encoding="utf-8") as out,
+        ):
             reader = csv.DictReader(lf)
 
             pdf = FPDF()
@@ -798,11 +877,11 @@ def generate_skill_timeline() -> Path | None:
 
             pdf.set_font("Noto", "B", size=16)
             pdf.multi_cell(
-              0,
-              10,
-              "Skill Timeline", 
-              new_x=XPos.LMARGIN, 
-              new_y=YPos.NEXT,
+                0,
+                10,
+                "Skill Timeline",
+                new_x=XPos.LMARGIN,
+                new_y=YPos.NEXT,
             )
             pdf.ln(4)
 
@@ -824,9 +903,8 @@ def generate_skill_timeline() -> Path | None:
 
                 if isinstance(extra_data_raw, dict):
                     # direct dict stored in memory
-                    candidate = (
-                        extra_data_raw.get("key_skills")
-                        or extra_data_raw.get("skills")
+                    candidate = extra_data_raw.get("key_skills") or extra_data_raw.get(
+                        "skills"
                     )
                     if isinstance(candidate, list):
                         skills = [str(s).strip() for s in candidate if str(s).strip()]
@@ -844,18 +922,21 @@ def generate_skill_timeline() -> Path | None:
                             skills = [clean_text(text)]
                         else:
                             if isinstance(parsed, dict):
-                                candidate = (
-                                    parsed.get("key_skills")
-                                    or parsed.get("skills")
+                                candidate = parsed.get("key_skills") or parsed.get(
+                                    "skills"
                                 )
                                 if isinstance(candidate, list):
                                     skills = [
-                                        str(s).strip() for s in candidate if str(s).strip()
+                                        str(s).strip()
+                                        for s in candidate
+                                        if str(s).strip()
                                     ]
                                 elif isinstance(candidate, str) and candidate.strip():
                                     skills = [candidate.strip()]
                             elif isinstance(parsed, list):
-                                skills = [str(s).strip() for s in parsed if str(s).strip()]
+                                skills = [
+                                    str(s).strip() for s in parsed if str(s).strip()
+                                ]
                             else:
                                 # fallback: treat as single item
                                 skills = [clean_text(text)]
@@ -881,8 +962,7 @@ def generate_skill_timeline() -> Path | None:
                 # --- Write timeline item ---
                 pdf.set_font("Noto", "B", size=12)
                 header_line = (
-                    f"{date_display} - {fa.file_name} "
-                    f"({fa.file_type.upper()})"
+                    f"{date_display} - {fa.file_name} ({fa.file_type.upper()})"
                 )
                 pdf.multi_cell(
                     0,
