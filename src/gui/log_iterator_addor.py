@@ -67,7 +67,7 @@ class LogIteratorAddor:
             Allow indexing to get rows.
         """
         return self.df.iloc[index]
-    
+
 # Sample code for the GUI developer
 r"""
 # Initialize
@@ -102,4 +102,7 @@ print(log[-1])
 
 # Printing the first object
 print(log[0])
+
+# REMEMBER TO ALWAYS SAVE
+log.save() # or log.save("<your_path>")
 """
