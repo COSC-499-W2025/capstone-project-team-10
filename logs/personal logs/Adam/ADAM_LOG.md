@@ -1,4 +1,46 @@
-# Term 2 Week 1 (01/11/2026 - 01/18/2026):
+# Term 2 Week 3 (01/18/2026 - 01/25/2026):
+
+## Completed tasks
+
+All in review features will be merged by the end of the week
+
+![Term 2 Week 3 Tasks completed](T2W3/image.png)
+
+## Features
+
+![Term 2 Week 3 Inprogress](T2W3/image-1.png)
+
+## Recap
+
+#### 1. Showcase rewrites and modification planning
+
+Planning and reworking of how we are going to implement resume editing and persistence for our showcase. I decided to go with modifing the logs instead of modifying the generated resume as the latter would make it more difficult to create templates in the future for generation, as well as making it more difficult to implement resume editing in the GUI. This change gives a demo widget that allows for modifying the logs, which will then be used to generate the resume and other showcase outputs as normal.
+
+PRS:
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/193
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/197
+
+##### Tickets:
+
+1. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/183
+
+### For next week:
+
+For next week I will be implementing the GUI view for editing the showcase outputs, and generating the outputs
+
+##### Tickets:
+
+1. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/199
+
+## Additional Context
+
+No problems with my work
+
+## Team Survey:
+
+Survey completed
+
+# Term 2 Week 2 (01/11/2026 - 01/18/2026):
 
 ## Completed tasks
 
@@ -26,14 +68,14 @@ Developed a compliance framework for judging the teams progress against Mileston
 PR:
 [https://github.com/COSC-499-W2025/capstone-project-team-10/pull/181](PR #181 - Milestone 2 Compliance planning)
 
-##### Tickets: 
+##### Tickets:
 
 1. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/170
 2. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/164
 
 ### For next week:
 
-For next week I will be doing rework for the showcase so that we comply with persistence requirements and can plan how we are going to implement resume editing. This requires researching libraries, and different methods of editing PDFs or generating them. 
+For next week I will be doing rework for the showcase so that we comply with persistence requirements and can plan how we are going to implement resume editing. This requires researching libraries, and different methods of editing PDFs or generating them.
 
 ##### Tickets:
 
@@ -68,9 +110,10 @@ The team was all asked to come up with ideas for how our GUI was going to look, 
 final design for the GUI layout
 
 PR:
+
 - https://github.com/COSC-499-W2025/capstone-project-team-10/pull/160
 
-##### Tickets: 
+##### Tickets:
 
 1. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/158
 
@@ -95,7 +138,6 @@ No problems with my work
 
 Survey completed
 
-
 # Week 14 (11/30/2025 - 12/07/2025):
 
 ## Completed tasks
@@ -119,11 +161,10 @@ Nothing In progress - Winter break
 
 - Recorded CLI --zip usage, error handling and -y/permission prompt usage
 
-##### Tickets: 
+##### Tickets:
 
 1. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/137
 2. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/136
-
 
 ### For next week:
 
@@ -136,8 +177,6 @@ No problems with my work
 ## Team Survey:
 
 Survey completed
-
-
 
 # Week 13 (11/23/2025 - 11/30/2025):
 
@@ -158,7 +197,8 @@ All in review features will be merged by the end of the week
 - Added logic to perform delta scanning in the search function, skipping files that have not changed since the last scan based on log data.
 - Updated tests to cover delta scan scenarios and added setup/teardown for log files to ensure test isolation.
 
-##### Tickets: 
+##### Tickets:
+
 - https://github.com/COSC-499-W2025/capstone-project-team-10/issues/118
 - https://github.com/COSC-499-W2025/capstone-project-team-10/issues/61
 
@@ -166,7 +206,7 @@ All in review features will be merged by the end of the week
 
 ##### https://docs.google.com/presentation/d/1XbbpL8-pQWZaCGlv856EApih3Kqz07bX3TclOWLYgPc/edit?usp=sharing
 
-I created the slides for our milestone 1 presentation, compiling a collection of examples and helpful images for us to present on. putting a 
+I created the slides for our milestone 1 presentation, compiling a collection of examples and helpful images for us to present on. putting a
 focus on milestone 1 features
 
 ### For next week:
@@ -179,11 +219,12 @@ For the next week I will documenting our milestone 1 requirement compliance, in 
 
 ## Additional Context
 
-No problems with my work, I did have to pick up some slack due to other teammates needing additional help. My original plan for this 
-week was to complete a different ticket (https://github.com/COSC-499-W2025/capstone-project-team-10/issues/89) but another group member 
+No problems with my work, I did have to pick up some slack due to other teammates needing additional help. My original plan for this
+week was to complete a different ticket (https://github.com/COSC-499-W2025/capstone-project-team-10/issues/89) but another group member
 needed more coding work so I passed it off to them and took over the slides. I also rewrote a malfunctioning module for tickets
-- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/118 and 
-- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/61 
+
+- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/118 and
+- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/61
 
 This was additional work that I was not expecting to be completing this week
 
