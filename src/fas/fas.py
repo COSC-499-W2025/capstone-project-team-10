@@ -3,6 +3,7 @@ import mimetypes
 import os
 from typing import Any, Optional
 import json
+from pathlib import Path
 from src.fss.repo_reader import Repository
 from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
 from utils.libraries_mappings import LIBRARY_SKILL_MAP as lsm
@@ -19,6 +20,7 @@ class FileAnalysis:
         file_type: str,
         last_modified: str,
         created_time: str,
+        project_id: str,
         extra_data: Optional[Any] = None,
         importance: float = 0.0,
     ) -> None:
@@ -30,6 +32,7 @@ class FileAnalysis:
         # self.extra_data: Optional[Any] = extra_data
         self.extra_data = _make_json_safe(extra_data)
         self.importance = importance
+        self.project_id = project_id
     def to_json(self) -> dict:
         return {
             # "file_path": self.file_path,
@@ -178,13 +181,16 @@ def compute_importance(file_type: str, extra_data: Optional[Any]) -> float:
     return round(float(importance), 2)
 
 
-def analyze_file(file_path: str) -> Optional[FileAnalysis]:
+def analyze_file(file_path: str, project_id: Optional[str] = None) -> Optional[FileAnalysis]:
     file_name = get_file_name(file_path)
     file_type = get_file_type(file_path)
     last_modified = get_last_modified_time(file_path)
     created_time = get_created_time(file_path)
     extra_data = get_file_extra_data(file_path, file_type)
     importance = compute_importance(file_type, extra_data)
+
+    if project_id is None:
+        project_id = determine_project_id(file_path, file_type, extra_data)
 
     return FileAnalysis(
         file_path=file_path,
@@ -194,24 +200,25 @@ def analyze_file(file_path: str) -> Optional[FileAnalysis]:
         created_time=created_time,
         extra_data=extra_data,
         importance=importance,
+        project_id=project_id,
     )
 
 
-def analyze_path(file_path: str) -> Optional[FileAnalysis]:
+def analyze_path(file_path: str, project_id: Optional[str] = None) -> Optional[FileAnalysis]:
     if not os.path.exists(file_path):
         print(f"Error: Path '{file_path}' does not exist.")
         return None
 
     if os.path.isdir(file_path) and file_path.endswith(".git"):
         # Placeholder for git analysis
-        return analyze_file(file_path)
+        return analyze_file(file_path, project_id)
 
     # Otherwise treat as a regular file
-    return analyze_file(file_path)
+    return analyze_file(file_path, project_id)
 
 
-def run_fas(file_path: str) -> Optional[FileAnalysis]:
-    return analyze_path(file_path)
+def run_fas(file_path: str, project_id: Optional[str] = None) -> Optional[FileAnalysis]:
+    return analyze_path(file_path, project_id=project_id)
 
 def analyze_file_json(file_path: str) -> Optional[FileAnalysis]:
     file_name = get_file_name(file_path)
@@ -221,6 +228,9 @@ def analyze_file_json(file_path: str) -> Optional[FileAnalysis]:
     extra_data = get_file_extra_data(file_path, file_type)
     importance = compute_importance(file_type, extra_data)
 
+    if project_id is None:
+        project_id = determine_project_id(file_path, file_type, extra_data)
+
     return FileAnalysis(
         file_path=file_path,
         file_name=file_name,
@@ -229,6 +239,7 @@ def analyze_file_json(file_path: str) -> Optional[FileAnalysis]:
         created_time=created_time,
         extra_data=extra_data,
         importance=importance,
+        project_id=project_id,
     ).to_json()
 
 def analyze_path_json(file_path: str) -> Optional[FileAnalysis]:
@@ -242,6 +253,35 @@ def analyze_path_json(file_path: str) -> Optional[FileAnalysis]:
 def run_fas_json(file_path: Optional[str] = None) -> Optional[FileAnalysis]:
     return analyze_path_json(file_path)
 
+def determine_project_id(file_path: str, file_type: str, extra_data: Optional[Any]) -> str:
+    if file_type == "git":
+        if isinstance(extra_data, dict) and "repo_id" in extra_data:
+            return extra_data["repo_id"]
+        # Otherwise use parent dir name
+        parent_dir = os.path.dirname(file_path)
+        return os.path.basename(parent_dir)
+    
+    if isinstance(extra_data, dict) and "repo_id" in extra_data:
+        return extra_data["repo_id"]
+    
+    # Try to find if this file belongs to a git repository
+    repo_id = find_git_repo_id(file_path)
+    if repo_id:
+        return repo_id
+
+    return Path(file_path).parent.name
+
+
+def find_git_repo_id(file_path: str) -> Optional[str]:
+    current_path = Path(file_path).resolve()
+    
+    # Serach directory tree for git file association for project id.
+    for parent in current_path.parents:
+        git_dir = parent / ".git"
+        if git_dir.exists():
+            return parent.name
+    
+    return None
 
 # This is just to run code directly for testing purposes
 # To run fas from command line

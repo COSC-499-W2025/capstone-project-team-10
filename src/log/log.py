@@ -115,6 +115,7 @@ def open_log_file() -> None:
                     "Created time",
                     "Extra data",
                     "Importance",
+                    "Project id",
                 ]
             ]
         )
@@ -136,6 +137,7 @@ def write(fileAnalysis: FileAnalysis) -> None:
                 fileAnalysis.created_time,
                 fileAnalysis.extra_data,
                 fileAnalysis.importance,
+                fileAnalysis.project_id,
             ]
         )
 
@@ -171,6 +173,7 @@ def update(fileAnalysis: FileAnalysis) -> None:
                         fileAnalysis.created_time,
                         fileAnalysis.extra_data,
                         fileAnalysis.importance,
+                        fileAnalysis.project_id,
                     ]
                 )
                 updated = True

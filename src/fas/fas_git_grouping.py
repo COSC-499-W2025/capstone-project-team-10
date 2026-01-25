@@ -42,9 +42,9 @@ class GitGrouping:
         
         # Build the git_output object with all required fields
         git_output = {
+            "repo_id": repo_id, 
             "author": repo.get_authors(),
             "title": repo_id, # Repo ID becomes the title of the project
-            "subject": "Git Repo",
             "created": created_date,
             "modified": modified_date,
             "extra data": extra_data,
@@ -60,28 +60,20 @@ class GitGrouping:
             project_path = repo_path[:-4] if repo_path.endswith('.git') else repo_path
             git = Git(project_path)
             repo_files = git.files()
-            print(repo_files)
-            print("\n")
             
             # Filter out empty strings and strip whitespace
             repo_files = [f.strip() for f in repo_files if f and f.strip()]
-            print(repo_files)
-            print("\n")
             
             # A set of the files present within the git repo so there are no repeated or wasted analysis/searches
             output = []  
-
-            print(project_path)
-            print("\n")
             
             for file in repo_files:
                 # Get file path to each file in the repo
                 file_path = os.path.join(project_path, file)
-                print(file_path)
                 
                 # Only analyze if is a file and exists
                 if os.path.isfile(file_path):
-                    file_result = fas.run_fas(file_path)
+                    file_result = fas.analyze_file(file_path, project_id=repo_id)
                     
                     # Add result to output, which will be added to the returned project file attached in extra data
                     if file_result is not None:
@@ -91,13 +83,14 @@ class GitGrouping:
                             "Last modified": file_result.last_modified,
                             "Created time": file_result.created_time,
                             "Extra data": file_result.extra_data,
+                            "Project id": file_result.project_id,
                         })
             
             return output
             
         except Exception as e:
             print(f"[Error] Failed to retrieve files from repository: {type(e).__name__}: {e}")
-            return set()
+            return []
         
     def get_repo_dates(self, repo_path: str) -> tuple:
         # Extract the creation date (first commit) and last modification date (most recent commit) from the repository.
