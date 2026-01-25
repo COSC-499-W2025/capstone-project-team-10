@@ -160,3 +160,83 @@ class TestLog:
         print("Checking: " + log_file_path)
         assert checkLogOutput(log_file_path)
         clean_up_log_tests()
+
+    def test_log_update_no_file(self):
+        setup_log_tests()
+        global test_file_analysis
+        log.update(test_file_analysis)
+        # Read the produced file, check that the lines are written
+        log_file_path = str(os.path.join(param.result_log_folder_path, "0.log"))
+        print("Checking: " + log_file_path)
+        assert checkLogOutput(log_file_path)
+        clean_up_log_tests()
+
+    def test_follow_log_reads_and_stops(self):
+        """Test that follow_log reads existing lines and stops on !close! signal"""
+        import threading
+        import time
+
+        setup_log_tests()
+        log.open_log_file()
+
+        # Write initial entries
+        global test_file_analysis
+        log.write(test_file_analysis)
+        log.write(test_file_analysis)
+
+        log_file_path = str(os.path.join(param.result_log_folder_path, "0.log"))
+        lines = []
+
+        def append_lines_and_close():
+            """Append new lines after a delay, then send close signal"""
+            time.sleep(0.3)
+            log.write(test_file_analysis)  # Append a new entry
+            with open(log_file_path, "a", encoding="utf-8") as f:
+                f.write("!close!\n")  # Append stop signal
+
+        # Start thread that appends lines
+        thread = threading.Thread(target=append_lines_and_close)
+        thread.start()
+
+        # Follow and collect lines (skip header)
+        for line in log.follow_log(log_file_path, include_header=False):
+            lines.append(line)
+
+        thread.join()
+
+        # Should have 3 data rows + 1 close signal
+        assert len(lines) == 4
+        assert lines[-1] == "!close!"
+        clean_up_log_tests()
+
+    def test_follow_log_with_header(self):
+        """Test that follow_log can include the header line"""
+        import threading
+        import time
+
+        setup_log_tests()
+        log.open_log_file()
+
+        global test_file_analysis
+        log.write(test_file_analysis)
+
+        log_file_path = str(os.path.join(param.result_log_folder_path, "0.log"))
+        lines = []
+        count = 0
+
+        def send_close_signal():
+            time.sleep(0.2)
+            with open(log_file_path, "a", encoding="utf-8") as f:
+                f.write("!close!\n")
+
+        thread = threading.Thread(target=send_close_signal)
+        thread.start()
+
+        for line in log.follow_log(log_file_path, include_header=True):
+            lines.append(line)
+
+        thread.join()
+
+        assert lines[0].startswith("File path analyzed")  # Header
+        assert "!close!" in lines[-1]
+        clean_up_log_tests()
