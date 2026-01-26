@@ -21,6 +21,8 @@ class FileAnalysis:
         created_time: str,
         extra_data: Optional[Any] = None,
         importance: float = 0.0,
+        customized: bool = False,
+        project_id: Optional[str] = None,
     ) -> None:
         self.file_path: str = file_path
         self.file_name: str = file_name

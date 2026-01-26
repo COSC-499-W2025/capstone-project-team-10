@@ -121,7 +121,15 @@ def generate_resume(allow_image: bool = True) -> Path | None:
             for row in reader:
                 # Create FileAnalysis object from CSV row
                 file_analysis: FileAnalysis = FileAnalysis(
-                    row[0], row[1], row[2], row[3], row[4], row[5]
+                    row[0],  # file_path
+                    row[1],  # file_name
+                    row[2],  # file_type
+                    row[3],  # last_modified
+                    row[4],  # created_time
+                    row[5],  # extra_data
+                    float(row[6]) if len(row) > 6 and row[6] else 0.0,  # importance
+                    row[7].lower() == 'true' if len(row) > 7 and row[7] else False,  # customized
+                    row[8] if len(row) > 8 else None,  # project_id
                 )
                 # Format entry header for this file
                 entry_headers: str = (
