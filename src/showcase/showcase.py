@@ -377,7 +377,7 @@ def generate_resume(
                     header_font_size -= 2
 
                 pdf_output.set_font("Noto", size=12)
-                #fa.extra_data = clean_text(fa.extra_data)
+                fa.extra_data = clean_text(fa.extra_data)
                 _, ext = os.path.splitext(fa.file_path)
                 ext = ext.lower()
                 processor = get_processor(fa, ext)
