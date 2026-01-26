@@ -1,3 +1,30 @@
+# T2 - Week 3 (1/18/2025 - 1/25/2025)
+
+![T2 - Week 3 - Task Completed](T2-W3/Done.png)
+
+
+## Features
+
+![T2 - Week 3 - In Progress](T2-W3/Features.png)
+<!-- ![T2 - Week 3 - In Progress](T2-W3/Features1.png) -->
+
+## Recap
+
+- For term 2 week 3, I worked on the GUI
+  - GUI layout is essential for our app so making it early helps a lot
+  + Things that went well: The layout is finnaly finished
+  - Things that did not went well: Making GUI with python as a desktop app is way harder than webapp since we dont have that much library to work with.
+- I will have to plan with my team for week 4.
+
+
+## Additional Context
+## Team Survey:
+
+
+![Week 14 - Team Survey](W14/Team_Survey_(1).png)
+![Week 14 - Team Survey](W14/Team_Survey_(2).png)
+![Week 14 - Team Survey](W14/Team_Survey_(3).png)
+
 # T2 - Week 2 (1/11/2025 - 1/18/2025)
 
 ![T2 - Week 2 - Task Completed](T2-W2/Done.png)
