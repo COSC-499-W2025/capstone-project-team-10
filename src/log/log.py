@@ -115,6 +115,7 @@ def open_log_file() -> None:
                     "Created time",
                     "Extra data",
                     "Importance",
+                    "Customized",
                     "Project id",
                 ]
             ]
@@ -137,6 +138,7 @@ def write(fileAnalysis: FileAnalysis) -> None:
                 fileAnalysis.created_time,
                 fileAnalysis.extra_data,
                 fileAnalysis.importance,
+                fileAnalysis.customized,
                 fileAnalysis.project_id,
             ]
         )
@@ -144,7 +146,7 @@ def write(fileAnalysis: FileAnalysis) -> None:
 
 # This can be optimized by changing how logs are stored, say as a database or serialized object.
 # But because our log files will be relatively small compared to the total number of files on a system, this should be sufficient for now.
-def update(fileAnalysis: FileAnalysis) -> None:
+def update(fileAnalysis: FileAnalysis, forceUpdate: bool = False) -> None:
     global current_log_file
     if current_log_file == "" or not Path(current_log_file).exists():
         resume_log_file()
@@ -164,18 +166,23 @@ def update(fileAnalysis: FileAnalysis) -> None:
         for row in reader:
             if row[0] == fileAnalysis.file_path:
                 # Write updated row
-                writer.writerow(
-                    [
-                        fileAnalysis.file_path,
-                        fileAnalysis.file_name,
-                        fileAnalysis.file_type,
-                        fileAnalysis.last_modified,
-                        fileAnalysis.created_time,
-                        fileAnalysis.extra_data,
-                        fileAnalysis.importance,
-                        fileAnalysis.project_id,
+                if row[7] == "False" or forceUpdate:
+                    writer.writerow(
+                        [
+                            fileAnalysis.file_path,
+                            fileAnalysis.file_name,
+                            fileAnalysis.file_type,
+                            fileAnalysis.last_modified,
+                            fileAnalysis.created_time,
+                            fileAnalysis.extra_data,
+                            fileAnalysis.importance,
+                            fileAnalysis.customized,
+                            fileAnalysis.project_id,
                     ]
-                )
+                    )
+                else:
+                    # Keep original row if customized is True and not forcing update
+                    writer.writerow(row)
                 updated = True
             else:
                 # Write original row

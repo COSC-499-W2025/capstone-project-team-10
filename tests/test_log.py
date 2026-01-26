@@ -1,4 +1,5 @@
 import os
+from posixpath import curdir
 
 import pytest
 
@@ -51,9 +52,23 @@ test_file_analysis: FileAnalysis = FileAnalysis(
     last_modified="2023-10-01T12:00:00",
     created_time="2023-09-30T11:00:00",
     extra_data="EXTRA EXTRA DATA",
+    importance=0.0,
+    customized=False,
 )
-expectedHeader: str = "File path analyzed,File name,File type,Last modified,Created time,Extra data,Importance"
-expectedBody: str = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,EXTRA EXTRA DATA,0.0"
+
+test_file_analysis_customized: FileAnalysis = FileAnalysis(
+    file_path="tests/testdata/fakeTestFile/file1.txt",
+    file_name="file1.txt",
+    file_type="txt",
+    last_modified="2023-10-01T12:00:00",
+    created_time="2023-09-30T11:00:00",
+    extra_data="EXTRA EXTRA DATA",
+    importance=0.0,
+    customized=True,
+)
+
+expectedHeader: str = "File path analyzed,File name,File type,Last modified,Created time,Extra data,Importance,Customized"
+expectedBody: str = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,EXTRA EXTRA DATA,0.0,False"
 
 
 class TestLog:
@@ -147,7 +162,7 @@ class TestLog:
 
             assert len(lines) == 2  # Header + one entry
             assert lines[0].strip() == expectedHeader
-            expected_updated_body = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,UPDATED EXTRA DATA,0.0"
+            expected_updated_body = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,UPDATED EXTRA DATA,0.0,False"
             assert lines[1].strip() == expected_updated_body
         clean_up_log_tests()
 
@@ -159,4 +174,36 @@ class TestLog:
         log_file_path = str(os.path.join(param.result_log_folder_path, "0.log"))
         print("Checking: " + log_file_path)
         assert checkLogOutput(log_file_path)
+        clean_up_log_tests()
+
+    def test_log_update_blocked(self):
+        setup_log_tests()
+        log.open_log_file()
+        global test_file_analysis_customized
+        log.write(test_file_analysis_customized)
+        modified_test_file_analysis = FileAnalysis(
+            file_path=test_file_analysis_customized.file_path,
+            file_name=test_file_analysis_customized.file_name,
+            file_type=test_file_analysis_customized.file_type,
+            last_modified=test_file_analysis_customized.last_modified,
+            created_time=test_file_analysis_customized.created_time,
+            extra_data="SHOULD NOT UPDATE",
+            customized=True,
+        )
+        log.update(modified_test_file_analysis)
+        # Read the produced file, check that the last line is NOT updated
+        log_file_path = str(os.path.join(param.result_log_folder_path, "0.log"))
+        with open(log_file_path, "r") as log_file:
+            lines = log_file.readlines()
+            print("Log file contents after blocked update:")
+            for line in lines:
+                print(line, end="")
+
+            assert len(lines) == 2  # Header + one entry
+            assert lines[0].strip() == expectedHeader
+            assert (
+                lines[1].strip()
+                == "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,EXTRA EXTRA DATA,0.0,True"
+            )
+        # Should be unchanged
         clean_up_log_tests()
