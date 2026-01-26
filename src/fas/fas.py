@@ -34,7 +34,6 @@ class FileAnalysis:
         self.extra_data = _make_json_safe(extra_data)
         self.importance = importance
         self.customized = customized
-
         self.project_id = project_id
     def to_json(self) -> dict:
         return {
