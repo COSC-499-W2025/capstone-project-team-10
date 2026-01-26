@@ -10,26 +10,26 @@ There will be 3 machines set up with the terminal open and with the python virtu
 
 - **Simple Zip Scan:**
 
-> "you have a  zip folder at `./sample-folder2/zipfolder.zip`, can you use the cli to scan it?"
+> "you have a  zip folder at `"tests\testdata\test_peer_testing\testScanFolder.zip"`, can you use the cli to scan it?"
 >
 > **Command: (For group members conducting the evaluation)**  
-`python -m src.main --zip "./sample-folder2/zipfolder.zip"`
+`python -m src.main --zip "tests\testdata\test_peer_testing\testScanFolder.zip"`
 
 - **Simple Resume Scan:**
 
-> "Now run a scan and generate a Resume PDF from the folder `./sample-folder` and check the output file" (we will determine the name and contents of the folder later on).
+> "Now run a scan and generate a Resume PDF from the folder `tests\testdata\test_peer_testing` and check the output file".
 >
 > **Command:**  
- `python -m src.main "./sample-folder" --cli -r` or  
-`python -m src.main "./sample-folder" --cli -y -r`
+ `python -m src.main "tests\testdata\test_peer_testing" --cli -r -c` or  
+`python -m src.main "tests\testdata\test_peer_testing" --cli -y -r -c`
 
 - **Specific File type scan:**
 
 > "Run the same scan you just did for a resume, except this time filter it to only use .java files."  
 >
 > **Command:**  
-`python -m src.main "./sample-folder" --cli --file-types java -r` or  
-`python -m src.main "./sample-folder" --cli --file-types java -y -r` or any variation that generates a valid file.
+`python -m src.main "tests\testdata\test_peer_testing" --cli --file-types java -r -c` or  
+`python -m src.main "tests\testdata\test_peer_testing" --cli --file-types java -y -r -c` or any variation that generates a valid file.
 
 - **Checking output:**
 
@@ -37,18 +37,18 @@ There will be 3 machines set up with the terminal open and with the python virtu
 
 - **Time Filter scan:**
 
-> "Run a scan to generate a portfolio from the folder `./sample-folder` and filter it to only go through files created after April 2025."  
+> "Run a scan to generate a portfolio from the folder `tests\testdata\test_peer_testing` and filter it to only go through files created after April 2025."  
 >
 > **Command:**  
-`python -m src.main "./sample-folder" --cli -y -p --after 2025-04-01` or  
-`python -m src.main "./sample-folder" --cli -y -p -a 2025-04-01`
+`python -m src.main "tests\testdata\test_peer_testing" --cli -y -p --after 2025-04-01 -c` or  
+`python -m src.main "tests\testdata\test_peer_testing" --cli -y -p -a 2025-04-01 -c`
 
 - **Super Detailed Scan:**
 
-> "generate a skills timeline of files created before December 2025 and exclude the file at `./sample-folder/pathToBeExcluded` and only scan git commits from the user `JohnDoe`" (Placeholder git user).
+> "generate a skills timeline of files created before February 2026 and exclude the file at `./sample-folder/pathToBeExcluded` and only scan git commits from the user `JohnDoe`" (Placeholder git user).
 >
 >**Command:**  
-`python -m src.main "./sample-folder" --cli -y -t -b 2025-12-01 --exclude-paths "./sample-folder/pathToBeExcluded" -g JohnDoe`  
+`python -m src.main "tests\testdata\test_peer_testing" --cli -y -c -t -b 2026-02-01 --exclude-paths "tests\testdata\test_peer_testing\sample.txt" -g JohnDoe`  
 
 ### Notes
 
