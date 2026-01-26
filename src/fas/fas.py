@@ -92,8 +92,8 @@ def get_created_time(file_path: str) -> str:
     if hasattr(st, "st_birthtime"):  # macOS
         return datetime.datetime.fromtimestamp(st.st_birthtime).isoformat()
     else:  # Windows/Linux fallback
-        # return datetime.datetime.fromtimestamp(st.st_ctime).isoformat()
-        return datetime.datetime.fromtimestamp(st.st_birthtime).isoformat()
+        return datetime.datetime.fromtimestamp(st.st_ctime).isoformat()
+        # return datetime.datetime.fromtimestamp(st.st_birthtime).isoformat()
 
 
 def get_file_name(file_path: str) -> str:
