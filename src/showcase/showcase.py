@@ -241,9 +241,8 @@ def parse_markdown_file(file_analysis: FileAnalysis):
     header_text = header if header else "Markdown Document"
     languages_text = ", ".join(code_blocks) if code_blocks else "No code blocks"
     skills_text = ", ".join(paragraphs) if paragraphs else "Document Analysis"
-    return (
-        f"Project: {header_text}\nWord Count: {word_count} | Languages: {languages_text}\nKey Skills demonstrated in this project: {skills_text}",
-    )
+    return f"Project: {header_text}\nWord Count: {word_count} | Languages: {languages_text}\nKey Skills demonstrated in this project: {skills_text}"
+
 
 
 def parse_extra_data(extra_data_raw):
@@ -378,7 +377,7 @@ def generate_resume(
                     header_font_size -= 2
 
                 pdf_output.set_font("Noto", size=12)
-                fa.extra_data = clean_text(fa.extra_data)
+                #fa.extra_data = clean_text(fa.extra_data)
                 _, ext = os.path.splitext(fa.file_path)
                 ext = ext.lower()
                 processor = get_processor(fa, ext)
@@ -754,6 +753,9 @@ def generate_skill_timeline() -> Path | None:
                     row.get("Last modified", ""),
                     row.get("Created time", ""),
                     row.get("Extra data", ""),
+                    float(row.get("Importance", 0)) if row.get("Importance") else 0.0,
+                    row.get("Customized", "").lower() == 'true' if row.get("Customized") else False,
+                    row.get("Project id", ""),
                 )
                 skills = extract_skills(fa.extra_data)
                 if not skills:

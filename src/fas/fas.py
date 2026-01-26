@@ -20,17 +20,16 @@ class FileAnalysis:
         file_type: str,
         last_modified: str,
         created_time: str,
-        project_id: str,
         extra_data: Optional[Any] = None,
         importance: float = 0.0,
         customized: bool = False,
+        project_id: Optional[str] = None,
     ) -> None:
         self.file_path: str = file_path
         self.file_name: str = file_name
         self.file_type: str = file_type
         self.last_modified: str = last_modified
         self.created_time: str = created_time
-        # self.extra_data: Optional[Any] = extra_data
         self.extra_data = _make_json_safe(extra_data)
         self.importance = importance
         self.customized = customized
