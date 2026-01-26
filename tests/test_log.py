@@ -54,6 +54,7 @@ test_file_analysis: FileAnalysis = FileAnalysis(
     extra_data="EXTRA EXTRA DATA",
     importance=0.0,
     customized=False,
+    project_id="ID-1",
 )
 
 test_file_analysis_customized: FileAnalysis = FileAnalysis(
@@ -65,10 +66,11 @@ test_file_analysis_customized: FileAnalysis = FileAnalysis(
     extra_data="EXTRA EXTRA DATA",
     importance=0.0,
     customized=True,
+    project_id="ID-2",
 )
 
-expectedHeader: str = "File path analyzed,File name,File type,Last modified,Created time,Extra data,Importance,Customized"
-expectedBody: str = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,EXTRA EXTRA DATA,0.0,False"
+expectedHeader: str = "File path analyzed,File name,File type,Last modified,Created time,Extra data,Importance,Customized,Project id"
+expectedBody: str = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,EXTRA EXTRA DATA,0.0,False,ID-1"
 
 
 class TestLog:
@@ -150,6 +152,7 @@ class TestLog:
             last_modified=test_file_analysis.last_modified,
             created_time=test_file_analysis.created_time,
             extra_data="UPDATED EXTRA DATA",
+            project_id=test_file_analysis.project_id,
         )
         log.update(modified_test_file_analysis)
         # Read the produced file, check that the last line is updated
@@ -162,7 +165,7 @@ class TestLog:
 
             assert len(lines) == 2  # Header + one entry
             assert lines[0].strip() == expectedHeader
-            expected_updated_body = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,UPDATED EXTRA DATA,0.0,False"
+            expected_updated_body = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,UPDATED EXTRA DATA,0.0,False,ID-1"
             assert lines[1].strip() == expected_updated_body
         clean_up_log_tests()
 
@@ -189,6 +192,7 @@ class TestLog:
             created_time=test_file_analysis_customized.created_time,
             extra_data="SHOULD NOT UPDATE",
             customized=True,
+            project_id=test_file_analysis_customized.project_id,
         )
         log.update(modified_test_file_analysis)
         # Read the produced file, check that the last line is NOT updated
@@ -203,7 +207,7 @@ class TestLog:
             assert lines[0].strip() == expectedHeader
             assert (
                 lines[1].strip()
-                == "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,EXTRA EXTRA DATA,0.0,True"
+                == "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,EXTRA EXTRA DATA,0.0,True,ID-2"
             )
         # Should be unchanged
         clean_up_log_tests()

@@ -31,6 +31,7 @@ MOCK_FILE_RESULT.file_type = "Python"
 MOCK_FILE_RESULT.last_modified = datetime(2024, 11, 1)
 MOCK_FILE_RESULT.created_time = datetime(2024, 1, 15)
 MOCK_FILE_RESULT.extra_data = {"lines": 100}
+MOCK_FILE_RESULT.project_id = "test_id"
 
 # Mocks the Path calls
 @pytest.fixture
@@ -83,7 +84,7 @@ def mock_param():
 @pytest.fixture
 def mock_fas():
     with patch('src.fas.fas_git_grouping.fas') as mock_fas:
-        mock_fas.run_fas.return_value = MOCK_FILE_RESULT
+        mock_fas.analyze_file.return_value = MOCK_FILE_RESULT
         yield mock_fas
 
 # Mock os functions
@@ -107,7 +108,7 @@ def test_add_repository_complete_output(mock_os, mock_fas, mock_param, mock_repo
     mock_git_class.return_value.files.return_value = MOCK_GIT_FILES_RAW
     mock_repo_class.return_value.get_authors.return_value = MOCK_AUTHORS
     mock_repo_class.return_value.get_commits_content.return_value = MOCK_COMMITS
-    mock_fas.run_fas.return_value = MOCK_FILE_RESULT
+    mock_fas.analyze_file.return_value = MOCK_FILE_RESULT
     mock_os.path.join = lambda *args: "/".join(args)
     mock_os.path.isfile.return_value = True
     
@@ -124,16 +125,16 @@ def test_add_repository_complete_output(mock_os, mock_fas, mock_param, mock_repo
     # Verify git_output structure
     assert "author" in git_output
     assert "title" in git_output
-    assert "subject" in git_output
     assert "created" in git_output
     assert "modified" in git_output
     assert "extra data" in git_output
     assert "commits" in git_output
+    assert "repo_id" in git_output
     
     # Verify git_output values
     assert git_output["author"] == MOCK_AUTHORS
     assert git_output["title"] == MOCK_RESOLVED_PATH_STR
-    assert git_output["subject"] == "Git Repo"
+    assert git_output["repo_id"] == MOCK_RESOLVED_PATH_STR
     assert git_output["created"] == MOCK_CREATED_DATE
     assert git_output["modified"] == MOCK_MODIFIED_DATE
     
@@ -155,7 +156,7 @@ def test_add_repository_custom_id(mock_os, mock_fas, mock_param, mock_repo_class
     mock_param.get.return_value = "test_user"
     mock_git_class.return_value.files.return_value = []
     mock_repo_class.return_value.get_commits_content.return_value = []
-    mock_fas.run_fas.return_value = None
+    mock_fas.analyze_file.return_value = None
     mock_os.path.isfile.return_value = False
     mock_pydriller_repo.return_value.traverse_commits.return_value = []
 
@@ -163,6 +164,7 @@ def test_add_repository_custom_id(mock_os, mock_fas, mock_param, mock_repo_class
     git_output = grouping.add_repository(MOCK_REPO_PATH, repo_id=MOCK_CUSTOM_ID)
     
     assert git_output["title"] == MOCK_CUSTOM_ID
+    assert git_output["repo_id"] == MOCK_CUSTOM_ID
     assert MOCK_CUSTOM_ID in grouping.repositories
     assert MOCK_CUSTOM_ID in grouping.files
     assert MOCK_CUSTOM_ID in grouping.commits
@@ -174,7 +176,7 @@ def test_add_repository_custom_id(mock_os, mock_fas, mock_param, mock_repo_class
 @patch('src.fas.fas_git_grouping.os')
 def test_get_repo_files_with_analysis(mock_os, mock_fas, mock_git_class):
     mock_git_class.return_value.files.return_value = ["test_file.py"]
-    mock_fas.run_fas.return_value = MOCK_FILE_RESULT
+    mock_fas.analyze_file.return_value = MOCK_FILE_RESULT
     mock_os.path.join = lambda *args: "/".join(args)
     mock_os.path.isfile.return_value = True
     
@@ -187,6 +189,7 @@ def test_get_repo_files_with_analysis(mock_os, mock_fas, mock_git_class):
     assert files[0]["Last modified"] == MOCK_FILE_RESULT.last_modified
     assert files[0]["Created time"] == MOCK_FILE_RESULT.created_time
     assert files[0]["Extra data"] == {"lines": 100}
+    assert files[0]["Project id"] == "test_id"
 
 # Test get_repo_files filtering
 @patch('src.fas.fas_git_grouping.Git')
@@ -194,7 +197,7 @@ def test_get_repo_files_with_analysis(mock_os, mock_fas, mock_git_class):
 @patch('src.fas.fas_git_grouping.os')
 def test_get_repo_files_filters_correctly(mock_os, mock_fas, mock_git_class):
     mock_git_class.return_value.files.return_value = MOCK_GIT_FILES_RAW
-    mock_fas.run_fas.return_value = MOCK_FILE_RESULT
+    mock_fas.analyze_file.return_value = MOCK_FILE_RESULT
     mock_os.path.join = lambda *args: "/".join(args)
     mock_os.path.isfile.return_value = True
     
@@ -209,7 +212,7 @@ def test_get_repo_files_filters_correctly(mock_os, mock_fas, mock_git_class):
 @patch('src.fas.fas_git_grouping.os')
 def test_get_repo_files_removes_git_suffix(mock_os, mock_fas, mock_git_class):
     mock_git_class.return_value.files.return_value = []
-    mock_fas.run_fas.return_value = None
+    mock_fas.analyze_file.return_value = None
     mock_os.path.isfile.return_value = False
     
     grouping = GitGrouping()
@@ -225,7 +228,7 @@ def test_get_repo_files_git_exception(mock_git_class):
     grouping = GitGrouping()
     files = grouping.get_repo_files("/any/path", "test_id")
     
-    assert files == set()
+    assert files == []
 
 # Test get_repo_dates success
 @patch('src.fas.fas_git_grouping.PyDrillerRepo')
@@ -317,6 +320,7 @@ def test_categorize_messages():
     assert "feature" in categories
     assert "docs" in categories
     assert "refactor" in categories
+    assert "fix" in categories
     assert "style" in categories
     assert "other" in categories
 
@@ -356,12 +360,12 @@ def test_git_grouping_initial_state():
 @patch('src.fas.fas_git_grouping.param')
 @patch('src.fas.fas_git_grouping.fas')
 @patch('src.fas.fas_git_grouping.os')
-def test_multiple_repositories(mock_os, mock_fas, mock_param, mock_repo_class,mock_pydriller_repo, mock_git_class, mock_path_resolve):
+def test_multiple_repositories(mock_os, mock_fas, mock_param, mock_repo_class, mock_pydriller_repo, mock_git_class, mock_path_resolve):
     # Setup basic mocks
     mock_param.get.return_value = "test_user"
     mock_git_class.return_value.files.return_value = []
     mock_repo_class.return_value.get_commits_content.return_value = []
-    mock_fas.run_fas.return_value = None
+    mock_fas.analyze_file.return_value = None
     mock_os.path.isfile.return_value = False
     mock_pydriller_repo.return_value.traverse_commits.return_value = []
     
