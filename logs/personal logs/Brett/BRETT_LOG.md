@@ -1,3 +1,15 @@
+# Week 17 (1/19/2026 = 1/25/2026) ** TERM 2 **
+
+![Week 17 Tasks](Week17/Week17Tasks.png)
+
+## Features
+
+![Week 17 KanBan](Week17/Week17KanBan1.png)
+![Week 17 KanBan](Week17/Week17KanBan2.png)
+
+## Recap
+This week we continued GUI work and more importantly worked towards completing the new requirements from milestone 2. I completed the integration of the zip_app.py module with the fss.py module. This now gives the fss the functionality of searching through zip files and passing them to the analysis service. I did not need to make changes to the zip_app.py module, but fixed a bug in the fss module generating windows permission errors. I also updated and integrated the file selection in the GUI to work with the new layout toby made. I was working on this last week but it did not conform to the gui design we built, but I updated it so it now should. Next week I want to add file hashing to detect files that have already been scanned.
+
 # Week 16 (1/12/2026 = 1/18/2026) ** TERM 2 **
 
 ![Week 16 Tasks](Week16/Week16Tasks.png)
