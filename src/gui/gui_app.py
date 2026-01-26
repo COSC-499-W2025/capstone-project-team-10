@@ -90,9 +90,6 @@ def run_gui():
             shutil.rmtree(eula_folder)
         window.show_eula_prompt(eula_folder, persisted_eula)
     #Other Content Loading ->
-    else:
-        # Displays file selector for now but this should be changed to the main menu screen or whatever the home window will be
-        window.show_file_selector()
 
     window.show()
     sys.exit(app.exec_())

@@ -1,8 +1,9 @@
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QListWidget
+    QLabel, QListWidget ,QStackedWidget
 )
 from PyQt5.QtCore import Qt
+from src.gui.gui_file_selection import FileSelectionWidget
 
 # ---------- UI Color Constants ----------
 HEADER_BG_COLOR = "#002145"
@@ -58,14 +59,15 @@ class AppShell(QWidget):
             }}
             """)
 
-        self.sidebar.addItems([
+        self.page_names = [
             "Dashboard",
             "Scan",
             "Adding Files",
             "Resume",
             "Portfolio",
             "Settings",
-        ])
+        ]
+        self.sidebar.addItems(self.page_names)
         self.sidebar.setFixedWidth(180)
         self.sidebar.currentTextChanged.connect(self.change_page)
         main_layout.addWidget(self.sidebar)
@@ -91,19 +93,60 @@ class AppShell(QWidget):
         """)
         right_layout.addWidget(self.header)
 
-        # Content area
-        self.content = QLabel("Dashboard content goes here")
-        self.content.setAlignment(Qt.AlignCenter)
-        right_layout.addWidget(self.content, 1)  # stretch=1 to fill space
+        self.content_stack = QStackedWidget()
+        right_layout.addWidget(self.content_stack, 1)
+
+        self.pages = {}
+        
+        # Create each page for the stack
+        for name in self.page_names:
+            self.pages[name] = self._create_page(name)  # Called once per page
+            self.content_stack.addWidget(self.pages[name])
 
         main_layout.addWidget(right_area, 1)  # right_area stretches
 
         # Set first page
         self.sidebar.setCurrentRow(0)
 
+    def _create_page(self, page_name: str) -> QWidget | None:
+        "Function to create a widget for each page."
+        match page_name:
+            case "Dashboard":
+                # TODO: Add DashboardWidget
+                return self._create_placeholder(page_name)
+
+            case "Scan":
+                return FileSelectionWidget()
+
+            case "Adding Files":
+                # TODO: Add AddingFilesWidget
+                return self._create_placeholder(page_name)
+
+            case "Resume":
+                # TODO: Add ResumeWidget
+                return self._create_placeholder(page_name)
+
+            case "Portfolio":
+                # TODO: Add PortfolioWidget
+                return self._create_placeholder(page_name)
+
+            case "Settings":
+                # TODO: Add SettingsWidget
+                return self._create_placeholder(page_name)
+
+    def _create_placeholder(self, page_name: str) -> QWidget:
+        """Create a placeholder label for pages not yet implemented."""
+        label = QLabel(f"{page_name} content goes here")
+        label.setAlignment(Qt.AlignCenter)
+        return label
+
     def change_page(self, page_name: str):
         self.header.setText(page_name)
-        self.content.setText(f"{page_name} content goes here")
+        self.content_stack.setCurrentWidget(self.pages[page_name])
 
         if self.on_page_change:
             self.on_page_change(page_name)
+
+    def get_page(self, page_name: str) -> QWidget | None:
+        """Access a specific page widget by name."""
+        return self.pages.get(page_name)
