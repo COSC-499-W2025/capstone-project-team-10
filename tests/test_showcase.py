@@ -9,20 +9,8 @@ from unittest.mock import MagicMock, patch
 import src.showcase.showcase as showcase
 from src.fas.fas import FileAnalysis
 
-import src.fas.fas_docx as docx
-import src.fas.fas_rtf as rtf
-import src.fas.fas_odt as odt
-
 import pdfplumber
 from bs4 import BeautifulSoup
-
-
-docx_file_path = os.path.join("tests", "testdata", "test_showcase","docx_test.docx")
-docx_result = docx.extract_docx_data(docx_file_path)
-rtf_file_path = os.path.join("tests", "testdata", "test_fas","fas_rtf_data.rtf")
-rtf_result = rtf.extract_rtf_data(rtf_file_path)
-odt_file_path = os.path.join("tests", "testdata", "test_fas","fas_odt_data.odt")
-odt_result = odt.extract_odt_data(odt_file_path)
 
 resume_file_path = os.path.join("tests", "testdata", "test_showcase", "test_resume.pdf")
 PDF_PATH = Path(resume_file_path)
@@ -360,7 +348,6 @@ def test_resume_coding_project_key_skills_and_code_complexity():
     assert "Key Skills" in text, "Python project key skills missing"
     assert "Code Complexity" in text, "Python project code complexity missing"
 
-
 def test_portfolio_image_project_contains_image():
     soup = load_portfolio_html()
     # Look for any <img> tags
@@ -398,6 +385,14 @@ def test_portfolio_coding_project_key_skills_and_code_complexity():
     assert "Key Skills" in py_div.get_text(), "Python project missing key skills"
     # Check code complexity
     assert "Code Complexity" in py_div.get_text(), "Python project missing code complexity"
+
+def test_portfolio_markdown_project_header():
+    soup = load_portfolio_html()
+    md_div = soup.find("div", class_="md")
+    assert md_div is not None, "No Markdown project div found"
+    md_text = md_div.get_text()
+    assert "Project:" in md_text, "Markdown project header label missing"
+    assert "Project Overview" in md_text or "Markdown Document" in md_text, "Markdown project title missing"
 
 def test_generate_resume_with_git_single_author():
     """Test resume generation with a single-author git project"""

@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget
 import sys
 from pathlib import Path
 import shutil
+from src.gui.gui_app_shell import AppShell
 import src.gui.gui_eula_mgr.gui_perms_prompt as perms_prompt
 import src.gui.gui_file_selection as file_selection
 import src.param.param as param
@@ -10,13 +11,19 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Team 10 Capstone")
-        self.setMinimumSize(400, 300)
+        self.setMinimumSize(900, 600)
 
         self.stack = QStackedWidget()
         self.setCentralWidget(self.stack)
 
-        self.main_content = QWidget()
-        self.stack.addWidget(self.main_content)
+        # self.main_content = QWidget()
+        # self.stack.addWidget(self.main_content)
+        # Shared app state (FAS results, etc.)
+        self.app_state = {}
+
+        # Main application UI
+        self.app_shell = AppShell(on_page_change=self.on_page_change)
+        self.stack.addWidget(self.app_shell)
 
         self.eula_prompt = None 
         self.file_selector = None
@@ -48,11 +55,30 @@ class MainWindow(QMainWindow):
         self.stack.setCurrentWidget(self.file_selector)
 
     def restore_main_content(self):
-        self.stack.setCurrentWidget(self.main_content)
+        self.stack.setCurrentWidget(self.app_shell)
         if self.eula_prompt is not None:
             self.stack.removeWidget(self.eula_prompt)
             self.eula_prompt.deleteLater()
             self.eula_prompt = None
+            
+    def on_page_change(self, page_name: str):
+        """
+        Central navigation + data logic
+        """
+        if page_name == "Dashboard":
+            pass
+
+        elif page_name == "Scan":
+            pass
+
+        elif page_name == "Resume":
+            pass
+
+        elif page_name == "Portfolio":
+            pass
+
+        elif page_name == "Settings":
+            pass
 
 def run_gui():
     app = QApplication(sys.argv)

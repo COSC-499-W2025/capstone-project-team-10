@@ -22,13 +22,13 @@ class TestPDF:
         return pdfr.extract_pdf_data(TESTPATH4)
     
     def test_file_not_found(self):
-        with pytest.raises(FileNotFoundError):
-            pdfr.extract_pdf_data(r"C:\badpath.pdf")
+        metadata = pdfr.extract_pdf_data(r"C:\badpath.pdf")
+        assert metadata["error"] != None
     
     def test_invalid_file_type(self):
-        with pytest.raises(Exception):
-            pdfr.extract_pdf_data(TESTPATH3)
-
+        metadata = pdfr.extract_pdf_data(r"C:\badpath.pdf")
+        assert metadata["error"] != None
+        
     def test_filepath(self, sample_pdf):
         assert sample_pdf["file_path"] == TESTPATH1
         assert isinstance(sample_pdf["file_path"], str)

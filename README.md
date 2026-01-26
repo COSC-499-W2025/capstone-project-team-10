@@ -399,3 +399,172 @@ To run the text_analysis.py make sure you run setup_nltk_data.py first.
     - The user may generate a chronological list of projects using the -t or --skill_timeline_entries flag
 
 #### Tickets for "Functional Requirements" Have been closed if they have been met by current functionality
+
+## Milestone 2 Compliance:
+
+### "API" Compliance
+
+Because of how our project design differs from other groups its very important that we highlight the seperation of the Backend functionality and the front-end processing. To fulfill this requirement we are required to use singular functions with arguments as entry points for functionality.
+
+Good examples of this are the FSS and FAS usage, calling the function with arguments gives a single output that is usable by the GUI
+
+Since we are not using a web-app we do not have to fulfill requirement #31 "Use a FastAPI to faciliate the communication between the backend and the frontend"
+
+The API requirements we must fulfil are
+
+#### POST /projects/upload:
+
+- [ ] the FSS must be reworked to call the zip extractor itself
+
+#### POST /privacy-consent
+
+- [X] Fulfilled by the GUI call to display the privacy prompt
+
+#### GET /projects
+
+- [ ] Fulfilled by having the GUI access lines from the log file through the log API
+
+#### GET /projects/{id}
+
+- Fulfilled by having the GUI access lines from the log file through the log API
+
+#### GET /skills
+
+Some additional work may need to be completed for this feature, as we could create a different log to store extracted skills but this may require a 
+non-trivial amount of rework for the CLI
+
+- [ ] I highly recommend that this be completed in order to abide by the requirements, even though it is not strictly necessary from a 
+functionality perspective
+
+#### GET /resume/{id}
+
+- [ ] A new resume API is needed to fulfill this requirement, making the program store created resumes in application storage
+
+#### POST /resume/generate
+
+- [ ] Fulfilled by Showcase functionality
+
+#### POST /resume/{id}/edit
+
+- [ ] New Showcase functionality is needed to facilitate the editing of resume objects
+
+#### GET /portfolio/{id}
+
+- [ ] A new portfolio API is needed to fulfill this requirement, making the program store created portfolios in application storage
+
+#### POST /portfolio/generate
+
+- [X] Fulfilled by Showcase functionality
+
+#### POST /portfolio/{id}/edit
+
+- [ ] New Showcase functionality is needed to facilitate the editing of portfolio objects
+
+### Other Milestone 2 requirements
+
+#### [X] Allow incremental information by adding another zipped folder of files for the same portfolio or résumé that incorporates additional information at a later point in time
+
+Logs allow for incremental scans. 
+
+#### [ ] Recognize duplicate files and maintains only one in the system
+
+System does not maintain files from user-space in its own database
+
+#### [ ] Allow users to choose which information is represented (e.g., re-ranking of projects, corrections to chronology, attributes for project comparison, skills to highlight, projects selected for showcase)
+
+Unimplemented
+
+#### [X] Incorporate a key role of the user in a given project
+
+Uncertain what this means, but we do create user specific skills and outcomes for collaborative projects.
+
+#### [X] Incorporate evidence of success (e.g., metrics, feedback, evaluation) for a given project
+
+Users measures of success (amount of contributions, and skills contributed) are recorded for collaborative projects
+
+#### [ ] Allow user to associate a portfolio image for a given project to use as the thumbnail
+
+Unimplemented
+
+#### [ ] Customize and save information about a portfolio showcase project
+
+Unimplemented
+
+#### [ ] Customize and save the wording of a project used for a résumé item
+
+Unimplemented
+
+#### [ ] Display textual information about a project as a portfolio showcase
+
+Unimplemented
+
+#### [ ] Display textual information about a project as a résumé item
+
+Unimplemented
+
+#### [ ] You need to provide at least two zipped test data files for the same project, one as a snapshot at an earlier point in time, and another as a snapshot later in time that could have additional/modified files, with the following directory structure:
+test-data.zip:
+./code_collab_proj/app/
+./code_collab_proj/test/
+./code_collab_proj/doc/
+etc.
+
+#### [ ] You need to provide at least one zipped test data file that has multiple projects, showcasing individual and collaborative projects. If you have code and non-code projects, be sure to provide test data for those too. The directory structure should resemble the following:
+test-data.zip:
+./code_indiv_proj/
+./code_collab_proj/
+./text_indiv_proj/
+./image_indiv_proj/
+etc.
+
+#### [X] Your API endpoints must be tested as if they are being called over HTTP but without running a real server, ensuring the correct status code and expected data.
+
+Unclear how this applies to us, but our Unit tests do check outputs from their function calls 
+
+#### [ ] Your system must have clear documentation for all of the API endpoints
+
+README lacks specific information about function calls
+
+
+### Notes and Rework Required After Assessment:
+
+After carefully combing over the functionality it appears that the main areas that require rewrites are:
+
+#### [ ] FSS
+
+- Rework the function calls to be more API like
+- Make the FSS responsible for processing zipped folders
+
+#### [ ] Project Grouping rewrites
+
+- Grouping will have to be rewritten to allow for customized project grouping
+
+#### [ ] Logging and FAS rewrites
+
+- We may require rewriting how the logs/FileAnalysis objects are structured to allow for customized project grouping
+shift away from logging individual files and logging "Projects" that contain files. the file analysis can remain but must be encapsulated.
+Where this encapsulation happens is up to the developer, I do suggest moving it into the FAS though to keep the logging dynamic
+- May require rewrites to support attaching an image to a project. 
+
+#### [ ] Showcase rewrites
+
+- Showcase may have to have its own logging system to allow for modification, without influencing the scan logs, or being overwritten by future updates. this depends on how modification is implemented, and can change. Two birds can be killed with one stone by implementing the versioning and saving of generated outputs inside the application data. This may have adverse effects on the user if saving lots of info, so I suggest implementing a hard ceiling of 10 resumes to persist, any new ones generated delete the oldest one. We can have this parameterized for user control. 
+- We are also going to have to make it more "resume" like with fields for the user to enter other information about themselves
+
+#### [ ] All backend functionality
+
+- Ensure that "backend" functions are API like in nature, every class shall only have one function that can be called by the GUI/CLI
+- Ensure that "backend" functions are documented like an API, with inputs, and expected outputs defined. Specifically focus on 
+    - Success -> Output
+    - Failure -> Output
+
+Status:
+- [ ] FAS
+- [ ] FSS
+- [ ] Log
+- [ ] Showcase
+- [ ] Zip
+
+### GUI Development:
+
+The GUI development/planning shall begin when the design is finalized
