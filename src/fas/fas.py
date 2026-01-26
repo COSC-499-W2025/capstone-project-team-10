@@ -225,7 +225,7 @@ def analyze_path(file_path: str, project_id: Optional[str] = None) -> Optional[F
 
 
 def run_fas(file_path: str, project_id: Optional[str] = None) -> Optional[FileAnalysis]:
-    return analyze_path(file_path, project_id=project_id)
+    return analyze_path(file_path, project_id)
 
 
 
