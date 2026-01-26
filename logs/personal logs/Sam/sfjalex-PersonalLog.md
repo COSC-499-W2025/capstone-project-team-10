@@ -1,3 +1,22 @@
+# Term 2 Week 3 (01/19/2026 - 01/25/2026)
+
+![Term Two Week Three Tasks](Term2Week3/WeekThreeTasks.png)
+
+# Features
+
+![Term Two Week Three Feature One](Term2Week3/WeekThreeFeatureOne.png)
+![Term Two Week Three Feature Two](Term2Week3/WeekThreeFeatureTwo.png)
+
+# Recap
+
+This week I focused on adding a new parameter to the logs to allow for better and more comprehensive project grouping. By adding a new attribute to the logs and CSV to ensure we can filter by project ID, which is automatically added for files in a git repo via the repo ID, and can be manually adjusted via the log editor and preserved with the customized attribute Adam created this week. As well I spent a large chunk of time fixing an issue that arose from the showcase updates that prevented resumes from being generated on scans containing git repos.
+
+Next week I intend to finish the ticket I was working on by implementing filtering by log attributes, to let the GUI make a call and only display elements that have a specific project ID or attribute, to display only user specified objects.
+
+Code Reviews:
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/201 - Peer testing preparations doc 
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/193 - Add 'customized' flag to FileAnalysis and log update logic
+
 # Term 2 Week 2 (01/12/2026 - 01/18/2026)
 
 ![Term Two Week Two Tasks](Term2Week2/WeekTwoTasks.png)
