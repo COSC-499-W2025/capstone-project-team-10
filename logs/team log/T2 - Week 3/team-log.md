@@ -24,6 +24,9 @@
 ## In-Review
 <img width="1140" height="232" alt="image" src="https://github.com/user-attachments/assets/e2d002ff-6a45-4386-a0f5-07abfb037c26" />
 
+## Test suite
+<img width="1948" height="52" alt="image" src="https://github.com/user-attachments/assets/7b680de8-47fb-47d6-b728-51d03c5cf521" />
+
 ## Reflection
 - Currently, the team is working hard to implement the GUI format of the program - we realized that a lot of our work is not "GUI-future-proof" - and are running through a myriad of the code-base to pinpoint the missing functionality to get the GUI machine running.
 - Delegating backend and frontend would prove to be a hard task, since if one is doing a portion of the functionality for the frontend, they would have to have a good understanding of the specific parts of the backend (which they might not have a firm hold of), proving to be quite a hassle to maintain streamlineness. Discussions and further planning will be needed to have better fluidity in progress and work.
