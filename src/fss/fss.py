@@ -77,6 +77,8 @@ def search(search_params: FSS_Search):
             next(reader)  # Skip header
             for file_details in reader:
                 log_entries.append(file_details)
+                
+        # Update log details after closing file
         for file_details in log_entries:
             file_analysis: fas.FileAnalysis = fas.FileAnalysis(
                 file_details[0],
