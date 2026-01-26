@@ -1,14 +1,14 @@
 import datetime
+import json
 import mimetypes
 import os
 from typing import Any, Optional
-import json
+
+from src.fas.fas_code_reader import CodeReader
+from src.fas.fas_extra_data import get_file_extra_data
 from src.fss.repo_reader import Repository
 from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
 from utils.libraries_mappings import LIBRARY_SKILL_MAP as lsm
-from src.fas.fas_code_reader import CodeReader
-from src.fas.fas_extra_data import get_file_extra_data
-
 
 
 class FileAnalysis:
@@ -21,6 +21,7 @@ class FileAnalysis:
         created_time: str,
         extra_data: Optional[Any] = None,
         importance: float = 0.0,
+        customized: bool = False,
     ) -> None:
         self.file_path: str = file_path
         self.file_name: str = file_name
@@ -30,6 +31,8 @@ class FileAnalysis:
         # self.extra_data: Optional[Any] = extra_data
         self.extra_data = _make_json_safe(extra_data)
         self.importance = importance
+        self.customized = customized
+
     def to_json(self) -> dict:
         return {
             # "file_path": self.file_path,
@@ -40,7 +43,7 @@ class FileAnalysis:
             "extra_data": _make_json_safe(self.extra_data),
             # "importance": self.importance,
         }
-    
+
 
 def _make_json_safe(value):
     if isinstance(value, dict):
@@ -53,6 +56,7 @@ def _make_json_safe(value):
         return value.isoformat()
     # fallback: convert to string
     return str(value)
+
 
 # def get_file_type(file_path: str) -> str:
 #     # First, try to get the file extension
@@ -69,6 +73,7 @@ def _make_json_safe(value):
 
 #     return "unknown"
 
+
 def get_file_type(file_path: str) -> str:
     # Special-case: git repository folder
     if os.path.isdir(file_path) and os.path.basename(file_path) == ".git":
@@ -81,6 +86,7 @@ def get_file_type(file_path: str) -> str:
         return "unknown"
 
     return file_name.rsplit(".", 1)[-1].lower()
+
 
 def get_last_modified_time(file_path: str) -> str:
     st = os.stat(file_path)
@@ -127,37 +133,38 @@ def compute_importance(file_type: str, extra_data: Optional[Any]) -> float:
     }
     # Language-specific importance scores
     language_scores = {
-        "python": 9,        
-        "javascript": 9,    
-        "typescript": 8,    
-        "java": 8,          
-        "kotlin": 7,        
-        "c": 7,             
-        "cpp": 8,           
-        "csharp": 7,        
-        "php": 6,          
-        "ruby": 5,         
-        "go": 7,            
-        "rust": 8,          
-        "swift": 6,         
-        "perl": 4,          
-        "shell": 5,         
-        "haskell": 4,       
-        "ocaml": 4,        
-        "elixir": 5,        
-        "r": 6,             
-        "matlab": 5,        
-        "pascal": 3,        
+        "python": 9,
+        "javascript": 9,
+        "typescript": 8,
+        "java": 8,
+        "kotlin": 7,
+        "c": 7,
+        "cpp": 8,
+        "csharp": 7,
+        "php": 6,
+        "ruby": 5,
+        "go": 7,
+        "rust": 8,
+        "swift": 6,
+        "perl": 4,
+        "shell": 5,
+        "haskell": 4,
+        "ocaml": 4,
+        "elixir": 5,
+        "r": 6,
+        "matlab": 5,
+        "pascal": 3,
     }
 
-     # If extra_data contains canonical language, use language_scores
-    
+    # If extra_data contains canonical language, use language_scores
+
     if isinstance(extra_data, dict) and "language" in extra_data:
         language = extra_data["language"]
-        importance = language_scores.get(language, 5)  # default 5 if language not in dict
+        importance = language_scores.get(
+            language, 5
+        )  # default 5 if language not in dict
     else:
         importance = base_scores.get(file_type.lower(), 1)
-  
 
     # Boost importance if file contains meaningful content
     try:
@@ -170,8 +177,8 @@ def compute_importance(file_type: str, extra_data: Optional[Any]) -> float:
             importance += extra_data.get("image_count", 0) * 0.1
 
         if "libraries" in extra_data:
-                lib_count = len(extra_data["libraries"])
-                importance += lib_count * 0.6   # each library adds complexity
+            lib_count = len(extra_data["libraries"])
+            importance += lib_count * 0.6  # each library adds complexity
     except:
         pass  # extra_data might not be structured
 
@@ -213,6 +220,7 @@ def analyze_path(file_path: str) -> Optional[FileAnalysis]:
 def run_fas(file_path: str) -> Optional[FileAnalysis]:
     return analyze_path(file_path)
 
+
 def analyze_file_json(file_path: str) -> Optional[FileAnalysis]:
     file_name = get_file_name(file_path)
     file_type = get_file_type(file_path)
@@ -230,6 +238,7 @@ def analyze_file_json(file_path: str) -> Optional[FileAnalysis]:
         extra_data=extra_data,
         importance=importance,
     ).to_json()
+
 
 def analyze_path_json(file_path: str) -> Optional[FileAnalysis]:
     if not os.path.exists(file_path):
@@ -251,7 +260,7 @@ if __name__ == "__main__":
     result = run_fas(test_path)
     resultJSON = run_fas_json(test_path)
     if result:
-        # print(result.__dict__)   
+        # print(result.__dict__)
         print(result)
         print(json.dumps(result.__dict__, indent=2))
     else:
