@@ -2,7 +2,8 @@
 [Term 1](#term-1)  
 
 [Term 2](#term-2)  
-[Week 2](#week-2-1112026---1182026)
+[Week 2](#week-2-1112026---1182026)  
+[Week 3](week-3-1182026---1252026)
 
 # Term 1
 # Week 3 (9/14/2025 -  9/21/2025)
@@ -106,3 +107,14 @@ https://github.com/COSC-499-W2025/capstone-project-team-10/pull/177
 
 ### Recap
 This week I worked on making preparations for peer testing next week, I have laid out a document as to how the stations will be setup, what our introduction will be, and what tasks will be given out to the testers. Next week we will flesh out and get everything ready for peer testing while we also work on implementing some of the GUI features.
+
+## Week 3 (1/18/2026 - 1/25/2026)
+<img width="1086" height="646" alt="image" src="https://github.com/user-attachments/assets/0dd093b8-601b-4331-b35a-89f40e201a87" />
+
+### Tasks
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/201
+### Reviews
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/202
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/194
+### Recap
+We finished preparations for peer testing and everything is set and organized. Started working on getting the GUI to access projects id from the log folder, still in progress so should be pushed by next week.
