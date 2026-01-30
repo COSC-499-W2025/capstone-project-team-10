@@ -1,4 +1,5 @@
 import csv
+import time
 import re
 from pathlib import Path
 
@@ -193,3 +194,32 @@ def update(fileAnalysis: FileAnalysis, forceUpdate: bool = False) -> None:
     else:
         # Replace original file with updated file
         Path(temp_path).replace(current_log_file)
+
+
+def follow_log(file_path: str | None = None, include_header: bool = False, poll_interval: float = 0.5,
+               stop_signal: str = "!close!"):
+    """
+    Generator that yields log lines as they appear in the file.
+    Polls the file and waits for new lines to be added.
+    Stops when a line containing stop_signal is encountered.
+    """
+    global current_log_file
+
+    if file_path is None:
+        if current_log_file == "" or not Path(current_log_file).exists():
+            resume_log_file()
+        file_path = current_log_file
+
+    with open(file_path, "r", encoding="utf-8", newline="") as f:
+        if not include_header:
+            f.readline()  # skip header line
+
+        while True:
+            line = f.readline()
+            if line:
+                stripped = line.rstrip("\r\n")
+                yield stripped
+                if stop_signal in stripped:
+                    break
+            else:
+                time.sleep(poll_interval)
