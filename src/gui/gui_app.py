@@ -10,7 +10,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Team 10 Capstone")
-        self.setMinimumSize(900, 600)
+        self.setMinimumSize(1500, 1000)
 
         self.stack = QStackedWidget()
         self.setCentralWidget(self.stack)
