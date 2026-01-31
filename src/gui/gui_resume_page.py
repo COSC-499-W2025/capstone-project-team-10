@@ -155,7 +155,9 @@ class ResumePage(QWidget):
         self.file_type_edit.setText(fa.file_type)
         self.created_time_edit.setText(fa.created_time)
         self.last_modified_edit.setText(fa.last_modified)
-        self.extra_data_edit.setText(fa.extra_data)
+        # self.extra_data_edit.setText(fa.extra_data)
+        self.extra_data_edit.setText(self.manager.get_key_skills_csv(project_name))
+
 
     def save_changes(self):
         """Save current edits back to the ResumeManager (and log)."""
@@ -167,10 +169,15 @@ class ResumePage(QWidget):
             "file_type": self.file_type_edit.text(),
             "created_time": self.created_time_edit.text(),
             "last_modified": self.last_modified_edit.text(),
-            "extra_data": self.extra_data_edit.toPlainText(),
+            # "extra_data": self.extra_data_edit.toPlainText(),
         }
 
         self.manager.update_project_info(self.current_project_name, mods)
+        
+        self.manager.set_key_skills_from_csv(
+            self.current_project_name,
+            self.extra_data_edit.toPlainText()
+        )
 
         # Refresh project list in case name changed
         self.refresh_project_list()

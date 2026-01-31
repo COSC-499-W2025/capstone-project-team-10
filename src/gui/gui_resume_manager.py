@@ -3,7 +3,10 @@ import csv
 from typing import Dict, Any, Optional
 import src.log.log as log
 import src.showcase.showcase as showcase
+import ast
+
 from src.fas.fas import FileAnalysis
+
 
 
 class ResumeManager:
@@ -66,3 +69,54 @@ class ResumeManager:
         """Generate full resume PDF from current projects."""
         # Ensure current log is up-to-date
         return showcase.generate_resume(output_file_path=output_path)
+    
+    def _parse_extra_data(self, extra_data_raw):
+        if isinstance(extra_data_raw, dict):
+            return extra_data_raw
+
+        if isinstance(extra_data_raw, str):
+            try:
+                parsed = ast.literal_eval(extra_data_raw)
+                if isinstance(parsed, dict):
+                    return parsed
+            except:
+                pass
+
+        return {}
+    
+    # Note that the CSV here is a simple comma-separated list of skills and not a full .CSV format
+    def get_key_skills_csv(self, project_name: str) -> str:
+        fa = self.projects.get(project_name)
+        if not fa:
+            return ""
+
+        extra_dict = self._parse_extra_data(fa.extra_data)
+        key_skills = extra_dict.get("key_skills", [])
+
+        if isinstance(key_skills, list):
+            return ", ".join([str(x).strip() for x in key_skills if str(x).strip()])
+
+        # if it was stored weirdly
+        if isinstance(key_skills, str):
+            return key_skills.strip()
+
+        return ""
+
+    def set_key_skills_from_csv(self, project_name: str, skills_csv: str) -> bool:
+        fa = self.projects.get(project_name)
+        if not fa:
+            return False
+
+        extra_dict = self._parse_extra_data(fa.extra_data)
+
+        # turn "Python, SQL, Git" -> ["Python", "SQL", "Git"]
+        skills = [s.strip() for s in skills_csv.split(",") if s.strip()]
+
+        extra_dict["key_skills"] = skills
+
+        # store back as string (same format your log expects)
+        fa.extra_data = str(extra_dict)
+
+        log.update(fa, forceUpdate=True)
+        self.projects[project_name] = fa
+        return True
