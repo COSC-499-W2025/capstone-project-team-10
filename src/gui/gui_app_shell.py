@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 
 from src.gui.gui_resume_page import ResumePage  
+from src.gui.gui_portfolio_page import PortfolioPage
 
 
 # ---------- UI Color Constants ----------
@@ -111,8 +112,9 @@ class AppShell(QWidget):
 
         self.page_resume = ResumePage()
 
-        self.page_portfolio = QLabel("Portfolio content goes here")
-        self.page_portfolio.setAlignment(Qt.AlignCenter)
+        # self.page_portfolio = QLabel("Portfolio content goes here")
+        # self.page_portfolio.setAlignment(Qt.AlignCenter)
+        self.page_portfolio = PortfolioPage()
 
         self.page_settings = QLabel("Settings content goes here")
         self.page_settings.setAlignment(Qt.AlignCenter)

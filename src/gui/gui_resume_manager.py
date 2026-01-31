@@ -70,6 +70,11 @@ class ResumeManager:
         # Ensure current log is up-to-date
         return showcase.generate_resume(output_file_path=output_path)
     
+    def get_full_portfolio(self, output_path: Optional[Path] = None) -> Path | None:
+        """Generate full portfolio from current projects."""
+        # Ensure current log is up-to-date
+        return showcase.generate_portfolio(output_file_path=output_path)
+    
     def _parse_extra_data(self, extra_data_raw):
         if isinstance(extra_data_raw, dict):
             return extra_data_raw
