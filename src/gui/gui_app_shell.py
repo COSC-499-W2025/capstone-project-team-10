@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (
     QLabel, QListWidget
 )
 from PyQt5.QtCore import Qt
+from src.gui.gui_scan_page import ScanPage
 
 # ---------- UI Color Constants ----------
 HEADER_BG_COLOR = "#002145"
