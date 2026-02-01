@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt
 
-from src.gui.gui_resume_page import ResumePage  
+from src.gui.gui_resume_page import ResumePage
 from src.gui.gui_portfolio_page import PortfolioPage
 
 
@@ -30,6 +30,26 @@ class AppShell(QWidget):
         main_layout.setSpacing(0)
 
         # ---------- Sidebar ----------
+        # Now header + sidebar list
+        left_area = QWidget()
+        left_layout = QVBoxLayout(left_area)
+        left_layout.setContentsMargins(0, 0, 0, 0)
+        left_layout.setSpacing(0)
+
+        self.header = QLabel("")  # keep blank
+        self.header.setFixedHeight(70)
+        self.header.setAlignment(Qt.AlignCenter)
+        self.header.setStyleSheet(f"""
+            QLabel {{
+                background-color: {HEADER_BG_COLOR};
+                color: white;
+                font-size: 18px;
+                font-weight: bold;
+            }}
+        """)
+        left_layout.addWidget(self.header)
+
+        # Sidebar list
         self.sidebar = QListWidget()
         self.sidebar.setStyleSheet(f"""
             QListWidget {{
@@ -71,30 +91,19 @@ class AppShell(QWidget):
         ]
         self.sidebar.addItems(self.sidebar_items)
 
-        self.sidebar.setFixedWidth(180)
+        self.sidebar.setFixedWidth(220)
         self.sidebar.currentTextChanged.connect(self.change_page)
-        main_layout.addWidget(self.sidebar)
+
+        left_layout.addWidget(self.sidebar, 1)
+
+        # Add left area to main layout
+        main_layout.addWidget(left_area)
 
         # ---------- Right area ----------
         right_area = QWidget()
         right_layout = QVBoxLayout(right_area)
         right_layout.setContentsMargins(0, 0, 0, 0)
         right_layout.setSpacing(0)
-
-        # Header
-        self.header = QLabel("Dashboard")
-        self.header.setAlignment(Qt.AlignCenter)
-        self.header.setFixedHeight(50)
-        self.header.setStyleSheet(f"""
-            QLabel {{
-                font-size: 18px;
-                font-weight: bold;
-                padding: 12px;
-                background-color: {HEADER_BG_COLOR};
-                color: white;
-            }}
-        """)
-        right_layout.addWidget(self.header)
 
         # ---------- Content stack ----------
         self.content_stack = QStackedWidget()
@@ -111,9 +120,6 @@ class AppShell(QWidget):
         self.page_add_files.setAlignment(Qt.AlignCenter)
 
         self.page_resume = ResumePage()
-
-        # self.page_portfolio = QLabel("Portfolio content goes here")
-        # self.page_portfolio.setAlignment(Qt.AlignCenter)
         self.page_portfolio = PortfolioPage()
 
         self.page_settings = QLabel("Settings content goes here")
@@ -127,13 +133,13 @@ class AppShell(QWidget):
         self.content_stack.addWidget(self.page_portfolio)   # index 4
         self.content_stack.addWidget(self.page_settings)    # index 5
 
+        # Add right area to main layout
         main_layout.addWidget(right_area, 1)
 
         # Set first page
         self.sidebar.setCurrentRow(0)
 
     def change_page(self, page_name: str):
-        self.header.setText(page_name)
 
         # Switch stack page
         if page_name == "Dashboard":
