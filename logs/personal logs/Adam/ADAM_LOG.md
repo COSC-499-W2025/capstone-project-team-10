@@ -1,3 +1,52 @@
+# Term 2 Week 4 (01/25/2026 - 02/01/2026):
+
+## Completed tasks
+
+All in review features will be merged by the end of the week
+
+![Term 2 Week 4 Tasks completed](T2W4/image.png)
+
+## Features
+
+![Term 2 Week 4 Inprogress](T2W4/image-1.png)
+
+## Recap
+
+#### 1. Example test data for M2
+
+For this week I compiled a collection of test data for the testing of our Milestone two. These are a range of files from our test data and some personal projects/school work that is good to analyze
+
+PRS: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/205
+
+
+##### Tickets:
+
+1. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/172
+
+### For next week:
+
+For next week I will be implementing a settings screen in the GUI views for editing parameters. This will allow users to persist their settings after a scan
+
+##### Tickets:
+
+1. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/208
+
+## Additional Context
+
+I was originally going to be making the resume editor, but Toby ended taking it because of a miscommunication, so I had to find something last minute.
+
+### What went well:
+
+I found a number of good files for use in our milestone 2 demo 
+
+### What didnt go well:
+
+Some of my work from last week was overwritten by Toby due to a miscommunication about my involvement with the showcase
+
+## Team Survey:
+
+Survey completed
+
 # Term 2 Week 3 (01/18/2026 - 01/25/2026):
 
 ## Completed tasks
