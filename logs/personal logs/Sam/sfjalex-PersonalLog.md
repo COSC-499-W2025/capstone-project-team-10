@@ -1,3 +1,20 @@
+# Term 2 Week 4 (01/26/2026 - 02/01/2026)
+
+There is no survey this week
+Note: I realized I forgot to press submit on the survey from last week even though I had completed it.
+
+# Features
+
+![Term Two Week Four Feature One](Term2Week4/TermTwoWeekFourFeatureOne.png)
+![Term Two Week Four Feature Two](Term2Week4/TermTwoWeekFourFeatureTwo.png)
+
+# Recap
+
+This week I continued to work on enhancing the project grouping by focusing on the filtering and creating the GUI for both the dashboard as well as the project tab that I intend to link to it. However this week I was not able to fully complete the feature that I wanted to, at least to the standard that I thought acceptable for the capstone project. 
+
+Since there is technically no required contributions this week I will be continuing my work from this week into the next week. So my plan to complete for these two combined weeks is to finish the dashboard as well as the project grouping tab and filtering, along with the ability to manually add or remove files from a given project.
+
+
 # Term 2 Week 3 (01/19/2026 - 01/25/2026)
 
 ![Term Two Week Three Tasks](Term2Week3/WeekThreeTasks.png)
