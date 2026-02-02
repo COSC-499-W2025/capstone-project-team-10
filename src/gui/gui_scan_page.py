@@ -20,7 +20,7 @@ class ScanPage(QtWidgets.QWidget):
         self.layout.addStretch()
         
         # Title
-        self.title_label = QtWidgets.QLabel("File Analysis Scan")
+        self.title_label = QtWidgets.QLabel("Scan!")
         self.title_label.setAlignment(QtCore.Qt.AlignCenter)
         self.title_label.setStyleSheet("font-size: 16px; font-weight: bold;")
         self.layout.addWidget(self.title_label)
@@ -89,8 +89,12 @@ class ScanPage(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(self, "No Filters", "Please choose filters first.")
             return
         
-        # TODO: Pass filters and directory to scan_manager
-        QtWidgets.QMessageBox.information(self, "Scan Started", f"Scanning {self.selected_directory} with filters applied.")
+        # Emit signal with scan parameters
+        scan_params = {
+            'directory': self.selected_directory,
+            'filters': self.current_filters
+        }
+        self.scan_started.emit(scan_params)
     
     def display_filters(self, filters):
         """Display the applied filters"""
@@ -118,3 +122,6 @@ class ScanPage(QtWidgets.QWidget):
         
         self.filter_summary.setText(summary)
         self.filter_summary.setVisible(True)
+
+    # Add signal at class level
+    scan_started = QtCore.pyqtSignal(dict)
