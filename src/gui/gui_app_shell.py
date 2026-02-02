@@ -6,6 +6,9 @@ from PyQt5.QtCore import Qt
 
 from src.gui.gui_scan_page import ScanPage
 from src.gui.gui_scan_results import ScanResultsPage
+from src.gui.gui_resume_page import ResumePage
+from src.gui.gui_portfolio_page import PortfolioPage
+
 
 # ---------- UI Color Constants ----------
 HEADER_BG_COLOR = "#002145"
@@ -140,6 +143,26 @@ class AppShell(QWidget):
         self.page_scan.scan_started.connect(self.on_scan_started)
         self.page_scan_results.back_to_scan.connect(lambda: self.change_page("Scan"))
         
+        self.page_scan = QLabel("Scan content goes here")
+        self.page_scan.setAlignment(Qt.AlignCenter)
+
+        self.page_add_files = QLabel("Adding Files content goes here")
+        self.page_add_files.setAlignment(Qt.AlignCenter)
+
+        self.page_resume = ResumePage()
+        self.page_portfolio = PortfolioPage()
+
+        self.page_settings = QLabel("Settings content goes here")
+        self.page_settings.setAlignment(Qt.AlignCenter)
+
+        # Add pages to stack (order matters)
+        self.content_stack.addWidget(self.page_dashboard)   # index 0
+        self.content_stack.addWidget(self.page_scan)        # index 1
+        self.content_stack.addWidget(self.page_add_files)   # index 2
+        self.content_stack.addWidget(self.page_resume)      # index 3
+        self.content_stack.addWidget(self.page_portfolio)   # index 4
+        self.content_stack.addWidget(self.page_settings)    # index 5
+
         # Add right area to main layout
         main_layout.addWidget(right_area, 1)
 

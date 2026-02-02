@@ -43,3 +43,6 @@ coverage.xml
 
 # NLTK data files
 utils/nltk_data/*
+docs/demo/demo-collab-new.zip
+docs/demo/demo-collab-old.zip
+docs/demo/demo-multiple.zip

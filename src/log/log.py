@@ -117,6 +117,7 @@ def open_log_file() -> None:
                     "Extra data",
                     "Importance",
                     "Customized",
+                    "Project id",
                 ]
             ]
         )
@@ -139,6 +140,7 @@ def write(fileAnalysis: FileAnalysis) -> None:
                 fileAnalysis.extra_data,
                 fileAnalysis.importance,
                 fileAnalysis.customized,
+                fileAnalysis.project_id,
             ]
         )
 
@@ -176,7 +178,8 @@ def update(fileAnalysis: FileAnalysis, forceUpdate: bool = False) -> None:
                             fileAnalysis.extra_data,
                             fileAnalysis.importance,
                             fileAnalysis.customized,
-                        ]
+                            fileAnalysis.project_id,
+                    ]
                     )
                 else:
                     # Keep original row if customized is True and not forcing update
