@@ -25,14 +25,23 @@ class FilterDialog(QtWidgets.QDialog):
         self.lower_bound_edit.setCalendarPopup(True)
         self.lower_bound_edit.setDateTime(QtCore.QDateTime.currentDateTime())
         self.lower_bound_edit.setDisplayFormat("yyyy-MM-dd HH:mm:ss")
+        self.lower_bound_edit.setEnabled(False)  # Add this - disabled by default
         
         self.upper_bound_edit = QtWidgets.QDateTimeEdit()
         self.upper_bound_edit.setCalendarPopup(True)
         self.upper_bound_edit.setDateTime(QtCore.QDateTime.currentDateTime())
         self.upper_bound_edit.setDisplayFormat("yyyy-MM-dd HH:mm:ss")
+        self.upper_bound_edit.setEnabled(False)  # Add this - disabled by default
         
-        time_layout.addRow("Start Time:", self.lower_bound_edit)
-        time_layout.addRow("End Time:", self.upper_bound_edit)
+        # Add checkboxes to enable time bounds
+        lower_check = QtWidgets.QCheckBox("Use Start Time")
+        lower_check.stateChanged.connect(lambda: self.lower_bound_edit.setEnabled(lower_check.isChecked()))
+        
+        upper_check = QtWidgets.QCheckBox("Use End Time")
+        upper_check.stateChanged.connect(lambda: self.upper_bound_edit.setEnabled(upper_check.isChecked()))
+        
+        time_layout.addRow(lower_check, self.lower_bound_edit)
+        time_layout.addRow(upper_check, self.upper_bound_edit)
         time_group.setLayout(time_layout)
         layout.addWidget(time_group)
         
@@ -123,9 +132,11 @@ class FilterDialog(QtWidgets.QDialog):
             self.filetype_list.takeItem(self.filetype_list.row(current_item))
     
     def get_filters(self):
-        """Returns the configured filters"""
-        self.time_lower_bound = self.lower_bound_edit.dateTime().toPyDateTime()
-        self.time_upper_bound = self.upper_bound_edit.dateTime().toPyDateTime()
+        """
+          Returns the configured filters
+        """
+        self.time_lower_bound = self.lower_bound_edit.dateTime().toPyDateTime() if self.lower_bound_edit.isEnabled() else None
+        self.time_upper_bound = self.upper_bound_edit.dateTime().toPyDateTime() if self.upper_bound_edit.isEnabled() else None
         
         return {
             'excluded_paths': self.excluded_paths,

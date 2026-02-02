@@ -50,6 +50,13 @@ class ScanPage(QtWidgets.QWidget):
         self.layout.addLayout(button_layout)
         self.layout.addStretch()
         
+        # Filter summary section (initially hidden)
+        self.filter_summary = QtWidgets.QLabel()
+        self.filter_summary.setAlignment(QtCore.Qt.AlignCenter)
+        self.filter_summary.setStyleSheet("font-size: 10px; color: blue;")
+        self.filter_summary.setVisible(False)
+        self.layout.addWidget(self.filter_summary)
+        
     def browse_files(self):
         file_dialog = QtWidgets.QFileDialog()
         selected_directory = file_dialog.getExistingDirectory(self, "Select a directory to scan")
@@ -68,5 +75,33 @@ class ScanPage(QtWidgets.QWidget):
         filter_dialog = FilterDialog(self)
         if filter_dialog.exec_() == QtWidgets.QDialog.Accepted:
             filters = filter_dialog.get_filters()
+            self.display_filters(filters)
             # TODO: Pass filters and directory to scan_manager
             QtWidgets.QMessageBox.information(self, "Scan Started", f"Scanning {self.selected_directory} with filters applied.")
+    
+    def display_filters(self, filters):
+        """Display the applied filters"""
+        summary = "Applied Filters:\n"
+        
+        # File types
+        if filters['file_types']:
+            summary += f"File Types: {', '.join(filters['file_types'])}\n"
+        else:
+            summary += "File Types: None\n"
+        
+        # Excluded paths
+        if filters['excluded_paths']:
+            summary += f"Excluded Paths: {len(filters['excluded_paths'])} path(s)\n"
+        else:
+            summary += "Excluded Paths: None\n"
+        
+        # Time bounds
+        if filters['time_lower_bound'] or filters['time_upper_bound']:
+            lower = filters['time_lower_bound'].strftime("%Y-%m-%d %H:%M:%S") if filters['time_lower_bound'] else "None"
+            upper = filters['time_upper_bound'].strftime("%Y-%m-%d %H:%M:%S") if filters['time_upper_bound'] else "None"
+            summary += f"Time Bounds: {lower} to {upper}"
+        else:
+            summary += "Time Bounds: None"
+        
+        self.filter_summary.setText(summary)
+        self.filter_summary.setVisible(True)
