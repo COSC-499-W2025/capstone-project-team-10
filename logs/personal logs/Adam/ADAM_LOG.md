@@ -45,7 +45,7 @@ Some of my work from last week was overwritten by Toby due to a miscommunication
 
 ## Team Survey:
 
-Survey completed
+No Survey Available
 
 # Term 2 Week 3 (01/18/2026 - 01/25/2026):
 
