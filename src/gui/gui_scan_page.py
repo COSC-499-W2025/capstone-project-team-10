@@ -1,23 +1,30 @@
 import PyQt5.QtWidgets as QtWidgets
 import PyQt5.QtCore as QtCore
+from src.gui.gui_scan_manager import ScanManager
+from src.gui.gui_scan_filtering import FilterDialog
 
 class ScanPage(QtWidgets.QWidget):
+
     def __init__(self, parent=None):
+
         super(ScanPage, self).__init__(parent)
         
+        self.scan_manager = ScanManager()
         self.selected_directory = None
         
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignCenter)
         self.layout.setSpacing(20)
         
-        # Placeholder text
-        self.title_label = QtWidgets.QLabel("Select files to scan")
+        self.layout.addStretch()
+        
+        # Scan button
+        self.title_label = QtWidgets.QLabel("Select folder to scan")
         self.title_label.setAlignment(QtCore.Qt.AlignCenter)
         self.title_label.setStyleSheet("font-size: 16px; font-weight: bold;")
         self.layout.addWidget(self.title_label)
         
-        # Directory display label
+        # Directory label
         self.directory_label = QtWidgets.QLabel("No directory selected")
         self.directory_label.setAlignment(QtCore.Qt.AlignCenter)
         self.directory_label.setStyleSheet("font-size: 12px; color: gray;")
@@ -49,11 +56,17 @@ class ScanPage(QtWidgets.QWidget):
         
         if selected_directory:
             self.selected_directory = selected_directory
-            # Print to terminal
-            print(f"Selected directory: {selected_directory}")
             # Display on GUI
             self.directory_label.setText(f"Directory: {selected_directory}")
         
     def start_scan(self):
-        # TODO: Implement scan functionality
-        pass
+        if not self.selected_directory:
+            QtWidgets.QMessageBox.warning(self, "No Directory", "Please select a directory first.")
+            return
+        
+        # Open filter dialog
+        filter_dialog = FilterDialog(self)
+        if filter_dialog.exec_() == QtWidgets.QDialog.Accepted:
+            filters = filter_dialog.get_filters()
+            # TODO: Pass filters and directory to scan_manager
+            QtWidgets.QMessageBox.information(self, "Scan Started", f"Scanning {self.selected_directory} with filters applied.")
