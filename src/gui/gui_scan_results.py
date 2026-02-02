@@ -51,7 +51,9 @@ class ScanResultsPage(QtWidgets.QWidget):
         self.current_stage = "scanning"  # "scanning" or "analysis"
     
     def start_scan_animation(self):
-        """Start the scan animation sequence"""
+        """
+          Start the scan animation sequence
+        """
         self.current_stage = "scanning"
         self.dot_count = 0
         self.file_list.clear()
@@ -62,7 +64,9 @@ class ScanResultsPage(QtWidgets.QWidget):
         self.stage_timer.start(2000)  # Switch to analysis after 2 seconds
     
     def update_animation(self):
-        """Update the animation dots"""
+        """
+          Update the animation dots
+        """
         dots = "." * (self.dot_count % 4)
         
         if self.current_stage == "scanning":
@@ -73,11 +77,12 @@ class ScanResultsPage(QtWidgets.QWidget):
         self.dot_count += 1
     
     def switch_stage(self):
-        """Switch from Scanning to Analysis or finish"""
+        """
+          Switch from Scanning to Analysis or finish
+        """
         if self.current_stage == "scanning":
             self.current_stage = "analysis"
             self.dot_count = 0
-            # Run analysis animation for 2 seconds
             self.stage_timer.start(2000)
         else:
             # Scan complete

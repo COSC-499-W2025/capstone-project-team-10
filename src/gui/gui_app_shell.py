@@ -174,7 +174,9 @@ class AppShell(QWidget):
             self.on_page_change(page_name)
 
     def on_scan_started(self, scan_params):
-        """Switch to results page and start animation"""
+        """
+            Switch to results page and start animation
+        """
         self.change_page("scan_results")
         self.page_scan_results.start_scan_animation()
 

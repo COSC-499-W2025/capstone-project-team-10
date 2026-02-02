@@ -74,7 +74,6 @@ class ScanPage(QtWidgets.QWidget):
             self.directory_label.setText(f"Directory: {selected_directory}")
     
     def open_filter_dialog(self):
-        """Open the filter dialog"""
         filter_dialog = FilterDialog(self)
         if filter_dialog.exec_() == QtWidgets.QDialog.Accepted:
             self.current_filters = filter_dialog.get_filters()
@@ -96,8 +95,7 @@ class ScanPage(QtWidgets.QWidget):
         }
         self.scan_started.emit(scan_params)
     
-    def display_filters(self, filters):
-        """Display the applied filters"""
+    def display_filters(self, filters): # Can be removed later
         summary = "Applied Filters:\n"
         
         # File types
