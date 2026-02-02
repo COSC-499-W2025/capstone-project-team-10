@@ -1,4 +1,32 @@
-# T2 - Week 3 (1/18/2025 - 1/25/2025)
+# T2 - Week 1 (1/25/2026 - 2/01/2026)
+
+![T2 - Week 1 - Task Completed](T2-W4/Done.png)
+![T2 - Week 1 - Task Completed](T2-W4/Done1.png)
+
+
+## Features
+
+![T2 - Week 1 - In Progress](T2-W4/Features.png)
+![T2 - Week 1 - In Progress](T2-W4/Features1.png)
+
+## Recap
+
+- For term 2 week 1, I worked on the the GUI editor for resume and portfolio, I also make it so that the GUI match the design we did closely
+  + Things that went well: The GUI is actually very good
+  - Things that did not went well: On my machine only, the choosing log function crash my laptop everytime so I can't test it myself. The API-ish implementation is also a bit complicated
+- I will start work on the resume showing if possible next week
+
+
+## Additional Context
+## Team Survey:
+
+![Week 14 - Team Survey](T2-W4/Team_Survey.png)
+![Week 14 - Team Survey](T2-W4/Team_Survey_(1).png)
+![Week 14 - Team Survey](T2-W4/Team_Survey_(2).png)
+![Week 14 - Team Survey](T2-W4/Team_Survey_(3).png)
+
+
+# T2 - Week 3 (1/18/2026 - 1/25/2026)
 
 ![T2 - Week 3 - Task Completed](T2-W3/Done.png)
 
@@ -25,7 +53,7 @@
 ![Week 14 - Team Survey](W14/Team_Survey_(2).png)
 ![Week 14 - Team Survey](W14/Team_Survey_(3).png)
 
-# T2 - Week 2 (1/11/2025 - 1/18/2025)
+# T2 - Week 2 (1/11/2026 - 1/18/2026)
 
 ![T2 - Week 2 - Task Completed](T2-W2/Done.png)
 
@@ -52,7 +80,7 @@
 ![Week 14 - Team Survey](W14/Team_Survey_(2).png)
 ![Week 14 - Team Survey](W14/Team_Survey_(3).png)
 
-# T2 - Week 1 (1/5/2025 - 1/11/2025)
+# T2 - Week 1 (1/5/2026 - 1/11/2026)
 
 ![T2 - Week 1 - Task Completed](T2-W1/Done.png)
 ![T2 - Week 1 - Task Completed](T2-W1/Done1.png)
