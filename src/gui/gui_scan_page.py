@@ -11,6 +11,7 @@ class ScanPage(QtWidgets.QWidget):
         
         self.scan_manager = ScanManager()
         self.selected_directory = None
+        self.current_filters = None
         
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignCenter)
@@ -18,8 +19,8 @@ class ScanPage(QtWidgets.QWidget):
         
         self.layout.addStretch()
         
-        # Scan button
-        self.title_label = QtWidgets.QLabel("Select folder to scan")
+        # Title
+        self.title_label = QtWidgets.QLabel("File Analysis Scan")
         self.title_label.setAlignment(QtCore.Qt.AlignCenter)
         self.title_label.setStyleSheet("font-size: 16px; font-weight: bold;")
         self.layout.addWidget(self.title_label)
@@ -35,13 +36,19 @@ class ScanPage(QtWidgets.QWidget):
         button_layout.setSpacing(15)
         button_layout.setAlignment(QtCore.Qt.AlignCenter)
         
-        # Top button - Browse files
-        self.browse_button = QtWidgets.QPushButton("Browse Files", self)
+        # Button 1 - Choose directory
+        self.browse_button = QtWidgets.QPushButton("Choose Directory", self)
         self.browse_button.setFixedSize(200, 50)
         self.browse_button.clicked.connect(self.browse_files)
         button_layout.addWidget(self.browse_button, alignment=QtCore.Qt.AlignCenter)
         
-        # Bottom button - Start scan
+        # Button 2 - Choose filters
+        self.filter_button = QtWidgets.QPushButton("Choose Filters", self)
+        self.filter_button.setFixedSize(200, 50)
+        self.filter_button.clicked.connect(self.open_filter_dialog)
+        button_layout.addWidget(self.filter_button, alignment=QtCore.Qt.AlignCenter)
+        
+        # Button 3 - Start scan
         self.scan_button = QtWidgets.QPushButton("Start Scan", self)
         self.scan_button.setFixedSize(200, 50)
         self.scan_button.clicked.connect(self.start_scan)
@@ -65,19 +72,25 @@ class ScanPage(QtWidgets.QWidget):
             self.selected_directory = selected_directory
             # Display on GUI
             self.directory_label.setText(f"Directory: {selected_directory}")
+    
+    def open_filter_dialog(self):
+        """Open the filter dialog"""
+        filter_dialog = FilterDialog(self)
+        if filter_dialog.exec_() == QtWidgets.QDialog.Accepted:
+            self.current_filters = filter_dialog.get_filters()
+            self.display_filters(self.current_filters)
         
     def start_scan(self):
         if not self.selected_directory:
             QtWidgets.QMessageBox.warning(self, "No Directory", "Please select a directory first.")
             return
         
-        # Open filter dialog
-        filter_dialog = FilterDialog(self)
-        if filter_dialog.exec_() == QtWidgets.QDialog.Accepted:
-            filters = filter_dialog.get_filters()
-            self.display_filters(filters)
-            # TODO: Pass filters and directory to scan_manager
-            QtWidgets.QMessageBox.information(self, "Scan Started", f"Scanning {self.selected_directory} with filters applied.")
+        if self.current_filters is None:
+            QtWidgets.QMessageBox.warning(self, "No Filters", "Please choose filters first.")
+            return
+        
+        # TODO: Pass filters and directory to scan_manager
+        QtWidgets.QMessageBox.information(self, "Scan Started", f"Scanning {self.selected_directory} with filters applied.")
     
     def display_filters(self, filters):
         """Display the applied filters"""
