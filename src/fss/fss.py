@@ -2,6 +2,7 @@ import csv
 import os
 from datetime import date, datetime
 from pathlib import Path
+from typing import Optional
 
 import src.fas.fas as fas
 import src.log.log as log
@@ -27,6 +28,7 @@ class FSS_Search:
 def search(search: FSS_Search):
     exclude_flag = True
     num_of_files_scanned = 0
+    num_of_duplicates_found = 0
     excluded_set = set()
 
     if not os.path.exists(search.input_path):
@@ -126,12 +128,47 @@ def search(search: FSS_Search):
                 "create",
             ):
                 continue
+
             # TODO add in FAS and return value, pass in file and set of repo paths for grouping
             # Given no exclusion this is where details about scanned files can be extracted.
-            file_result: fas.FileAnalysis | None = fas.run_fas(file_path)
-            # Pass file result to log module for logging
+
+            file_result = get_duplicate_from_log(file_path)
+
             if file_result:
                 log.write(file_result)
-                # Pass file result to GUI/CLI if necessary
-            num_of_files_scanned += 1
+                num_of_duplicates_found += 1
+            else:
+                file_result: fas.FileAnalysis | None = fas.run_fas(file_path)
+                # Pass file result to log module for logging
+                if file_result:
+                    log.write(file_result)
+                    # Pass file result to GUI/CLI if necessary
+                num_of_files_scanned += 1
+            
     return num_of_files_scanned
+
+def get_duplicate_from_log(file_path: str, project_id: Optional[str] = None) -> fas.FileAnalysis | None:
+    """
+    Checks if file is already analyzed and returns the analysis instead of running new scan
+    """
+    # Computes file hash
+    file_hash = fas.compute_file_hash(file_path)
+    if file_hash is None:
+        return None
+
+    # Checks if file scan exists
+    existing = log.find_existing_analysis(file_hash)
+    if existing is None:
+        return None
+
+    # If file has already been scanned retrives the previous analysis
+    existing.file_path = file_path
+    if project_id is not None:
+        existing.project_id = project_id
+    else:
+        existing.project_id = fas.determine_project_id(
+            file_path, existing.file_type, existing.extra_data
+        )
+    existing.file_hash = file_hash
+
+    return existing

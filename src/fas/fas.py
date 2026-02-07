@@ -1,5 +1,6 @@
 import datetime
 import json
+import hashlib
 import mimetypes
 import os
 from typing import Any, Optional
@@ -24,6 +25,7 @@ class FileAnalysis:
         importance: float = 0.0,
         customized: bool = False,
         project_id: Optional[str] = None,
+        file_hash: Optional[str] = None,
     ) -> None:
         self.file_path: str = file_path
         self.file_name: str = file_name
@@ -34,6 +36,7 @@ class FileAnalysis:
         self.importance = importance
         self.customized = customized
         self.project_id = project_id
+        self.file_hash = file_hash
     def to_json(self) -> dict:
         return {
             # "file_path": self.file_path,
@@ -99,8 +102,8 @@ def get_created_time(file_path: str) -> str:
     if hasattr(st, "st_birthtime"):  # macOS
         return datetime.datetime.fromtimestamp(st.st_birthtime).isoformat()
     else:  # Windows/Linux fallback
-        # return datetime.datetime.fromtimestamp(st.st_ctime).isoformat()
-        return datetime.datetime.fromtimestamp(st.st_birthtime).isoformat()
+        return datetime.datetime.fromtimestamp(st.st_ctime).isoformat()
+        # return datetime.datetime.fromtimestamp(st.st_birthtime).isoformat()
 
 
 def get_file_name(file_path: str) -> str:
@@ -111,6 +114,22 @@ def get_file_name(file_path: str) -> str:
         return os.path.basename(parent_dir)
     return os.path.basename(file_path)
 
+# Uses SHA256 hashing to compute the hash for a file
+def compute_file_hash(file_path: str, algorithm: str = "sha256") -> Optional[str]:
+
+    if os.path.isdir(file_path):
+        h = hashlib.new(algorithm)
+        h.update(file_path.encode("utf-8"))
+        return h.hexdigest()
+
+    try:
+        h = hashlib.new(algorithm)
+        with open(file_path, "rb") as f:
+            for chunk in iter(lambda: f.read(8192), b""):
+                h.update(chunk)
+        return h.hexdigest()
+    except (OSError, IOError):
+        return None
 
 def compute_importance(file_type: str, extra_data: Optional[Any]) -> float:
     """
@@ -193,6 +212,7 @@ def analyze_file(file_path: str, project_id: Optional[str] = None) -> Optional[F
     created_time = get_created_time(file_path)
     extra_data = get_file_extra_data(file_path, file_type)
     importance = compute_importance(file_type, extra_data)
+    file_hash =  compute_file_hash(file_path)
 
     if project_id is None:
         project_id = determine_project_id(file_path, file_type, extra_data)
@@ -206,6 +226,7 @@ def analyze_file(file_path: str, project_id: Optional[str] = None) -> Optional[F
         extra_data=extra_data,
         importance=importance,
         project_id=project_id,
+        file_hash=file_hash,
     )
 
 
@@ -234,6 +255,7 @@ def analyze_file_json(file_path: str) -> Optional[FileAnalysis]:
     created_time = get_created_time(file_path)
     extra_data = get_file_extra_data(file_path, file_type)
     importance = compute_importance(file_type, extra_data)
+    file_hash = compute_file_hash(file_path)
 
     if project_id is None:
         project_id = determine_project_id(file_path, file_type, extra_data)
@@ -247,6 +269,7 @@ def analyze_file_json(file_path: str) -> Optional[FileAnalysis]:
         extra_data=extra_data,
         importance=importance,
         project_id=project_id,
+        file_hash=file_hash,
     ).to_json()
 
 
