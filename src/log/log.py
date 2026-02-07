@@ -119,7 +119,7 @@ def open_log_file() -> None:
                     "Importance",
                     "Customized",
                     "Project id",
-                    "File Hash",
+                    "File hash",
                 ]
             ]
         )
@@ -265,7 +265,7 @@ def find_existing_analysis(file_hash: str) -> Optional[FileAnalysis]:
                 if header is None:
                     continue
 
-                hash_col = header.index("File Hash")
+                hash_col = header.index("File hash")
 
                 for row in reader:
                     if len(row) > hash_col and row[hash_col] == file_hash:
