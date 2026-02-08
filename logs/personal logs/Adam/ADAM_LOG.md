@@ -1,3 +1,52 @@
+# Term 2 Week 5 (02/02/2026 - 02/08/2026):
+
+## Completed tasks
+
+All in review features will be merged by the end of the week
+
+![Term 2 Week 5 Tasks completed](T2W5/image.png)
+
+## Features
+
+![Term 2 Week 5 Inprogress](T2W5/image-1.png)
+
+## Recap
+
+#### 1. GUI Settings page
+
+For this week I completed a settings page for the GUI and allowed it to modify the parameters using the param API. This will allow users to modify the preserved settings for the program
+
+PRS: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/214
+
+
+##### Tickets:
+
+1. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/208
+
+### For next week:
+
+For next week I will be working on the API compliance and documentation for our Backend functionality
+
+##### Tickets:
+
+1. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/215
+
+## Additional Context
+
+N/A
+
+### What went well:
+
+The Parameter page is structured well and I added multiple parts that can be reused
+
+### What didnt go well:
+
+PyQT5 Sucks and styling things is so rough I think Id rather code in assembly at this point
+
+## Team Survey:
+
+Survey Complete
+
 # Term 2 Week 4 (01/25/2026 - 02/01/2026):
 
 ## Completed tasks
