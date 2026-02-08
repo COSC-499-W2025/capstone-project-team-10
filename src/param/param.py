@@ -66,7 +66,6 @@ def load_additional_params() -> None:
         with open(optional_parameters_path, "r", encoding="utf-8") as param_file:
             new_params = json.load(param_file).copy()
             load_defaults()
-            print(f"Loaded additional parameters: {new_params}")
             recursive_update(params, new_params)
     except FileNotFoundError:
         print("No additional parameters file found. Using default parameters.")
