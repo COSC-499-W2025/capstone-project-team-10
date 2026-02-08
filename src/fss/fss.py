@@ -149,7 +149,10 @@ def search(search: FSS_Search):
 
 def get_duplicate_from_log(file_path: str, project_id: Optional[str] = None) -> fas.FileAnalysis | None:
     """
-    Checks if file is already analyzed and returns the analysis instead of running new scan
+    Checks if file is already analyzed and returns the analysis instead of running new scan.
+    Computes the file hash, searches all logs for a match, and returns the cached
+    FileAnalysis with the current file's path and project_id updated.
+    Returns None if no cached analysis exists.
     """
     # Computes file hash
     file_hash = fas.compute_file_hash(file_path)

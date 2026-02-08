@@ -313,6 +313,8 @@ class TestLog:
         log.write(test_file_analysis)
 
         fa = log.find_existing_analysis("x")
-        assert fa != None
+        assert fa is not None
+        assert fa.file_name == "file1.txt"
+        assert fa.file_hash == "x"
 
 
