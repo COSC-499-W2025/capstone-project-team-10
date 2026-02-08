@@ -1,16 +1,19 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QStackedWidget
+import shutil
 import sys
 from pathlib import Path
-import shutil
-from src.gui.gui_app_shell import AppShell
+
+from PyQt5.QtWidgets import QApplication, QMainWindow, QStackedWidget, QWidget
+
 import src.gui.gui_eula_mgr.gui_perms_prompt as perms_prompt
 import src.param.param as param
+from src.gui.gui_app_shell import AppShell
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Team 10 Capstone")
-        self.setMinimumSize(1500, 1000)
+        self.setMinimumSize(700, 700)
 
         self.stack = QStackedWidget()
         self.setCentralWidget(self.stack)
@@ -24,7 +27,7 @@ class MainWindow(QMainWindow):
         self.app_shell = AppShell(on_page_change=self.on_page_change)
         self.stack.addWidget(self.app_shell)
 
-        self.eula_prompt = None 
+        self.eula_prompt = None
 
     def show_eula_prompt(self, eula_folder, persisted_eula):
         # Remove old EULA prompt if it exists
@@ -35,8 +38,7 @@ class MainWindow(QMainWindow):
 
         # Create EULA prompt, passing a callback to restore the main content
         self.eula_prompt = perms_prompt.PermsPromptWindow(
-            persisted_eula,
-            on_accept=self.restore_main_content
+            persisted_eula, on_accept=self.restore_main_content
         )
         self.stack.addWidget(self.eula_prompt)
         self.stack.setCurrentWidget(self.eula_prompt)
@@ -47,7 +49,7 @@ class MainWindow(QMainWindow):
             self.stack.removeWidget(self.eula_prompt)
             self.eula_prompt.deleteLater()
             self.eula_prompt = None
-            
+
     def on_page_change(self, page_name: str):
         """
         Central navigation + data logic
@@ -67,6 +69,7 @@ class MainWindow(QMainWindow):
         elif page_name == "Settings":
             pass
 
+
 def run_gui():
     app = QApplication(sys.argv)
     window = MainWindow()
@@ -76,7 +79,7 @@ def run_gui():
         if eula_folder.is_dir():
             shutil.rmtree(eula_folder)
         window.show_eula_prompt(eula_folder, persisted_eula)
-    #Other Content Loading ->
-    
+    # Other Content Loading ->
+
     window.show()
     sys.exit(app.exec_())
