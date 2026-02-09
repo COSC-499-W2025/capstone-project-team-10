@@ -1,3 +1,17 @@
+# Term 2 Week 5 (02/02/2026 - 02/08/2026)
+
+![Term Two Week Five Tasks](Term2Week5/Term2Week5Tasks.png)
+
+# Features
+
+![Term Two Week Five Feature One](Term2Week5/Term2Week5Feature.png)
+
+# Recap
+
+This week we discussed how our GUI should function when completed to get a more complete picture, as such I completed the dashboard of the GUI, along with a historical view of logs scanned so users can view them just by clicking them if the logs are still on their system.
+
+For this next week I intend to keep working on the grouping by adding a specific page to interact with the project ID value in the logs to manipulate projects manually as well as continuing my work on the GUI with what in all likely hood will be the favourite system to allow us to mark the logs themselves for ease of access for the user and continuous context between session of the application.
+
 # Term 2 Week 4 (01/26/2026 - 02/01/2026)
 
 There is no survey this week
