@@ -48,10 +48,10 @@ class DashboardPage(QWidget):
         """)
         
         recent_widget = self.create_recent_tab()
-        favorite_widget = self.create_favorite_tab()
+        favourite_widget = self.create_favourite_tab()
         
         tab_widget.addTab(recent_widget, "Recent")
-        tab_widget.addTab(favorite_widget, "Favorite")
+        tab_widget.addTab(favourite_widget, "Favourite")
         
         layout.addWidget(tab_widget)
     
@@ -110,18 +110,16 @@ class DashboardPage(QWidget):
         
         return recent_widget
     
-    def create_favorite_tab(self):
-        favorite_widget = QWidget()
-        favorite_layout = QVBoxLayout(favorite_widget)
-        favorite_layout.setContentsMargins(20, 20, 20, 20)
+    def create_favourite_tab(self):
+        favourite_widget = QWidget()
+        favourite_layout = QVBoxLayout(favourite_widget)
+        favourite_layout.setContentsMargins(20, 20, 20, 20)
         
-        self.favorites_table = QTableWidget()
-        self.favorites_table.setColumnCount(3)
-        self.favorites_table.setHorizontalHeaderLabels(["ID", "Size", "Date Created"])
+        self.favourites_table = QTableWidget()
+        self.favourites_table.setColumnCount(3)
+        self.favourites_table.setHorizontalHeaderLabels(["ID", "Size", "Date Created"])
         
-        #self.favorites_table.cellClicked.connect(self.on_favorite_cell_clicked)
-        
-        self.favorites_table.setStyleSheet("""
+        self.favourites_table.setStyleSheet("""
             QTableWidget {
                 background-color: white;
                 gridline-color: #e0e0e0;
@@ -146,24 +144,24 @@ class DashboardPage(QWidget):
             }
         """)
         
-        self.favorites_table.viewport().setCursor(Qt.PointingHandCursor)
+        self.favourites_table.viewport().setCursor(Qt.PointingHandCursor)
         
-        header = self.favorites_table.horizontalHeader()
+        header = self.favourites_table.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
         
-        self.favorites_table.verticalHeader().setVisible(False)
-        self.favorites_table.setSelectionBehavior(QTableWidget.SelectRows)
+        self.favourites_table.verticalHeader().setVisible(False)
+        self.favourites_table.setSelectionBehavior(QTableWidget.SelectRows)
         
-        favorite_layout.addWidget(self.favorites_table)
-        
-        bottom_label = QLabel("Your favorite logs")
+        favourite_layout.addWidget(self.favourites_table)
+
+        bottom_label = QLabel(f"All logs are located at {self.log_dir}")
         bottom_label.setStyleSheet("color: #999; font-size: 12px;")
         bottom_label.setAlignment(Qt.AlignCenter)
-        favorite_layout.addWidget(bottom_label)
+        favourite_layout.addWidget(bottom_label)
         
-        return favorite_widget
+        return favourite_widget
     
     def on_cell_clicked(self, row, column):
         if column == 0:  # First column clicked
