@@ -1,13 +1,39 @@
-# T2 - Week 1 (1/25/2026 - 2/01/2026)
+# T2 - Week 5 (1/18/2026 - 1/25/2026)
 
-![T2 - Week 1 - Task Completed](T2-W4/Done.png)
-![T2 - Week 1 - Task Completed](T2-W4/Done1.png)
+![T2 - Week 5 - Task Completed](T2-W5/Done.png)
 
 
 ## Features
 
-![T2 - Week 1 - In Progress](T2-W4/Features.png)
-![T2 - Week 1 - In Progress](T2-W4/Features1.png)
+![T2 - Week 5 - In Progress](T2-W5/Features.png)
+<!-- ![T2 - Week 3 - In Progress](T2-W3/Features1.png) -->
+
+## Recap
+
+- For term 2 week 5, I worked on the FAS (File Analysis System) for uncommon file types
+  - Since for uncommon file types it does not yet handle this is a must do
+  + Things that went well: Its easier than GUI
+  - Things that did not went well: A lot of bug happen
+- I will have to plan with my team for week 6.
+
+
+## Additional Context
+## Team Survey:
+
+
+![Week 14 - Team Survey](W14/Team_Survey_(1).png)
+![Week 14 - Team Survey](W14/Team_Survey_(2).png)
+![Week 14 - Team Survey](W14/Team_Survey_(3).png)
+# T2 - Week 4 (1/25/2026 - 2/01/2026)
+
+![T2 - Week 4 - Task Completed](T2-W4/Done.png)
+![T2 - Week 4 - Task Completed](T2-W4/Done1.png)
+
+
+## Features
+
+![T2 - Week 4 - In Progress](T2-W4/Features.png)
+![T2 - Week 4 - In Progress](T2-W4/Features1.png)
 
 ## Recap
 
