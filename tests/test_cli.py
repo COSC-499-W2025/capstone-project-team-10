@@ -55,7 +55,6 @@ def patch_dependencies(monkeypatch):
     monkeypatch.setattr(cli, "log", DummyLog())
     monkeypatch.setattr(cli, "param", DummyParam())
     monkeypatch.setattr(cli, "fss", DummyFSS())
-    monkeypatch.setattr(cli, "zip", DummyZip())
     monkeypatch.setattr(cli, "generate_resume", DummyShowcase().generate_resume)
     monkeypatch.setattr(cli, "generate_portfolio", DummyShowcase().generate_portfolio)
 
@@ -70,20 +69,12 @@ def test_prompt_file_perms_no(monkeypatch):
     with pytest.raises(SystemExit):
         cli.prompt_file_perms()
 
-
-def test_extract_chosen_zip():
-    result = cli.extract_chosen_zip("dummy.zip")
-    assert result == Path("/tmp/unzipped")
-
-
 def test_add_cli_args():
     parser = argparse.ArgumentParser()
     cli.add_cli_args(parser)
     args = parser.parse_args(
         [
             "/tmp/file",
-            "--zip",
-            "dummy.zip",
             "--exclude-paths",
             "foo",
             "bar",
@@ -93,7 +84,6 @@ def test_add_cli_args():
         ]
     )
     assert args.file_path == "/tmp/file"
-    assert args.zip == "dummy.zip"
     assert args.exclude_paths == ["foo", "bar"]
     assert args.file_types == ["txt", "md"]
 
@@ -103,8 +93,6 @@ def test_run_cli(monkeypatch):
     test_args = [
         "cli_app.py",
         "/tmp/file",
-        "--zip",
-        "dummy.zip",
         "--exclude-paths",
         "foo",
         "bar",
@@ -162,10 +150,6 @@ def test_run_cli(monkeypatch):
     assert "2022-01-01" in all_output
     assert "2023-01-01" in all_output
 
-    # Check that the zip extraction message is present
-    assert "unzipped" in all_output
-    assert "File unzipped at:" in all_output
-
     # Check that the github username was taken in and correct
     assert "GitHub" in all_output
     assert "test_username" in all_output
@@ -183,8 +167,6 @@ def test_run_cli_quiet(monkeypatch):
     test_args = [
         "cli_app.py",
         "/tmp/file",
-        "--zip",
-        "dummy.zip",
         "--exclude-paths",
         "foo",
         "bar",
@@ -243,10 +225,6 @@ def test_run_cli_quiet(monkeypatch):
     # Check that the bounds string is correct
     assert "2022-01-01" not in all_output
     assert "2023-01-01" not in all_output
-
-    # Check that the zip extraction message is present
-    assert "unzipped" not in all_output
-    assert "File unzipped at:" not in all_output
 
     # Check that the github username was taken in and is correct
     assert "GitHub" not in all_output
