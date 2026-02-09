@@ -7,7 +7,6 @@ from pathlib import Path
 import src.fss.fss as fss
 import src.log.log as log
 import src.param.param as param
-import src.zip.zip_app as zip
 from src.log.log_sorter import LogSorter
 from src.showcase.showcase import (
     generate_portfolio,
@@ -45,17 +44,10 @@ def sort_sequence(log_path):
     print("Sorting finished")
 
 
-def extract_chosen_zip(zip_file_path: str) -> Path | None:
-    file_path = zip.extract_zip(zip_file_path)
-    print(f"File unzipped at: {file_path}")
-    return file_path
-
-
 def add_cli_args(parser: argparse.ArgumentParser):
     parser.add_argument(
         "file_path", nargs="?", help="Path to start search at or zip file to extract."
     )
-    parser.add_argument("--zip", help="Extract the specified zip file.")
     parser.add_argument(
         "--exclude-paths",
         nargs="+",
@@ -153,12 +145,7 @@ def run_cli():
         builtins.print = lambda *a, **k: None
 
     file_path = ""
-    if args.zip:
-        print("Processing Zip File")
-        file_path = extract_chosen_zip(args.zip)
-        if not file_path:
-            sys.exit(0)
-    elif args.file_path:
+    if args.file_path:
         file_path = args.file_path
     else:
         print("No starting file_path provided.")
