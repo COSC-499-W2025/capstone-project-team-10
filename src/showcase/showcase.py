@@ -358,7 +358,17 @@ def generate_resume(
             pdf_output.set_font("Noto", "BI", size=14)
             next(reader)  # Skip header row
             for row in reader:
-                fa = FileAnalysis(*row)
+                fa = FileAnalysis(
+                    file_path=row[0],
+                    file_name=row[1],
+                    file_type=row[2],
+                    last_modified=row[3],
+                    created_time=row[4],
+                    extra_data=row[5],
+                    importance=float(row[6]) if row[6] else 0.0,
+                    customized=row[7].strip().lower() == 'true' if len(row) > 7 else False,
+                    project_id=row[8] if len(row) > 8 else None,
+                )
                 entry_headers = (
                     resume_entry_template.format(
                         project_name=fa.file_name,
@@ -592,7 +602,17 @@ def generate_portfolio(
                 reader = csv.reader(lf)
                 next(reader)  # Skip header row
                 for row in reader:
-                    file_analysis = FileAnalysis(*row)
+                    file_analysis = FileAnalysis(
+                        file_path=row[0],
+                        file_name=row[1],
+                        file_type=row[2],
+                        last_modified=row[3],
+                        created_time=row[4],
+                        extra_data=row[5],
+                        importance=float(row[6]) if row[6] else 0.0,
+                        customized=row[7].strip().lower() == 'true' if len(row) > 7 else False,
+                        project_id=row[8] if len(row) > 8 else None,
+                    )
                     # Copy file to resources folder with correct extension
                     file_analysis_source = Path(file_analysis.file_path)
                     if not file_analysis_source.is_dir():
