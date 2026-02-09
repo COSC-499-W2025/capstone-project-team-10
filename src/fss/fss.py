@@ -41,6 +41,7 @@ def search(search_params: FSS_Search):
         extracted_path = extract_zip(search_params.input_path)
         if not extracted_path:
             return -1
+        print(f"File unzipped at: {extracted_path}")
         temp_search = FSS_Search(
             input_path=str(extracted_path),
             excluded_path=search_params.excluded_path,
