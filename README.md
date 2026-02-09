@@ -140,7 +140,7 @@ python -m src.main <file_path> [command-line-options] --cli
 
 | Option                           | Description                                                                                                                     | Example                                         |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `--zip <zipfile>`                | Extract the specified zip file and scan its contents.                                                                           | `--zip myprojects.zip`                          |
+| `<filepath>`                     | Extract the specified directory or file and scan its contents.                                                                  | `myprojects.zip`                                |
 | `--exclude-paths <paths>`        | Space-separated list of absolute paths to exclude from the scan.                                                                | `--exclude-paths /path/to/folder /path/to/file` |
 | `--file-types <types>`           | Space-separated list of file types to include (by extension, e.g. `py`, `md`, `pdf`).                                           | `--file-types py md pdf`                        |
 | `-y`, `--yes`                    | Automatically grant file access permission (skip interactive prompt).                                                           | `-y`                                            |
