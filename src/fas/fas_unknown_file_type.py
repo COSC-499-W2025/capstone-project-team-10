@@ -1,9 +1,11 @@
 import os
+from src.fas.fas_text_analysis import TextSummary
+
 
 def infer_unknown_file(file_path: str) -> dict:
     """
     Fallback analysis for unknown or uncommon file types.
-    Ensures human-readable metadata and key_skills.
+    Uses FAS text analysis for text-based files.
     """
 
     size = os.path.getsize(file_path)
@@ -13,52 +15,43 @@ def infer_unknown_file(file_path: str) -> dict:
         with open(file_path, "rb") as f:
             sample = f.read(512)
         is_text = b"\x00" not in sample
-    except:
+    except Exception:
         is_text = False
 
+    # ---- Text fallback ----
     if is_text:
         try:
             with open(file_path, "r", errors="ignore") as f:
-                lines = f.readlines()
+                text = f.read()
 
-            has_comments = any(
-                l.strip().startswith(("#", "//", ";")) for l in lines
-            )
-            has_blocks = any("{" in l or "}" in l for l in lines)
-
-            skills = [
-                "Text file analysis",
-                "File structure interpretation",
-            ]
-
-            if has_comments:
-                skills.append("Code or configuration comprehension")
-
-            if has_blocks:
-                skills.append("Structured syntax understanding")
-
-            return {
+            metadata = {
                 "file_category": "Unknown text-based file",
-                "description": "Unrecognized text file analyzed using structural heuristics",
-                "line_count": len(lines),
-                "key_skills": list(set(skills)),
+                "description": "Unrecognized text file analyzed using FAS text analysis",
+                "size_bytes": size,
             }
 
-        except:
-            pass
+            if text.strip():
+                analyzer = TextSummary(text)
+                metadata.update(
+                    analyzer.generate_text_analysis_data(
+                        num_keywords=10,
+                        num_sentences=3
+                    )
+                )
+
+            return metadata
+
+        except Exception as e:
+            return {
+                "file_category": "Unknown text-based file",
+                "description": "Text detected but analysis failed",
+                "size_bytes": size,
+                "error": str(e),
+            }
 
     # ---- Binary fallback ----
-    skills = [
-        "Binary file handling",
-        "Low-level file inspection",
-    ]
-
-    if size > 5 * 1024 * 1024:
-        skills.append("Large file handling")
-
     return {
         "file_category": "Unknown binary file",
         "description": "Unrecognized binary file inferred from content analysis",
         "size_bytes": size,
-        "key_skills": skills,
     }

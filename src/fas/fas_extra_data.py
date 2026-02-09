@@ -61,10 +61,15 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
                 return GitGrouping().add_repository(file_path)
 
             case _:
-                return infer_unknown_file(file_path)
+                metadata = infer_unknown_file(file_path)
 
         # ---------- Post-processing for text-like documents ----------
-        if file_type in ("docx", "odt", "rtf", "pdf") and isinstance(metadata, dict):
+        # if file_type in ("docx", "odt", "rtf", "pdf") and isinstance(metadata, dict):
+        if (
+            isinstance(metadata, dict)
+            and "summary" in metadata
+        ):
+
             _clean_summary(metadata)
             metadata["key_skills"] = _extract_text_skills(metadata)
 
