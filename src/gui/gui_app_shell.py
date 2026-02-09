@@ -13,6 +13,8 @@ from src.gui.gui_resume_page import ResumePage
 from src.gui.gui_scan_page import ScanPage
 from src.gui.gui_scan_results import ScanResultsPage
 from src.gui.gui_settings_page.gui_settings_page import SettingsPage
+from src.gui.gui_dashboard.gui_dashboard_container import DashboardContainer
+
 
 # ---------- UI Color Constants ----------
 HEADER_BG_COLOR = "#002145"
@@ -116,8 +118,7 @@ class AppShell(QWidget):
         right_layout.addWidget(self.content_stack, 1)
 
         # ---------- Pages ----------
-        self.page_dashboard = QLabel("Dashboard content goes here")
-        self.page_dashboard.setAlignment(Qt.AlignCenter)
+        self.page_dashboard = DashboardContainer()
 
         self.page_scan = ScanPage()
         self.page_scan_results = ScanResultsPage()
