@@ -130,12 +130,14 @@ class TestFasExtraData:
     # Unsupported file types
     # ------------------------------------------------------------
 
-    def test_unsupported_file_type_returns_none(self, tmp_path):
+    def test_unsupported_file_type_returns_fallback_data(self, tmp_path):
         test_file = tmp_path / "file.xyz"
         test_file.write_text("data")
 
         data = get_file_extra_data(str(test_file), "xyz")
-        assert data is None
+
+        assert data is not None
+        assert "key_skills" in data
 
     # ------------------------------------------------------------
     # JSON serializability
