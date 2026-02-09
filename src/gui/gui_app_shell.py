@@ -1,13 +1,19 @@
-from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QListWidget, QStackedWidget
-)
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import (
+    QHBoxLayout,
+    QLabel,
+    QListWidget,
+    QStackedWidget,
+    QVBoxLayout,
+    QWidget,
+)
 
-from src.gui.gui_resume_page import ResumePage
 from src.gui.gui_portfolio_page import PortfolioPage
+from src.gui.gui_resume_page import ResumePage
 from src.gui.gui_scan_page import ScanPage
 from src.gui.gui_scan_results import ScanResultsPage
+from src.gui.gui_settings_page.gui_settings_page import SettingsPage
+from src.gui.gui_dashboard.gui_dashboard_container import DashboardContainer
 
 
 # ---------- UI Color Constants ----------
@@ -112,8 +118,7 @@ class AppShell(QWidget):
         right_layout.addWidget(self.content_stack, 1)
 
         # ---------- Pages ----------
-        self.page_dashboard = QLabel("Dashboard content goes here")
-        self.page_dashboard.setAlignment(Qt.AlignCenter)
+        self.page_dashboard = DashboardContainer()
 
         self.page_scan = ScanPage()
         self.page_scan_results = ScanResultsPage()
@@ -124,17 +129,16 @@ class AppShell(QWidget):
         self.page_resume = ResumePage()
         self.page_portfolio = PortfolioPage()
 
-        self.page_settings = QLabel("Settings content goes here")
-        self.page_settings.setAlignment(Qt.AlignCenter)
+        self.page_settings = SettingsPage()
 
         # Add pages to stack (order matters)
-        self.content_stack.addWidget(self.page_dashboard)   # index 0
-        self.content_stack.addWidget(self.page_scan)        # index 1
-        self.content_stack.addWidget(self.page_add_files)   # index 2
-        self.content_stack.addWidget(self.page_resume)      # index 3
-        self.content_stack.addWidget(self.page_portfolio)   # index 4
-        self.content_stack.addWidget(self.page_settings)    # index 5
-        self.content_stack.addWidget(self.page_scan_results) # index 6
+        self.content_stack.addWidget(self.page_dashboard)  # index 0
+        self.content_stack.addWidget(self.page_scan)  # index 1
+        self.content_stack.addWidget(self.page_add_files)  # index 2
+        self.content_stack.addWidget(self.page_resume)  # index 3
+        self.content_stack.addWidget(self.page_portfolio)  # index 4
+        self.content_stack.addWidget(self.page_settings)  # index 5
+        self.content_stack.addWidget(self.page_scan_results)  # index 6
 
         # Connect signals AFTER all pages are created
         self.page_scan.scan_started.connect(self.page_scan_results.on_scan_started)
