@@ -27,7 +27,7 @@ class LogDetailsPage(QWidget):
         back_btn = QPushButton("← Back")
         back_btn.setStyleSheet("""
             QPushButton {
-                background-color: #007AFF;
+                background-color: #002145;
                 color: white;
                 border: none;
                 padding: 8px 16px;
