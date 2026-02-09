@@ -137,8 +137,12 @@ class AppShell(QWidget):
         self.content_stack.addWidget(self.page_scan_results) # index 6
 
         # Connect signals AFTER all pages are created
+        self.page_scan.scan_started.connect(self.page_scan_results.on_scan_started)
         self.page_scan.scan_started.connect(self.on_scan_started)
+        self.page_scan.scan_finished.connect(self.page_scan_results.on_scan_finished)
+        self.page_scan.scan_output.connect(self.page_scan_results.append_output)
         self.page_scan_results.back_to_scan.connect(self.return_to_scan)
+        self.page_scan.scan_finished.connect(lambda result: self.page_scan_results.back_button.setEnabled(True))
 
         # Add right area to main layout
         main_layout.addWidget(right_area, 1)
@@ -185,3 +189,7 @@ class AppShell(QWidget):
         """Return from scan results to scan page"""
         self.sidebar.setCurrentRow(1)  # Set to "Scan" item
         self.change_page("Scan")
+
+    def closeEvent(self, event):
+        self.page_scan.scan_manager.cleanup()
+        event.accept()

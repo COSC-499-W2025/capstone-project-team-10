@@ -4,15 +4,21 @@ from src.gui.gui_scan_manager import ScanManager
 from src.gui.gui_scan_filtering import FilterDialog
 
 class ScanPage(QtWidgets.QWidget):
+    scan_started = QtCore.pyqtSignal(dict)
+    scan_finished = QtCore.pyqtSignal(int)
+    scan_output = QtCore.pyqtSignal(str)
 
     def __init__(self, parent=None):
-
         super(ScanPage, self).__init__(parent)
-        
+
         self.scan_manager = ScanManager()
         self.selected_directory = None
         self.current_filters = None
-        
+
+        self.scan_manager.scan_finished.connect(self._on_scan_finished)
+        self.scan_manager.scan_failed.connect(self._on_scan_failed)
+        self.scan_manager.scan_output.connect(self.scan_output.emit)
+
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setAlignment(QtCore.Qt.AlignCenter)
         self.layout.setSpacing(20)
@@ -88,13 +94,27 @@ class ScanPage(QtWidgets.QWidget):
             QtWidgets.QMessageBox.warning(self, "No Filters", "Please choose filters first.")
             return
         
-        # Emit signal with scan parameters
+        started = self.scan_manager.scan_async(
+            directory_path=self.selected_directory,
+            filters=self.current_filters
+        )
+        if not started:
+            QtWidgets.QMessageBox.information(self, "Scan Running", "A scan is already running.")
+            return
+
+        # Emit immediately so results page can show animation
         scan_params = {
             'directory': self.selected_directory,
             'filters': self.current_filters
         }
         self.scan_started.emit(scan_params)
-    
+
+    def _on_scan_finished(self, result: int):
+        self.scan_finished.emit(result)
+
+    def _on_scan_failed(self, message: str):
+        QtWidgets.QMessageBox.critical(self, "Scan Failed", message)
+
     def display_filters(self, filters): # Can be removed later
         summary = "Applied Filters:\n"
         
@@ -120,6 +140,3 @@ class ScanPage(QtWidgets.QWidget):
         
         self.filter_summary.setText(summary)
         self.filter_summary.setVisible(True)
-
-    # Add signal at class level
-    scan_started = QtCore.pyqtSignal(dict)
