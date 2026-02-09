@@ -2,7 +2,6 @@ import csv
 import os
 from datetime import date, datetime
 from pathlib import Path
-import tempfile
 import zipfile
 import src.fas.fas as fas
 import src.log.log as log
@@ -38,18 +37,18 @@ def search(search_params: FSS_Search):
 
     # Checks if file path is a zip folder and recursively calls search with the extracted folder
     if zipfile.is_zipfile(search_params.input_path):
-        with tempfile.TemporaryDirectory() as temp_dir:
-            with zipfile.ZipFile(search_params.input_path, 'r') as zip_ref:
-                zip_ref.extractall(temp_dir)
-            
-            temp_search = FSS_Search(
-                input_path=temp_dir,
-                excluded_path=search_params.excluded_path,
-                file_types=search_params.file_types,
-                time_lower_bound=search_params.time_lower_bound,
-                time_upper_bound=search_params.time_upper_bound,
-            )
-            return search(temp_search)
+        from src.zip.zip_app import extract_zip
+        extracted_path = extract_zip(search_params.input_path)
+        if not extracted_path:
+            return -1
+        temp_search = FSS_Search(
+            input_path=str(extracted_path),
+            excluded_path=search_params.excluded_path,
+            file_types=search_params.file_types,
+            time_lower_bound=search_params.time_lower_bound,
+            time_upper_bound=search_params.time_upper_bound,
+        )
+        return search(temp_search)
 
     if exclude_flag:
         # ensures that the excluded paths input is a set

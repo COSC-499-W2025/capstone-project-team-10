@@ -49,7 +49,7 @@ def extract_zip(origin_path: str | Path):
     zipFolders.sort(key=lambda file: file.name, reverse=True)
 
     # the newest 5 folders are kept and the rest are deleted
-    for old_Files in zipFolders[5:]:
+    for old_Files in zipFolders[10:]:
         shutil.rmtree(old_Files, ignore_errors=True)
 
-    return base_destination_path
+    return destination_path
