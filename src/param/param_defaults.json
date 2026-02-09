@@ -16,6 +16,10 @@
         "log_file_naming_regex": "^(\\d+)\\.log$",
         "current_log_file": ""
     },
+    "showcase": {
+        "showcase_export_path": "",
+        "showcase_maximum_exports": 10
+    },
     "testing": {
         "test_key": null
     }
