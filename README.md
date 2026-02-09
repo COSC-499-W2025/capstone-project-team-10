@@ -458,7 +458,7 @@ non-trivial amount of rework for the CLI
 
 #### GET /resume/{id}
 
-- [ ] A new resume API is needed to fulfill this requirement, making the program store created resumes in application storage
+- [x] A new resume API is needed to fulfill this requirement, making the program store created resumes in application storage
 
 #### POST /resume/generate
 

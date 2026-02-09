@@ -8,6 +8,7 @@ import shutil
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Callable, Dict, Optional
+from src.resume.resume_manager import manager
 
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
@@ -397,6 +398,12 @@ def generate_resume(
                         )
                 pdf_output.ln(10)
             pdf_output.output(str(export_path))
+
+            try:
+                # Store internally for the GUI history
+                manager.create(export_path, {"type": "pdf_resume", "source_log": str(log_file)})
+            except Exception as e:
+                print(f"Failed to store resume internally: {e}")
             return export_path
     except Exception as e:
         print(f"Something went wrong: {e}")
