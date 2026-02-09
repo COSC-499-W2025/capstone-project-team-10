@@ -13,6 +13,7 @@ log_file_naming_regex: str = r"(\d+)\.log$"
 result_log_folder_path: str = ""
 export_folder_path: str = ""
 optional_parameters_path: str = ""
+internal_resume_storage_path: str = ""
 
 params = {}
 
@@ -24,7 +25,8 @@ def set_program_constants() -> None:
         program_file_path, \
         result_log_folder_path, \
         optional_parameters_path, \
-        export_folder_path
+        export_folder_path, \
+        internal_resume_storage_path
     os_name = platform.system()
     export_folder_path = os.path.join(os.path.expanduser("~"), "Downloads")
     match os_name:
@@ -47,6 +49,7 @@ def set_program_constants() -> None:
 
     result_log_folder_path = os.path.join(program_file_path, "logs")
     optional_parameters_path = os.path.join(program_file_path, "params.json")
+    internal_resume_storage_path = os.path.join(program_file_path, "storage", "resumes")
 
 
 def recursive_update(defaults, overrides):
