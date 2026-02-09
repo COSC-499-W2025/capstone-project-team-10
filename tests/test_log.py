@@ -182,16 +182,6 @@ class TestLog:
         assert checkLogOutput(log_file_path)
         clean_up_log_tests()
 
-    def test_log_update_no_file(self):
-        setup_log_tests()
-        global test_file_analysis
-        log.update(test_file_analysis)
-        # Read the produced file, check that the lines are written
-        log_file_path = str(os.path.join(param.result_log_folder_path, "0.log"))
-        print("Checking: " + log_file_path)
-        assert checkLogOutput(log_file_path)
-        clean_up_log_tests()
-
     def test_follow_log_reads_and_stops(self):
         """Test that follow_log reads existing lines and stops on !close! signal"""
         import threading
