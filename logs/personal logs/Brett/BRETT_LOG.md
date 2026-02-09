@@ -1,3 +1,16 @@
+# Week 18/19 (1/26/2026 = 2/8/2026) ** TERM 2 Week 4/5 **
+
+![Week 18/19 Tasks](Week18&19/Week18&19Tasks.png)
+
+## Features
+
+![Week 18/19 KanBan](Week18&19/Week18&19KanBan1.png)
+![Week 18/19 KanBan](Week18&19/Week18&19KanBan2.png)
+![Week 18/19 KanBan](Week18&19/Week18&19KanBan3.png)
+
+## Recap
+The last two weeks we added more gui features and links with the backend. Last week I began work on a file hashing system to identify files based on their content. This allowed me to implement changes to the searching, analyzing, logging flow so that identical files are only analyzed once even if they are in a seperate log. Otherwise it pulls the data from the log instead. I also refactored the way zip files are handled by our client so they are handled without the need for the --zip flag building off of my work from week 17. Finally I fixed a bug in the showcase.py file that was causing scans to fail because of an incorrect number of arguements being passed to our FileAnalysis object. Next week I want to continue working on bug fixes to improve polish and catch edge cases. I also want to look at showcase.py to see if it can be refactored to reduce it from 700+ lines of code.
+
 # Week 17 (1/19/2026 = 1/25/2026) ** TERM 2 **
 
 ![Week 17 Tasks](Week17/Week17Tasks.png)
