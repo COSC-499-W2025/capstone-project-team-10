@@ -3,7 +3,8 @@
 
 [Term 2](#term-2)  
 [Week 2](#week-2-1112026---1182026)  
-[Week 3](week-3-1182026---1252026)
+[Week 3](week-3-1182026---1252026)  
+[Week 4+5]()
 
 # Term 1
 # Week 3 (9/14/2025 -  9/21/2025)
@@ -118,3 +119,15 @@ https://github.com/COSC-499-W2025/capstone-project-team-10/pull/202
 https://github.com/COSC-499-W2025/capstone-project-team-10/pull/194
 ### Recap
 We finished preparations for peer testing and everything is set and organized. Started working on getting the GUI to access projects id from the log folder, still in progress so should be pushed by next week.
+
+## Week 4+5 (1/26/2026 - 2/08/2026)
+<img width="1090" height="650" alt="image" src="https://github.com/user-attachments/assets/836cda37-749e-4626-853e-5ce6ada4eb2d" />
+
+### Tasks
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/219
+### Reviews
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/221
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/220
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/216
+### Recap
+We have implemented a good amount to our GUI and it's coming along nicely, in these weeks I worked on making a resume manager API which sotres generated resumes into the application storage and indexes them in a json database that is easy for the GUI to read. Progress is going really well and next week I'll be working on getting project IDs from the log files.
