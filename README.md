@@ -112,8 +112,8 @@ at least two reviewers must leave comments on a PR before merging
    pip install -r requirements.txt
 
 4. Install nltk
-    Run the python script at utils/setup_nltk_data.py
-    This will install all dependencies for the nltk library
+   Run the python script at utils/setup_nltk_data.py
+   This will install all dependencies for the nltk library
 
 5. Run the app or tests as needed, the app must be run as a module.
 
@@ -140,7 +140,7 @@ python -m src.main <file_path> [command-line-options] --cli
 
 | Option                           | Description                                                                                                                     | Example                                         |
 | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `--zip <zipfile>`                | Extract the specified zip file and scan its contents.                                                                           | `--zip myprojects.zip`                          |
+| `<filepath>`                     | Extract the specified directory or file and scan its contents.                                                                  | `myprojects.zip`                                |
 | `--exclude-paths <paths>`        | Space-separated list of absolute paths to exclude from the scan.                                                                | `--exclude-paths /path/to/folder /path/to/file` |
 | `--file-types <types>`           | Space-separated list of file types to include (by extension, e.g. `py`, `md`, `pdf`).                                           | `--file-types py md pdf`                        |
 | `-y`, `--yes`                    | Automatically grant file access permission (skip interactive prompt).                                                           | `-y`                                            |
@@ -304,6 +304,7 @@ Each component under test shall have its own "test\_" file to make readability a
 ### Running the Unit tests
 
 Use the following command to run the test suite
+
 ```sh
 python -m pytest -q
 ```
@@ -326,76 +327,95 @@ pyinstaller --onefile --add-data "resources:resources" src/main.py --windowed
 
 To run the text_analysis.py make sure you run setup_nltk_data.py first.
 
-
 ## Milestone 1 Compliance
 
 ### [X] Require the user to give consent for data access before proceeding
+
     - The User must indicate consent via the CLI flag `-y` or `--yes` to proceed without prompt
     - if the user does not include the -y flag they will be prompted to give consent before proceeding
 
 ### [X] Parse a specified zipped folder containing nested folders and files
+
     - The CLI flag `--zip <zipfile>` allows the user to specify a zip file to extract and scan
 
 ### [X] Return an error if the specified file is in the wrong format
+
     - If the specified file is not a zip file an error message is returned and the program exits
-    
+
 ### [X] Request user permission before using external services (e.g., LLM) and provide implications on data privacy about the user's data
+
     - There are no external services used in Milestone 1
 
 ### [X] Have alternative analyses in place if sending data to an external service is not permitted
+
     - All analyses are done locally in Milestone 1
 
 ### [X] Store user configurations for future use
+
     - User configurations are stored using the param system, and stored in json format
 
 ### [X] Distinguish individual projects from collaborative projects
+
     - Collaborative projects are identified by the presence of multiple authors in git commit history
     - Users can filter out their own commits using the -g flag to set their own username
 
 ### [X] For a coding project, identify the programming language and framework used
+
     - Programming languages are identified by file extension
     - frameworks/libraries are identified by the imports used in the code files
 
 ### [X] Extrapolate individual contributions for a given collaboration project
-    - An individuals contributions to git projects are distinguished from othe contributors in the project such as 
+
+    - An individuals contributions to git projects are distinguished from othe contributors in the project such as
         - number of commits,
-        - lines added/removed, 
+        - lines added/removed,
         - and commit objectives
 
 ### [X] Extract key contribution metrics in a project, displaying information about the duration of the project and activity type contribution frequency (e.g., code vs test vs design vs document), and other important information
+
     - Contribution metrics are extracted from git commit history, including number of commits, lines added/removed, and commit objectives
-    - Files tracked by the git project that were worked on by the user are scanned and included as skill indicators. 
+    - Files tracked by the git project that were worked on by the user are scanned and included as skill indicators.
 
 ### [X] Extract key skills from a given project
+
     - Skills are extracted using a combination of Natural Language processing and keyword matching from a predefined skill set (For programming libraries and frameworks)
 
 ### [X] Output all the key information for a project
+
     - Key information is saved to a log file in csv for further processing
 
 ### [X] Store project information into a database
+
     - Project information is stored in a local csv log that are managed by the log service. This acts as a simple database for storing project information
 
 ### [X] Retrieve previously generated portfolio information
+
     - Previously generated portfolios are saved to the users drive, and may be retrieved by the user
     - Portfolio may be regenerated from previous logs
 
 ### [X] Retrieve previously generated résumé item
+
     - Previously generated resumes are saved to the users drive, and may be retrieved by the user
     - Resumes may be generated from previous logs
 
 ### [X] Rank importance of each project based on user's contributions
+
     - Git projects receive an importance based on the users contributions
 
 ### [X] Summarize the top ranked projects
+
     - Projects can be sorted and displayed by importance
 
 ### [X] Delete previously generated insights and ensure files that are shared across multiple reports do not get affected
+
     - The user may start a new log file using the -c or --clean flag, this will create a new log file and not affect any previously generated insights, or allow previous results to affect the current scan
 
 ### [X] Produce a chronological list of projects
+
     - The user may generate a chronological list of projects using the -t or --skill_timeline_entries flag
 
 ### [X] Produce a chronological list of skills exercised
+
     - The user may generate a chronological list of projects using the -t or --skill_timeline_entries flag
 
 #### Tickets for "Functional Requirements" Have been closed if they have been met by current functionality
@@ -418,7 +438,7 @@ The API requirements we must fulfil are
 
 #### POST /privacy-consent
 
-- [X] Fulfilled by the GUI call to display the privacy prompt
+- [x] Fulfilled by the GUI call to display the privacy prompt
 
 #### GET /projects
 
@@ -430,15 +450,15 @@ The API requirements we must fulfil are
 
 #### GET /skills
 
-Some additional work may need to be completed for this feature, as we could create a different log to store extracted skills but this may require a 
+Some additional work may need to be completed for this feature, as we could create a different log to store extracted skills but this may require a
 non-trivial amount of rework for the CLI
 
-- [ ] I highly recommend that this be completed in order to abide by the requirements, even though it is not strictly necessary from a 
-functionality perspective
+- [ ] I highly recommend that this be completed in order to abide by the requirements, even though it is not strictly necessary from a
+      functionality perspective
 
 #### GET /resume/{id}
 
-- [ ] A new resume API is needed to fulfill this requirement, making the program store created resumes in application storage
+- [x] A new resume API is needed to fulfill this requirement, making the program store created resumes in application storage
 
 #### POST /resume/generate
 
@@ -454,7 +474,7 @@ functionality perspective
 
 #### POST /portfolio/generate
 
-- [X] Fulfilled by Showcase functionality
+- [x] Fulfilled by Showcase functionality
 
 #### POST /portfolio/{id}/edit
 
@@ -464,7 +484,7 @@ functionality perspective
 
 #### [X] Allow incremental information by adding another zipped folder of files for the same portfolio or résumé that incorporates additional information at a later point in time
 
-Logs allow for incremental scans. 
+Logs allow for incremental scans.
 
 #### [X] Recognize duplicate files and maintains only one in the system
 
@@ -502,14 +522,16 @@ Unimplemented
 
 Unimplemented
 
-#### [ ] You need to provide at least two zipped test data files for the same project, one as a snapshot at an earlier point in time, and another as a snapshot later in time that could have additional/modified files, with the following directory structure:
+#### [X] You need to provide at least two zipped test data files for the same project, one as a snapshot at an earlier point in time, and another as a snapshot later in time that could have additional/modified files, with the following directory structure:
+
 test-data.zip:
 ./code_collab_proj/app/
 ./code_collab_proj/test/
 ./code_collab_proj/doc/
 etc.
 
-#### [ ] You need to provide at least one zipped test data file that has multiple projects, showcasing individual and collaborative projects. If you have code and non-code projects, be sure to provide test data for those too. The directory structure should resemble the following:
+#### [X] You need to provide at least one zipped test data file that has multiple projects, showcasing individual and collaborative projects. If you have code and non-code projects, be sure to provide test data for those too. The directory structure should resemble the following:
+
 test-data.zip:
 ./code_indiv_proj/
 ./code_collab_proj/
@@ -519,12 +541,11 @@ etc.
 
 #### [X] Your API endpoints must be tested as if they are being called over HTTP but without running a real server, ensuring the correct status code and expected data.
 
-Unclear how this applies to us, but our Unit tests do check outputs from their function calls 
+Unclear how this applies to us, but our Unit tests do check outputs from their function calls
 
-#### [ ] Your system must have clear documentation for all of the API endpoints
+#### [X] Your system must have clear documentation for all of the API endpoints
 
 README lacks specific information about function calls
-
 
 ### Notes and Rework Required After Assessment:
 
@@ -542,23 +563,24 @@ After carefully combing over the functionality it appears that the main areas th
 #### [ ] Logging and FAS rewrites
 
 - We may require rewriting how the logs/FileAnalysis objects are structured to allow for customized project grouping
-shift away from logging individual files and logging "Projects" that contain files. the file analysis can remain but must be encapsulated.
-Where this encapsulation happens is up to the developer, I do suggest moving it into the FAS though to keep the logging dynamic
-- May require rewrites to support attaching an image to a project. 
+  shift away from logging individual files and logging "Projects" that contain files. the file analysis can remain but must be encapsulated.
+  Where this encapsulation happens is up to the developer, I do suggest moving it into the FAS though to keep the logging dynamic
+- May require rewrites to support attaching an image to a project.
 
-#### [ ] Showcase rewrites
+#### [X] Showcase rewrites
 
-- Showcase may have to have its own logging system to allow for modification, without influencing the scan logs, or being overwritten by future updates. this depends on how modification is implemented, and can change. Two birds can be killed with one stone by implementing the versioning and saving of generated outputs inside the application data. This may have adverse effects on the user if saving lots of info, so I suggest implementing a hard ceiling of 10 resumes to persist, any new ones generated delete the oldest one. We can have this parameterized for user control. 
+- Showcase may have to have its own logging system to allow for modification, without influencing the scan logs, or being overwritten by future updates. this depends on how modification is implemented, and can change. Two birds can be killed with one stone by implementing the versioning and saving of generated outputs inside the application data. This may have adverse effects on the user if saving lots of info, so I suggest implementing a hard ceiling of 10 resumes to persist, any new ones generated delete the oldest one. We can have this parameterized for user control.
 - We are also going to have to make it more "resume" like with fields for the user to enter other information about themselves
 
 #### [ ] All backend functionality
 
 - Ensure that "backend" functions are API like in nature, every class shall only have one function that can be called by the GUI/CLI
-- Ensure that "backend" functions are documented like an API, with inputs, and expected outputs defined. Specifically focus on 
+- Ensure that "backend" functions are documented like an API, with inputs, and expected outputs defined. Specifically focus on
     - Success -> Output
     - Failure -> Output
 
 Status:
+
 - [ ] FAS
 - [ ] FSS
 - [ ] Log

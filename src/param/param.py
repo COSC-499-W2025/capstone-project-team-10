@@ -4,15 +4,16 @@ import os
 import platform
 
 # For Builds and Versioning
-project_name = "Capstone Project Team 10"
-project_version = "1.0.0"
-eula_date = "January 1st 2026"
+project_name: str = "Capstone Project Team 10"
+project_version: str = "1.0.0"
+eula_date: str = "January 1st 2026"
 program_file_path: str = ""
 log_max_count: int = 10
 log_file_naming_regex: str = r"(\d+)\.log$"
 result_log_folder_path: str = ""
 export_folder_path: str = ""
 optional_parameters_path: str = ""
+internal_resume_storage_path: str = ""
 
 params = {}
 
@@ -24,9 +25,11 @@ def set_program_constants() -> None:
         program_file_path, \
         result_log_folder_path, \
         optional_parameters_path, \
-        export_folder_path
+        export_folder_path, \
+        internal_resume_storage_path
     os_name = platform.system()
     export_folder_path = os.path.join(os.path.expanduser("~"), "Downloads")
+
     match os_name:
         case "Windows":
             appdata = os.getenv("APPDATA")
@@ -47,6 +50,7 @@ def set_program_constants() -> None:
 
     result_log_folder_path = os.path.join(program_file_path, "logs")
     optional_parameters_path = os.path.join(program_file_path, "params.json")
+    internal_resume_storage_path = os.path.join(program_file_path, "storage", "resumes")
 
 
 def recursive_update(defaults, overrides):
@@ -63,8 +67,9 @@ def load_additional_params() -> None:
     global params
     try:
         with open(optional_parameters_path, "r", encoding="utf-8") as param_file:
+            new_params = json.load(param_file).copy()
             load_defaults()
-            recursive_update(params, json.load(param_file).copy())
+            recursive_update(params, new_params)
     except FileNotFoundError:
         print("No additional parameters file found. Using default parameters.")
         load_defaults()
@@ -137,8 +142,21 @@ def load_defaults() -> None:
     params.clear()
     with open("src/param/param_defaults.json", "r", encoding="utf-8") as default_params:
         params.update(json.load(default_params))
-    project_name = get("config.project_name")
-    project_version = get("config.config_info")
+    project_name_temp = get("config.project_name")
+    if project_name_temp is None:
+        project_name = "Capstone Project Team 10"
+    else:
+        project_name = project_name_temp
+    project_version_temp = get("config.config_info")
+    if project_version_temp is None:
+        project_version = "0.0.0"
+    else:
+        project_version = project_version_temp
+
+    if (get("showcase.showcase_export_path") is None) or (
+        get("showcase.showcase_export_path") == ""
+    ):
+        set("showcase.showcase_export_path", export_folder_path)
 
 
 def init() -> None:

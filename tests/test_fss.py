@@ -19,6 +19,7 @@ path_to_excluded_folder = str(
     Path("tests/testdata/test_fss/testScanFolder/nestedFolder")
 )
 path_to_invalid_folder = str(Path("/DUMMMMMMMMMY/DUMMY/DUMB/DUMMY"))
+path_to_test_zip = str(Path("tests/testdata/test_fss_zip/testzip.zip"))
 
 
 @pytest.fixture(autouse=True, scope="function")
@@ -126,3 +127,23 @@ class TestFSS:
 
         result = fss.get_duplicate_from_log(str(test_file))
         assert result is None
+    def test_fss_zip_file(self):
+        """Test that search can extract and scan files from a zip archive."""
+        result = fss.search(fss.FSS_Search(path_to_test_zip))
+        assert result == 3
+
+    def test_fss_zip_with_txt_filter(self):
+        """Test that .txt filter works inside zip files."""
+        result = fss.search(fss.FSS_Search(
+            path_to_test_zip,
+            file_types={"txt"}
+        ))
+        assert result == 1
+
+    def test_fss_zip_with_multiple_filters(self):
+        """Test that multiple file type filters work inside zip files."""
+        result = fss.search(fss.FSS_Search(
+            path_to_test_zip,
+            file_types={"txt", "md"}
+        ))
+        assert result == 2
