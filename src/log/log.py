@@ -2,6 +2,7 @@ import csv
 import time
 import re
 from pathlib import Path
+from typing import Optional
 
 import src.param.param as param
 from src.fas.fas import FileAnalysis
@@ -118,6 +119,7 @@ def open_log_file() -> None:
                     "Importance",
                     "Customized",
                     "Project id",
+                    "File hash",
                 ]
             ]
         )
@@ -141,6 +143,7 @@ def write(fileAnalysis: FileAnalysis) -> None:
                 fileAnalysis.importance,
                 fileAnalysis.customized,
                 fileAnalysis.project_id,
+                fileAnalysis.file_hash,
             ]
         )
 
@@ -179,6 +182,7 @@ def update(fileAnalysis: FileAnalysis, forceUpdate: bool = False) -> None:
                             fileAnalysis.importance,
                             fileAnalysis.customized,
                             fileAnalysis.project_id,
+                            fileAnalysis.file_hash,
                     ]
                     )
                 else:
@@ -226,3 +230,59 @@ def follow_log(file_path: str | None = None, include_header: bool = False, poll_
                     break
             else:
                 time.sleep(poll_interval)
+
+def _get_all_log_files() -> list[Path]:
+    """
+    Returns a list of all log files in the log folder,
+    matched by the log file naming regex.
+    """
+    log_folder = Path(param.result_log_folder_path)
+    if not log_folder.exists():
+        return []
+
+    log_files = []
+    for file in log_folder.iterdir():
+        if file.is_file():
+            match = re.search(param.log_file_naming_regex, file.name)
+            if match:
+                log_files.append(file)
+    return log_files
+
+def find_existing_analysis(file_hash: str) -> Optional[FileAnalysis]:
+    """
+    Searches all log files for a row matching the given file hash.
+    If found, reconstructs and returns the FileAnalysis from that row.
+    Returns None if no match is found.
+    """
+    if file_hash is None:
+        return None
+
+    for log_file in _get_all_log_files():
+        try:
+            with open(log_file, "r", encoding="utf-8", newline="") as f:
+                reader = csv.reader(f)
+                header = next(reader, None)
+                if header is None:
+                    continue
+
+                hash_col = header.index("File hash")
+
+                for row in reader:
+                    if len(row) > hash_col and row[hash_col] == file_hash:
+                        return FileAnalysis(
+                            file_path=row[0],
+                            file_name=row[1],
+                            file_type=row[2],
+                            last_modified=row[3],
+                            created_time=row[4],
+                            extra_data=row[5],
+                            importance=float(row[6]) if row[6] else 0.0,
+                            customized=row[7].strip().lower() == "true",
+                            project_id=row[8],
+                            file_hash=row[hash_col],
+                        )
+        except Exception as e:
+            print(f"Warning: Could not read log file {log_file}: {e}")
+            continue
+
+    return None

@@ -7,6 +7,7 @@ import pytest
 import src.fss.fss as fss
 import src.log.log as log
 import src.param.param as param
+from src.fas.fas import FileAnalysis, compute_file_hash
 
 path_to_test_folder = str(Path("tests/testdata/test_fss/testScanFolder"))
 path_to_entire_test_folder = str(Path("tests/testdata/test_fss/"))
@@ -95,6 +96,37 @@ class TestFSS:
         with open(test_file_path, "w", encoding="utf-8") as test_file:
             test_file.writelines(lines[:-2])
 
+    def test_get_duplicate_from_log(self, tmp_path):
+
+        test_file = tmp_path / "test.txt"
+        test_file.write_text("hello world")
+
+        file_hash = compute_file_hash(test_file)
+
+        test_file_analysis: FileAnalysis = FileAnalysis(
+        file_path="tests/testdata/fakeTestFile/file1.txt",
+        file_name="file1.txt",
+        file_type="txt",
+        last_modified="2023-10-01T12:00:00",
+        created_time="2023-09-30T11:00:00",
+        extra_data="EXTRA EXTRA DATA",
+        importance=0.0,
+        customized=False,
+        project_id="ID-1",
+        file_hash=file_hash,
+        )
+
+        log.write(test_file_analysis)
+        result = fss.get_duplicate_from_log(test_file)
+        assert result is not None
+        assert result.file_hash == test_file_analysis.file_hash
+
+    def test_get_duplicate_from_log_non_duplicate(self, tmp_path):
+        test_file = tmp_path / "hashdupe.txt"
+        test_file.write_text("does not exist")
+
+        result = fss.get_duplicate_from_log(str(test_file))
+        assert result is None
     def test_fss_zip_file(self):
         """Test that search can extract and scan files from a zip archive."""
         result = fss.search(fss.FSS_Search(path_to_test_zip))

@@ -486,7 +486,7 @@ non-trivial amount of rework for the CLI
 
 Logs allow for incremental scans.
 
-#### [ ] Recognize duplicate files and maintains only one in the system
+#### [X] Recognize duplicate files and maintains only one in the system
 
 System does not maintain files from user-space in its own database
 
