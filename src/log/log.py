@@ -1,6 +1,7 @@
 import csv
-import time
 import re
+import threading
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -11,6 +12,7 @@ from src.fas.fas import FileAnalysis
 
 # Newest Log is always max count after maximum logs are being stored
 current_log_file: str = ""
+log_lock = threading.Lock()
 
 
 # resumes the last log file used
@@ -130,7 +132,10 @@ def write(fileAnalysis: FileAnalysis) -> None:
     global current_log_file
     if current_log_file == "" or not Path(current_log_file).exists():
         resume_log_file()
-    with open(current_log_file, "a", encoding="utf-8", newline="") as log_file:
+    with (
+        log_lock,
+        open(current_log_file, "a", encoding="utf-8", newline="") as log_file,
+    ):
         writer = csv.writer(log_file)
         writer.writerow(
             [
@@ -158,6 +163,7 @@ def update(fileAnalysis: FileAnalysis, forceUpdate: bool = False) -> None:
     updated = False
 
     with (
+        log_lock,
         open(current_log_file, "r", newline="") as current_log,
         open(temp_path, "w", newline="") as temp_log,
     ):
@@ -183,7 +189,7 @@ def update(fileAnalysis: FileAnalysis, forceUpdate: bool = False) -> None:
                             fileAnalysis.customized,
                             fileAnalysis.project_id,
                             fileAnalysis.file_hash,
-                    ]
+                        ]
                     )
                 else:
                     # Keep original row if customized is True and not forcing update
@@ -203,8 +209,12 @@ def update(fileAnalysis: FileAnalysis, forceUpdate: bool = False) -> None:
         Path(temp_path).replace(current_log_file)
 
 
-def follow_log(file_path: str | None = None, include_header: bool = False, poll_interval: float = 0.5,
-               stop_signal: str = "!close!"):
+def follow_log(
+    file_path: str | None = None,
+    include_header: bool = False,
+    poll_interval: float = 0.5,
+    stop_signal: str = "!close!",
+):
     """
     Generator that yields log lines as they appear in the file.
     Polls the file and waits for new lines to be added.
@@ -222,7 +232,9 @@ def follow_log(file_path: str | None = None, include_header: bool = False, poll_
             f.readline()  # skip header line
 
         while True:
+            log_lock.acquire()
             line = f.readline()
+            log_lock.release()
             if line:
                 stripped = line.rstrip("\r\n")
                 yield stripped
@@ -230,6 +242,7 @@ def follow_log(file_path: str | None = None, include_header: bool = False, poll_
                     break
             else:
                 time.sleep(poll_interval)
+
 
 def _get_all_log_files() -> list[Path]:
     """
@@ -247,6 +260,7 @@ def _get_all_log_files() -> list[Path]:
             if match:
                 log_files.append(file)
     return log_files
+
 
 def find_existing_analysis(file_hash: str) -> Optional[FileAnalysis]:
     """
