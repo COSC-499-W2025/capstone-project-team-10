@@ -47,9 +47,12 @@ def make_file_analysis(
     last_modified="2023-01-02T00:00:00",
     created_time="2023-01-01T00:00:00",
     extra_data="skills",
+    importance=1.0,
+    customized=False,
+    project_id="",
 ):
     return FileAnalysis(
-        file_name, file_type, file_path, last_modified, created_time, extra_data
+        file_path, file_name, file_type, last_modified, created_time, extra_data, importance, customized, project_id
     )
 
 
@@ -63,6 +66,9 @@ def make_test_file(writer: Any) -> None:
             "Last modified",
             "Created time",
             "Extra data",
+            "Importance",
+            "Customized",
+            "Project id",
         ]
     )
     writer.writerow(
@@ -73,6 +79,9 @@ def make_test_file(writer: Any) -> None:
             "2023-01-02T00:00:00",
             "2023-01-01T00:00:00",
             "skills",
+            "1.0",
+            "False",
+            "",
         ],
     )
     # file_path, file_name, file_type, last_modified, created_time, extra_data
@@ -84,6 +93,9 @@ def make_test_file(writer: Any) -> None:
             "2023-01-03T00:00:00",
             "2023-01-01T00:00:00",
             "artistic project",
+            "2.0",
+            "False",
+            "",
         ],
     )
 
@@ -138,7 +150,10 @@ def make_test_file_with_git(writer: Any, create_git_dirs: bool = False) -> None:
                         }
                     }
                 ]
-            })
+            }),
+            "5.0",
+            "False",
+            "",
         ]
     )
     
@@ -183,7 +198,10 @@ def make_test_file_with_git(writer: Any, create_git_dirs: bool = False) -> None:
                         }
                     }
                 ]
-            })
+            }),
+            "5.0",
+            "False",
+            "",
         ]
     )
 

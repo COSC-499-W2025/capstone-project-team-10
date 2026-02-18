@@ -55,6 +55,7 @@ test_file_analysis: FileAnalysis = FileAnalysis(
     importance=0.0,
     customized=False,
     project_id="ID-1",
+    file_hash="x",
 )
 
 test_file_analysis_customized: FileAnalysis = FileAnalysis(
@@ -67,10 +68,11 @@ test_file_analysis_customized: FileAnalysis = FileAnalysis(
     importance=0.0,
     customized=True,
     project_id="ID-2",
+    file_hash="x",
 )
 
-expectedHeader: str = "File path analyzed,File name,File type,Last modified,Created time,Extra data,Importance,Customized,Project id"
-expectedBody: str = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,EXTRA EXTRA DATA,0.0,False,ID-1"
+expectedHeader: str = "File path analyzed,File name,File type,Last modified,Created time,Extra data,Importance,Customized,Project id,File hash"
+expectedBody: str = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,EXTRA EXTRA DATA,0.0,False,ID-1,x"
 
 
 class TestLog:
@@ -153,6 +155,7 @@ class TestLog:
             created_time=test_file_analysis.created_time,
             extra_data="UPDATED EXTRA DATA",
             project_id=test_file_analysis.project_id,
+            file_hash=test_file_analysis.file_hash,
         )
         log.update(modified_test_file_analysis)
         # Read the produced file, check that the last line is updated
@@ -165,18 +168,8 @@ class TestLog:
 
             assert len(lines) == 2  # Header + one entry
             assert lines[0].strip() == expectedHeader
-            expected_updated_body = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,UPDATED EXTRA DATA,0.0,False,ID-1"
+            expected_updated_body = "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,UPDATED EXTRA DATA,0.0,False,ID-1,x"
             assert lines[1].strip() == expected_updated_body
-        clean_up_log_tests()
-
-    def test_log_update_no_file(self):
-        setup_log_tests()
-        global test_file_analysis
-        log.update(test_file_analysis)
-        # Read the produced file, check that the lines are written
-        log_file_path = str(os.path.join(param.result_log_folder_path, "0.log"))
-        print("Checking: " + log_file_path)
-        assert checkLogOutput(log_file_path)
         clean_up_log_tests()
 
     def test_log_update_no_file(self):
@@ -272,6 +265,7 @@ class TestLog:
             extra_data="SHOULD NOT UPDATE",
             customized=True,
             project_id=test_file_analysis_customized.project_id,
+            file_hash=test_file_analysis_customized.file_hash,
         )
         log.update(modified_test_file_analysis)
         # Read the produced file, check that the last line is NOT updated
@@ -286,7 +280,31 @@ class TestLog:
             assert lines[0].strip() == expectedHeader
             assert (
                 lines[1].strip()
-                == "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,EXTRA EXTRA DATA,0.0,True,ID-2"
+                == "tests/testdata/fakeTestFile/file1.txt,file1.txt,txt,2023-10-01T12:00:00,2023-09-30T11:00:00,EXTRA EXTRA DATA,0.0,True,ID-2,x"
             )
         # Should be unchanged
         clean_up_log_tests()
+
+    def test_get_all_log_files(self):
+        # Create two logs and check if the correct number of files are returned
+        setup_log_tests()
+        log.open_log_file()
+        log.write(test_file_analysis)
+        log.open_log_file()
+        log.write(test_file_analysis_customized)
+
+        log_files = log._get_all_log_files()
+        assert len(log_files) == 2 
+
+    def test_find_existing_analysis(self):
+        # Creates a log with 'x' as file hash and uses function to retreive the analysis from the hash
+        setup_log_tests()
+        log.open_log_file()
+        log.write(test_file_analysis)
+
+        fa = log.find_existing_analysis("x")
+        assert fa is not None
+        assert fa.file_name == "file1.txt"
+        assert fa.file_hash == "x"
+
+

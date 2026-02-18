@@ -169,3 +169,26 @@ class TestFas:
 
         assert result is not None
         assert result.file_type == "unknown"
+
+    def test_compute_file_hash(self, tmp_path):
+        file_a = tmp_path / "hasha.txt"
+        file_b = tmp_path / "hashb.txt"
+        file_c = tmp_path / "hashc.txt"
+
+        file_a.write_text("same content")
+        file_b.write_text("same content")
+        file_c.write_text("different content")
+
+        hash_a = fas.compute_file_hash(file_a)
+        hash_b = fas.compute_file_hash(file_b)
+        hash_c = fas.compute_file_hash(file_c)
+
+        assert hash_a == hash_b
+        assert hash_a != hash_c
+        assert hash_a is not None
+        assert isinstance(hash_a, str)
+        assert len(hash_a) == 64
+    
+    def test_compute_file_hash_fake_file(self):
+        hash = fas.compute_file_hash("fake/fakefilepath.txt")
+        assert hash == None
