@@ -329,92 +329,92 @@ To run the text_analysis.py make sure you run setup_nltk_data.py first.
 
 ## Milestone 1 Compliance
 
-### [X] Require the user to give consent for data access before proceeding
+### - [X] Require the user to give consent for data access before proceeding
 
     - The User must indicate consent via the CLI flag `-y` or `--yes` to proceed without prompt
     - if the user does not include the -y flag they will be prompted to give consent before proceeding
 
-### [X] Parse a specified zipped folder containing nested folders and files
+### - [X] Parse a specified zipped folder containing nested folders and files
 
     - The CLI flag `--zip <zipfile>` allows the user to specify a zip file to extract and scan
 
-### [X] Return an error if the specified file is in the wrong format
+### - [X] Return an error if the specified file is in the wrong format
 
     - If the specified file is not a zip file an error message is returned and the program exits
 
-### [X] Request user permission before using external services (e.g., LLM) and provide implications on data privacy about the user's data
+### - [X] Request user permission before using external services (e.g., LLM) and provide implications on data privacy about the user's data
 
     - There are no external services used in Milestone 1
 
-### [X] Have alternative analyses in place if sending data to an external service is not permitted
+### - [X] Have alternative analyses in place if sending data to an external service is not permitted
 
     - All analyses are done locally in Milestone 1
 
-### [X] Store user configurations for future use
+### - [X] Store user configurations for future use
 
     - User configurations are stored using the param system, and stored in json format
 
-### [X] Distinguish individual projects from collaborative projects
+### - [X] Distinguish individual projects from collaborative projects
 
     - Collaborative projects are identified by the presence of multiple authors in git commit history
     - Users can filter out their own commits using the -g flag to set their own username
 
-### [X] For a coding project, identify the programming language and framework used
+### - [X] For a coding project, identify the programming language and framework used
 
     - Programming languages are identified by file extension
     - frameworks/libraries are identified by the imports used in the code files
 
-### [X] Extrapolate individual contributions for a given collaboration project
+### - [X] Extrapolate individual contributions for a given collaboration project
 
     - An individuals contributions to git projects are distinguished from othe contributors in the project such as
         - number of commits,
         - lines added/removed,
         - and commit objectives
 
-### [X] Extract key contribution metrics in a project, displaying information about the duration of the project and activity type contribution frequency (e.g., code vs test vs design vs document), and other important information
+### - [X] Extract key contribution metrics in a project, displaying information about the duration of the project and activity type contribution frequency (e.g., code vs test vs design vs document), and other important information
 
     - Contribution metrics are extracted from git commit history, including number of commits, lines added/removed, and commit objectives
     - Files tracked by the git project that were worked on by the user are scanned and included as skill indicators.
 
-### [X] Extract key skills from a given project
+### - [X] Extract key skills from a given project
 
     - Skills are extracted using a combination of Natural Language processing and keyword matching from a predefined skill set (For programming libraries and frameworks)
 
-### [X] Output all the key information for a project
+### - [X] Output all the key information for a project
 
     - Key information is saved to a log file in csv for further processing
 
-### [X] Store project information into a database
+### - [X] Store project information into a database
 
     - Project information is stored in a local csv log that are managed by the log service. This acts as a simple database for storing project information
 
-### [X] Retrieve previously generated portfolio information
+### - [X] Retrieve previously generated portfolio information
 
     - Previously generated portfolios are saved to the users drive, and may be retrieved by the user
     - Portfolio may be regenerated from previous logs
 
-### [X] Retrieve previously generated résumé item
+### - [X] Retrieve previously generated résumé item
 
     - Previously generated resumes are saved to the users drive, and may be retrieved by the user
     - Resumes may be generated from previous logs
 
-### [X] Rank importance of each project based on user's contributions
+### - [X] Rank importance of each project based on user's contributions
 
     - Git projects receive an importance based on the users contributions
 
-### [X] Summarize the top ranked projects
+### - [X] Summarize the top ranked projects
 
     - Projects can be sorted and displayed by importance
 
-### [X] Delete previously generated insights and ensure files that are shared across multiple reports do not get affected
+### - [X] Delete previously generated insights and ensure files that are shared across multiple reports do not get affected
 
     - The user may start a new log file using the -c or --clean flag, this will create a new log file and not affect any previously generated insights, or allow previous results to affect the current scan
 
-### [X] Produce a chronological list of projects
+### - [X] Produce a chronological list of projects
 
     - The user may generate a chronological list of projects using the -t or --skill_timeline_entries flag
 
-### [X] Produce a chronological list of skills exercised
+### - [X] Produce a chronological list of skills exercised
 
     - The user may generate a chronological list of projects using the -t or --skill_timeline_entries flag
 
@@ -434,19 +434,27 @@ The API requirements we must fulfil are
 
 #### POST /projects/upload:
 
-- [ ] the FSS must be reworked to call the zip extractor itself
+- [x] the FSS must be reworked to call the zip extractor itself
+
+Fulfilled by PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/221
 
 #### POST /privacy-consent
 
 - [x] Fulfilled by the GUI call to display the privacy prompt
 
+Fulfilled by PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/177
+
 #### GET /projects
 
-- [ ] Fulfilled by having the GUI access lines from the log file through the log API
+- [x] Fulfilled by having the GUI access lines from the log file through the log API
+
+Fulfilled by PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/200
 
 #### GET /projects/{id}
 
-- Fulfilled by having the GUI access lines from the log file through the log API
+- [x] Fulfilled by having the GUI access lines from the log file through the log API and the showcase page
+
+Fulfilled by PR: TODO
 
 #### GET /skills
 
@@ -456,21 +464,32 @@ non-trivial amount of rework for the CLI
 - [ ] I highly recommend that this be completed in order to abide by the requirements, even though it is not strictly necessary from a
       functionality perspective
 
+Fulfilled by PR: TODO
+
 #### GET /resume/{id}
 
 - [x] A new resume API is needed to fulfill this requirement, making the program store created resumes in application storage
 
+Fulfilled by PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/219
+
 #### POST /resume/generate
 
-- [ ] Fulfilled by Showcase functionality
+- [x] Fulfilled by Showcase functionality
 
 #### POST /resume/{id}/edit
 
-- [ ] New Showcase functionality is needed to facilitate the editing of resume objects
+- [x] New Showcase functionality is needed to facilitate the editing of resume objects
+
+Fullfilled by PRs:
+
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/220
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/207
 
 #### GET /portfolio/{id}
 
 - [ ] A new portfolio API is needed to fulfill this requirement, making the program store created portfolios in application storage
+
+Fulfilled by PR: TODO
 
 #### POST /portfolio/generate
 
@@ -478,51 +497,64 @@ non-trivial amount of rework for the CLI
 
 #### POST /portfolio/{id}/edit
 
-- [ ] New Showcase functionality is needed to facilitate the editing of portfolio objects
+- [x] New Showcase functionality is needed to facilitate the editing of portfolio objects
+
+Fullfilled by Log edit API and PR:
+
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/207
 
 ### Other Milestone 2 requirements
 
-#### [X] Allow incremental information by adding another zipped folder of files for the same portfolio or résumé that incorporates additional information at a later point in time
+#### - [X] Allow incremental information by adding another zipped folder of files for the same portfolio or résumé that incorporates additional information at a later point in time
 
 Logs allow for incremental scans.
 
-#### [X] Recognize duplicate files and maintains only one in the system
+#### - [X] Recognize duplicate files and maintains only one in the system
 
 System does not maintain files from user-space in its own database
 
-#### [ ] Allow users to choose which information is represented (e.g., re-ranking of projects, corrections to chronology, attributes for project comparison, skills to highlight, projects selected for showcase)
+#### - [X] Allow users to choose which information is represented (e.g., re-ranking of projects, corrections to chronology, attributes for project comparison, skills to highlight, projects selected for showcase)
 
-Unimplemented
+Fulfilled by PRs:
 
-#### [X] Incorporate a key role of the user in a given project
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/193
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/197
+
+#### - [X] Incorporate a key role of the user in a given project
 
 Uncertain what this means, but we do create user specific skills and outcomes for collaborative projects.
 
-#### [X] Incorporate evidence of success (e.g., metrics, feedback, evaluation) for a given project
+#### - [X] Incorporate evidence of success (e.g., metrics, feedback, evaluation) for a given project
 
 Users measures of success (amount of contributions, and skills contributed) are recorded for collaborative projects
 
-#### [ ] Allow user to associate a portfolio image for a given project to use as the thumbnail
+#### - [ ] Allow user to associate a portfolio image for a given project to use as the thumbnail
 
-Unimplemented
+TODO: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/226
 
-#### [ ] Customize and save information about a portfolio showcase project
+#### - [X] Customize and save information about a portfolio showcase project
 
-Unimplemented
+Fulfilled by PR's:
 
-#### [ ] Customize and save the wording of a project used for a résumé item
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/197
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/193
 
-Unimplemented
+#### - [X] Customize and save the wording of a project used for a résumé item
 
-#### [ ] Display textual information about a project as a portfolio showcase
+Fulfilled by PR's:
 
-Unimplemented
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/197
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/193
 
-#### [ ] Display textual information about a project as a résumé item
+#### - [X] Display textual information about a project as a portfolio showcase
 
-Unimplemented
+Fulfilled by PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/207
 
-#### [X] You need to provide at least two zipped test data files for the same project, one as a snapshot at an earlier point in time, and another as a snapshot later in time that could have additional/modified files, with the following directory structure:
+#### - [X] Display textual information about a project as a résumé item
+
+Fulfilled by PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/207
+
+#### - [X] You need to provide at least two zipped test data files for the same project, one as a snapshot at an earlier point in time, and another as a snapshot later in time that could have additional/modified files, with the following directory structure:
 
 test-data.zip:
 ./code_collab_proj/app/
@@ -530,7 +562,9 @@ test-data.zip:
 ./code_collab_proj/doc/
 etc.
 
-#### [X] You need to provide at least one zipped test data file that has multiple projects, showcasing individual and collaborative projects. If you have code and non-code projects, be sure to provide test data for those too. The directory structure should resemble the following:
+PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/205
+
+#### - [X] You need to provide at least one zipped test data file that has multiple projects, showcasing individual and collaborative projects. If you have code and non-code projects, be sure to provide test data for those too. The directory structure should resemble the following:
 
 test-data.zip:
 ./code_indiv_proj/
@@ -539,40 +573,51 @@ test-data.zip:
 ./image_indiv_proj/
 etc.
 
-#### [X] Your API endpoints must be tested as if they are being called over HTTP but without running a real server, ensuring the correct status code and expected data.
+PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/205
+
+#### - [X] Your API endpoints must be tested as if they are being called over HTTP but without running a real server, ensuring the correct status code and expected data.
 
 Unclear how this applies to us, but our Unit tests do check outputs from their function calls
 
-#### [X] Your system must have clear documentation for all of the API endpoints
+#### - [X] Your system must have clear documentation for all of the API endpoints
 
-README lacks specific information about function calls
+Completed in the API Documentation section of this README
 
 ### Notes and Rework Required After Assessment:
 
 After carefully combing over the functionality it appears that the main areas that require rewrites are:
 
-#### [ ] FSS
+#### - [X] FSS
 
 - Rework the function calls to be more API like
 - Make the FSS responsible for processing zipped folders
 
-#### [ ] Project Grouping rewrites
+Completed in PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/202
+
+#### - [X] Project Grouping rewrites
 
 - Grouping will have to be rewritten to allow for customized project grouping
 
-#### [ ] Logging and FAS rewrites
+Completed in PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/203
+
+#### - [X] Logging and FAS rewrites
 
 - We may require rewriting how the logs/FileAnalysis objects are structured to allow for customized project grouping
   shift away from logging individual files and logging "Projects" that contain files. the file analysis can remain but must be encapsulated.
   Where this encapsulation happens is up to the developer, I do suggest moving it into the FAS though to keep the logging dynamic
 - May require rewrites to support attaching an image to a project.
 
-#### [X] Showcase rewrites
+Completed in PR's:
+
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/197
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/193
+
+#### - [X] Showcase rewrites
 
 - Showcase may have to have its own logging system to allow for modification, without influencing the scan logs, or being overwritten by future updates. this depends on how modification is implemented, and can change. Two birds can be killed with one stone by implementing the versioning and saving of generated outputs inside the application data. This may have adverse effects on the user if saving lots of info, so I suggest implementing a hard ceiling of 10 resumes to persist, any new ones generated delete the oldest one. We can have this parameterized for user control.
 - We are also going to have to make it more "resume" like with fields for the user to enter other information about themselves
 
-#### [ ] All backend functionality
+#### - [X] All backend functionality
 
 - Ensure that "backend" functions are API like in nature, every class shall only have one function that can be called by the GUI/CLI
 - Ensure that "backend" functions are documented like an API, with inputs, and expected outputs defined. Specifically focus on
@@ -581,12 +626,110 @@ After carefully combing over the functionality it appears that the main areas th
 
 Status:
 
-- [ ] FAS
-- [ ] FSS
-- [ ] Log
-- [ ] Showcase
-- [ ] Zip
+- [x] FAS
+- [x] FSS
+- [x] Log
+- [x] Showcase
+- [x] Zip
 
 ### GUI Development:
 
 The GUI development/planning shall begin when the design is finalized
+
+## API Documentation
+
+### POST /projects/upload
+
+To upload a project simply call the FSS search function. The FSS search function takes in an FSS_Search object that can be configured with the following parameters:
+
+- input_path: Which contains the file path of the zip/directory meant to be scanned, this is the only required parameter for the FSS search function, all other parameters have default values that can be used if the user does not wish to configure them.
+
+- excluded_path: This is a set of file paths that the user wishes to exclude from the scan, this can be used to exclude files that may contain sensitive information, or files that the user does not wish to be included in the analysis. This is an optional parameter and defaults to an empty set.
+
+- file_types: This is a set of file types that the user wishes to include in the scan, this can be used to only include certain types of files that may be relevant to the analysis. This is an optional parameter and defaults to an empty set, which means that all file types will be included in the scan.
+
+- time_lower_bound: datetime | None = None, This is a datetime object that represents the lower bound of the time range for the files to be included in the scan. This can be used to only include files that were created or modified after a certain date. This is an optional parameter and defaults to None, which means that there is no lower bound on the time range for the files to be included in the scan.
+
+- time_upper_bound: datetime | None = None, This is a datetime object that represents the upper bound of the time range for the files to be included in the scan. This can be used to only include files that were created or modified before a certain date. This is an optional parameter and defaults to None, which means that there is no upper bound on the time range for the files to be included in the scan.
+
+### POST /privacy-consent
+
+- Privacy consent is handled by the GUI and CLI, requiring user consent before proceeding with any file access or analysis. The user can provide consent via the CLI flag `-y` or `--yes` to proceed without prompt, or they will be prompted to give consent before proceeding if the flag is not used. In the GUI, a privacy consent prompt is displayed to the user, and they must provide consent before proceeding with any file access or analysis.
+
+### GET /projects -> log.follow_log()
+
+- Project information is retrieved from the log file through the logging API, which acts as a simple database for storing project information. The GUI can access lines from the log file through the log API to display project information to the user.
+
+### GET /projects/{id} -> TODO
+
+- TODO: This is currently fulfilled by the GUI accessing lines from the log file through the log API and the showcase page, but we may want to implement a specific API endpoint for this functionality to better separate concerns and make it more API like. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/229
+
+### GET /skills -> showcase.generate_skill_timeline()
+
+- This is currently fulfilled by calling the generate_skill_timeline function in the showcase. This takes the current active log and translates it into a skill timeline, which is a chronological list of skills exercised in the projects. This is then saved to the users parameter for offload, and can be accessed by the GUI to display the skill timeline to the user.
+
+### GET /resume/{id} -> resume_manager.get()
+
+- This is fulfilled by calling the get function from the resume_manager with the resume id, the resume manager will then return the resume object with a matching ID.
+
+### POST /resume/generate -> showcase.generate_resume()
+
+- This is fullfilled by a call to the generate_resume() function in the showcase module, which generates a resume PDF from the scanned projects. The generated resume is saved to the user's parameter for offload "showcase_export_path". This path defaults to the users downloads folder but can be changed by the user..
+
+### POST /resume/{id}/edit -> log.update()
+
+- Using the log update function with the line you would like to write, the logs are updated and then showcase items can be regenerated by calling their respective function to reflect the changes made by the user. This allows for a more dynamic and interactive experience for the user when editing their resume information. the update function takes in a FileAnalysis type object.
+
+The FileAnalysis object has the following parameters:
+
+- file_path: str,
+- file_name: str,
+- file_type: str,
+- last_modified: str,
+- created_time: str,
+- extra_data: Optional[Any] = None,
+- importance: float = 0.0,
+- customized: bool = False,
+- project_id: Optional[str] = None,
+
+### GET /portfolio/{id} -> TODO
+
+- TODO: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/225
+
+### POST /portfolio/generate showcase.generate_portfolio()
+
+- this is fullfilled by a call to the generate_portfolio() function in the showcase module, which generates a portfolio website from the scanned projects. The generated portfolio is saved to the user's parameter for offload "showcase_export_path". This path defaults to the users downloads folder but can be changed by the user.
+
+### POST /portfolio/{id}/edit -> log.update()
+
+- Using the log update function with the line you would like to write, the logs are updated and then showcase items can be regenerated by calling their respective function to reflect the changes made by the user. This allows for a more dynamic and interactive experience for the user when editing their resume information. the update function takes in a FileAnalysis type object.
+
+The FileAnalysis object has the following parameters:
+
+- file_path: str,
+- file_name: str,
+- file_type: str,
+- last_modified: str,
+- created_time: str,
+- extra_data: Optional[Any] = None,
+- importance: float = 0.0,
+- customized: bool = False,
+- project_id: Optional[str] = None,
+
+## API Testing
+
+API testing is currently done through unit tests, which test the functionality of the API endpoints by calling the respective functions and checking their outputs.
+
+Our testing suite can be run using the following command:
+
+```sh
+python -m pytest -q
+```
+
+for more verbose output, simply remove the -q flag:
+
+```sh
+python -m pytest
+```
+
+All tests are stored in the src/tests folder, and are organized by API. Each test file starts with "test\_" and contains a class that also starts with "Test\_" followed by the name of the API being tested. Each test function within the class starts with "test\_" and tests a specific functionality of the API.
