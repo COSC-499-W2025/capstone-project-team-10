@@ -12,7 +12,7 @@ from src.fas.fas import FileAnalysis
 
 # Newest Log is always max count after maximum logs are being stored
 current_log_file: str = ""
-log_lock = threading.Lock()
+log_lock = threading.RLock()
 
 
 # resumes the last log file used
@@ -162,51 +162,51 @@ def update(fileAnalysis: FileAnalysis, forceUpdate: bool = False) -> None:
     temp_path = str(Path(param.result_log_folder_path) / "log.tmp")
     updated = False
 
-    with (
-        log_lock,
-        open(current_log_file, "r", newline="") as current_log,
-        open(temp_path, "w", newline="") as temp_log,
-    ):
-        reader = csv.reader(current_log)
-        writer = csv.writer(temp_log)
+    with log_lock:
+        with (
+            open(current_log_file, "r", newline="") as current_log,
+            open(temp_path, "w", newline="") as temp_log,
+        ):
+            reader = csv.reader(current_log)
+            writer = csv.writer(temp_log)
 
-        header = next(reader)
-        writer.writerow(header)
+            header = next(reader)
+            writer.writerow(header)
 
-        for row in reader:
-            if row[0] == fileAnalysis.file_path:
-                # Write updated row
-                if row[7] == "False" or forceUpdate:
-                    writer.writerow(
-                        [
-                            fileAnalysis.file_path,
-                            fileAnalysis.file_name,
-                            fileAnalysis.file_type,
-                            fileAnalysis.last_modified,
-                            fileAnalysis.created_time,
-                            fileAnalysis.extra_data,
-                            fileAnalysis.importance,
-                            fileAnalysis.customized,
-                            fileAnalysis.project_id,
-                            fileAnalysis.file_hash,
-                        ]
-                    )
+            for row in reader:
+                if row[0] == fileAnalysis.file_path:
+                    # Write updated row
+                    if row[7] == "False" or forceUpdate:
+                        writer.writerow(
+                            [
+                                fileAnalysis.file_path,
+                                fileAnalysis.file_name,
+                                fileAnalysis.file_type,
+                                fileAnalysis.last_modified,
+                                fileAnalysis.created_time,
+                                fileAnalysis.extra_data,
+                                fileAnalysis.importance,
+                                fileAnalysis.customized,
+                                fileAnalysis.project_id,
+                                fileAnalysis.file_hash,
+                            ]
+                        )
+                    else:
+                        # Keep original row if customized is True and not forcing update
+                        writer.writerow(row)
+                    updated = True
                 else:
-                    # Keep original row if customized is True and not forcing update
+                    # Write original row
                     writer.writerow(row)
-                updated = True
-            else:
-                # Write original row
-                writer.writerow(row)
 
-    if not updated:
-        # remove temp file if no update was made
-        Path(temp_path).unlink()
-        # write the line to file if no update can be made
-        write(fileAnalysis)
-    else:
-        # Replace original file with updated file
-        Path(temp_path).replace(current_log_file)
+        if not updated:
+            # remove temp file if no update was made
+            Path(temp_path).unlink()
+            # write the line to file if no update can be made
+            write(fileAnalysis)
+        else:
+            # Replace original file with updated file
+            Path(temp_path).replace(current_log_file)
 
 
 def follow_log(
@@ -232,9 +232,9 @@ def follow_log(
             f.readline()  # skip header line
 
         while True:
-            log_lock.acquire()
-            line = f.readline()
-            log_lock.release()
+            line = ""
+            with log_lock:
+                line = f.readline()
             if line:
                 stripped = line.rstrip("\r\n")
                 yield stripped

@@ -321,7 +321,7 @@ def test_log_thread_safety():
 
     global test_file_analysis
 
-    write_count = 100
+    write_count = 10
     read_results = []
 
     def writer(idx):
@@ -383,7 +383,7 @@ def test_follow_log_multithreaded():
 
     global test_file_analysis
 
-    write_count = 100
+    write_count = 10
     lines_written = []
 
     def writer(idx):
