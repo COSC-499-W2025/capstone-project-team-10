@@ -1,6 +1,15 @@
 from pathlib import Path
 
-from pandas.core.internals.blocks import IgnoreRaise
+# Replace the old internal Pandas import (which is not accessible in newer versions of python) with a minimal context manager
+# from pandas.core.internals.blocks import IgnoreRaise
+
+# Minimal replacement for modern Python/Pandas
+class IgnoreRaise:
+    def __enter__(self):
+        pass
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        return True  # ignore all exceptions
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QApplication,
