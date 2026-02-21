@@ -3,6 +3,9 @@ from PyQt5.QtWidgets import (
     QPushButton, QLineEdit, QTextEdit, QFileDialog, QMessageBox
 )
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QDesktopServices
+from PyQt5.QtCore import QUrl
+
 from pathlib import Path
 from src.gui.gui_resume_manager import ResumeManager
 
@@ -185,5 +188,19 @@ class ResumePage(QWidget):
     def generate_pdf(self):
         """Generate full resume PDF using current project data."""
         pdf_path = self.manager.get_full_resume_pdf()
-        if pdf_path:
-            print(f"Resume PDF generated at: {pdf_path}")
+
+        if not pdf_path:
+            QMessageBox.warning(self, "Error", "Failed to generate resume PDF.")
+            return
+
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Resume Generated")
+        msg.setText("Resume PDF generated successfully!")
+        msg.setInformativeText(str(pdf_path))
+        open_btn = msg.addButton("Open Folder", QMessageBox.ActionRole)
+        msg.addButton(QMessageBox.Ok)
+
+        msg.exec_()
+
+        if msg.clickedButton() == open_btn:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(pdf_path.parent)))

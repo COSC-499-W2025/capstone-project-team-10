@@ -3,6 +3,9 @@ from PyQt5.QtWidgets import (
     QPushButton, QLineEdit, QTextEdit, QFileDialog, QMessageBox
 )
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QDesktopServices
+from PyQt5.QtCore import QUrl
+
 from pathlib import Path
 from src.gui.gui_resume_manager import ResumeManager
 
@@ -183,7 +186,21 @@ class PortfolioPage(QWidget):
         self.refresh_project_list()
 
     def generate_portfolio(self):
-        """Generate full portfolio PDF using current project data."""
+        """Generate full portfolio using current project data."""
         pdf_path = self.manager.get_full_portfolio()
-        if pdf_path:
-            print(f"Portfolio PDF generated at: {pdf_path}")
+
+        if not pdf_path:
+            QMessageBox.warning(self, "Error", "Failed to generate portfolio.")
+            return
+
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Portfolio Generated")
+        msg.setText("Portfolio generated successfully!")
+        msg.setInformativeText(str(pdf_path))
+        open_btn = msg.addButton("Open Folder", QMessageBox.ActionRole)
+        msg.addButton(QMessageBox.Ok)
+
+        msg.exec_()
+
+        if msg.clickedButton() == open_btn:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(pdf_path.parent)))
