@@ -158,6 +158,7 @@ def search(search_params: FSS_Search):
 
             if file_result:
                 log.write(file_result)
+                num_of_files_scanned += 1
                 num_of_duplicates_found += 1
             else:
                 file_result: fas.FileAnalysis | None = fas.run_fas(file_path)
