@@ -46,21 +46,40 @@ def sort_sequence(log_path):
 
 def add_cli_args(parser: argparse.ArgumentParser):
     parser.add_argument(
-        "file_path", nargs="?", help="Path to start search at or zip file to extract."
+        "file_path",
+        nargs="?",
+        help="""        ================================================
+        Set the path or zip file to scan.
+        ================================================\u200b
+        """,
     )
     parser.add_argument(
         "--exclude-paths",
         nargs="+",
-        help="Paths to exclude from search (space separated).",
+        help="""        ================================================
+        Set paths to ignore during scans.
+        
+        Please use absolute paths.
+        ================================================\u200b
+        """,
     )
     parser.add_argument(
-        "--file-types", nargs="+", help="File types to include (space separated)."
+        "--file-types",
+        nargs="+",
+        help="""        ================================================
+        Set the file types to scan (space separated).
+        Do not include punctuation - for example use 'py' for python files, 'txt' for text files, etc.
+        ================================================\u200b
+        """,
     )
     parser.add_argument(
         "-y",
         "--yes",
         action="store_true",
-        help="Automatically grant file access permission.",
+        help="""        ================================================
+        Automatically grant file access permission. Bypassing the prompt for user confirmation.
+        ================================================\u200b
+        """,
     )
     parser.add_argument(
         "-r",
@@ -68,7 +87,13 @@ def add_cli_args(parser: argparse.ArgumentParser):
         nargs="?",
         const=True,
         default=None,
-        help="Output a pdf with resume project insights. Optional: Include a directory path to change where the result is saved",
+        help="""        ================================================
+        Create a pdf with resume items from the current log.
+        
+        Optional: Include a directory path to change where the document is saved, 
+        by default it will be saved to the users downloads folder.
+        ================================================\u200b
+        """,
     )
     parser.add_argument(
         "-p",
@@ -76,7 +101,13 @@ def add_cli_args(parser: argparse.ArgumentParser):
         nargs="?",
         const=True,
         default=None,
-        help="Output a web portfolio with project descriptions. Optional: Include a directory path to change where the result is saved",
+        help="""        ================================================
+        Create a web portfolio with project descriptions and links from the current log.
+        
+        Optional: Include a directory path to change where the resulting zip file is saved, 
+        by default it will be saved to the users downloads folder.
+        ================================================\u200b
+        """,
     )
     parser.add_argument(
         "-t",
@@ -84,54 +115,95 @@ def add_cli_args(parser: argparse.ArgumentParser):
         nargs="?",
         const=True,
         default=None,
-        help="Output a pdf with with key skills ordered chronologically. Optional: Include a directory path to change where the result is saved",
+        help="""        ================================================
+        Create a pdf displaying key skills ordered chronologically. 
+        
+        Optional: Include a directory path to change where the result is saved, 
+        by default it will be saved to the users downloads folder.
+        ================================================\u200b
+        """,
     )
     parser.add_argument(
         "-c",
         "--clean",
         action="store_true",
-        help="Start a new log file instead of resuming the last one.",
+        help="""        ================================================
+        Start a clean log file instead of resuming the last one.
+        
+        This acts as a reset.
+        ================================================\u200b
+        """,
     )
     parser.add_argument(
         "-b",
         "--before",
         type=str,
-        help="Only include files created before the specified date (YYYY-MM-DD).",
+        help="""        ================================================
+        Only scan files created before the specified date. 
+        
+        Use format (YYYY-MM-DD).
+        ================================================\u200b
+        """,
     )
     parser.add_argument(
         "-a",
         "--after",
         type=str,
-        help="Only include files created after the specified date (YYYY-MM-DD).",
+        help="""        ================================================
+        Only scan files created after the specified date. 
+        
+        Use format (YYYY-MM-DD).
+        ================================================\u200b
+        """,
     )
     parser.add_argument(
         "-g",
         "--github_username",
         type=str,
-        help="Input a github username for specific git repo parsing.",
+        help="""        ================================================
+        Set a github username for scanning user specific contributions.
+        ================================================\u200b
+        """,
     )
     parser.add_argument(
         "-s",
         "--sort",
         action="store_true",
-        help="Initiate the sorting sequence after the logs are completed.",
+        help="""        ================================================
+        Sort the resulting scan logs. 
+        
+        Enables the sorting prompt after scan is complete.
+        ================================================\u200b
+        """,
     )
     # Flags
-    parser.add_argument("-q", "--quiet", action="store_true", help="Suppress output.")
+    parser.add_argument(
+        "-q",
+        "--quiet",
+        action="store_true",
+        help="""        ================================================
+        Suppress output.
+        ================================================\u200b
+        """,
+    )
 
     # Disable image embedding
     parser.add_argument(
         "-i",
         "--no_image",
         action="store_true",
-        help="Allow images to be embedded into the resume and portfolio.",
+        help="""        ================================================
+        Disable image embedding in the resume and portfolio.
+        ================================================\u200b
+        """,
     )
 
 
 def run_cli():
     # Setup supported CLI args
     parser = argparse.ArgumentParser(
-        description="CLI for file system scanning and zip extraction."
+        description="CLI for file system scanning and zip extraction.",
+        formatter_class=argparse.RawTextHelpFormatter,
     )
     add_cli_args(parser)
 
