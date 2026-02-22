@@ -354,9 +354,6 @@ class ProjectFilesPage(QWidget):
             else:
                 QMessageBox.warning(self, "Warning", f"Could not update log for '{file_name}'.")
 
-        if added:
-            QMessageBox.information(self, "Done", f"Successfully moved into project: '{self._current_project_id}'.")
-
 # Lists all project ids in selected log
 class LogDetailsPage(QWidget):
     # Return to previous page
