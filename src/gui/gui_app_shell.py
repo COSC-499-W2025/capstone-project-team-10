@@ -92,7 +92,7 @@ class AppShell(QWidget):
         self.sidebar_items = [
             "Dashboard",
             "Scan",
-            "Adding Files",
+            "Items",
             "Resume",
             "Portfolio",
             "Settings",
@@ -123,8 +123,8 @@ class AppShell(QWidget):
         self.page_scan = ScanPage()
         self.page_scan_results = ScanResultsPage()
 
-        self.page_add_files = QLabel("Adding Files content goes here")
-        self.page_add_files.setAlignment(Qt.AlignCenter)
+        self.page_items = QLabel("Items content goes here")
+        self.page_items.setAlignment(Qt.AlignCenter)
 
         self.page_resume = ResumePage()
         self.page_portfolio = PortfolioPage()
@@ -134,7 +134,7 @@ class AppShell(QWidget):
         # Add pages to stack (order matters)
         self.content_stack.addWidget(self.page_dashboard)  # index 0
         self.content_stack.addWidget(self.page_scan)  # index 1
-        self.content_stack.addWidget(self.page_add_files)  # index 2
+        self.content_stack.addWidget(self.page_items)  # index 2
         self.content_stack.addWidget(self.page_resume)  # index 3
         self.content_stack.addWidget(self.page_portfolio)  # index 4
         self.content_stack.addWidget(self.page_settings)  # index 5
@@ -163,8 +163,8 @@ class AppShell(QWidget):
         elif page_name == "Scan":
             self.content_stack.setCurrentWidget(self.page_scan)
 
-        elif page_name == "Adding Files":
-            self.content_stack.setCurrentWidget(self.page_add_files)
+        elif page_name == "Items":
+            self.content_stack.setCurrentWidget(self.page_items)
 
         elif page_name == "Resume":
             self.content_stack.setCurrentWidget(self.page_resume)

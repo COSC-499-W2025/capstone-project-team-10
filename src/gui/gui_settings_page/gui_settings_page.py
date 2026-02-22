@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from pandas.core.internals.blocks import IgnoreRaise
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QApplication,
