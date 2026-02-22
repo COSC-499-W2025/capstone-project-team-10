@@ -8,6 +8,7 @@ from PyQt5.QtCore import QUrl
 
 from pathlib import Path
 from src.gui.gui_resume_manager import ResumeManager
+from src.gui.gui_skills_page import SkillsPage
 
 
 class PortfolioPage(QWidget):
@@ -85,6 +86,12 @@ class PortfolioPage(QWidget):
 
         # --- Buttons ---
         btn_layout = QHBoxLayout()
+        
+        self.skills_page_btn = QPushButton("View Skills")
+        self.skills_page_btn.clicked.connect(self.open_skills_page)
+
+        btn_layout.addWidget(self.skills_page_btn)
+
         self.save_btn = QPushButton("Save Changes")
         self.save_btn.clicked.connect(self.save_changes)
 
@@ -204,3 +211,7 @@ class PortfolioPage(QWidget):
 
         if msg.clickedButton() == open_btn:
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(pdf_path.parent)))
+
+    def open_skills_page(self):
+        self.skills_page = SkillsPage(self.manager)
+        self.skills_page.show()
