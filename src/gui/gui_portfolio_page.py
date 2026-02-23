@@ -3,8 +3,12 @@ from PyQt5.QtWidgets import (
     QPushButton, QLineEdit, QTextEdit, QFileDialog, QMessageBox
 )
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QDesktopServices
+from PyQt5.QtCore import QUrl
+
 from pathlib import Path
 from src.gui.gui_resume_manager import ResumeManager
+from src.gui.gui_skills_page import SkillsPage
 
 
 class PortfolioPage(QWidget):
@@ -82,6 +86,12 @@ class PortfolioPage(QWidget):
 
         # --- Buttons ---
         btn_layout = QHBoxLayout()
+        
+        self.skills_page_btn = QPushButton("View Skills")
+        self.skills_page_btn.clicked.connect(self.open_skills_page)
+
+        btn_layout.addWidget(self.skills_page_btn)
+
         self.save_btn = QPushButton("Save Changes")
         self.save_btn.clicked.connect(self.save_changes)
 
@@ -183,7 +193,25 @@ class PortfolioPage(QWidget):
         self.refresh_project_list()
 
     def generate_portfolio(self):
-        """Generate full portfolio PDF using current project data."""
+        """Generate full portfolio using current project data."""
         pdf_path = self.manager.get_full_portfolio()
-        if pdf_path:
-            print(f"Portfolio PDF generated at: {pdf_path}")
+
+        if not pdf_path:
+            QMessageBox.warning(self, "Error", "Failed to generate portfolio.")
+            return
+
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Portfolio Generated")
+        msg.setText("Portfolio generated successfully!")
+        msg.setInformativeText(str(pdf_path))
+        open_btn = msg.addButton("Open Folder", QMessageBox.ActionRole)
+        msg.addButton(QMessageBox.Ok)
+
+        msg.exec_()
+
+        if msg.clickedButton() == open_btn:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(pdf_path.parent)))
+
+    def open_skills_page(self):
+        self.skills_page = SkillsPage(self.manager)
+        self.skills_page.show()
