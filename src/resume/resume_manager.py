@@ -46,7 +46,7 @@ class ResumeManager:
     def create(self, source_path: Path, metadata: dict = None) -> int:
         """
         API: POST /resume
-        Copies a generated PDF to internal storage and indexes it.
+        Copies a generated PDF to internal storage and indexes it
         """
         index = self._load_index()
         resume_id = index["next_id"]
@@ -123,6 +123,5 @@ class ResumeManager:
             return True
             
         return False
-
-# Singleton instance
+    
 manager = ResumeManager()
