@@ -144,6 +144,6 @@ class TestFSS:
         """Test that multiple file type filters work inside zip files."""
         result = fss.search(fss.FSS_Search(
             path_to_test_zip,
-            file_types={"txt", "md"}
+            file_types={"txt","md"}
         ))
         assert result == 2
