@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 from pathlib import Path
 from src.gui.gui_resume_manager import ResumeManager
+from src.gui.gui_items_page.gui_items_helper import append_generated_item
 
 
 class ResumePage(QWidget):
@@ -186,4 +187,5 @@ class ResumePage(QWidget):
         """Generate full resume PDF using current project data."""
         pdf_path = self.manager.get_full_resume_pdf()
         if pdf_path:
+            append_generated_item(pdf_path, "resume")
             print(f"Resume PDF generated at: {pdf_path}")
