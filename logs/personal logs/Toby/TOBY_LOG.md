@@ -1,4 +1,31 @@
-# T2 - Week 5 (1/18/2026 - 1/25/2026)
+# T2 - Week 7 (1/18/2026 - 1/25/2026) Reading Week
+
+# T2 - Week 6 (2/09/2026 - 2/15/2026) 
+
+![T2 - Week 6 - Task Completed](T2-W6/Done.png)
+
+
+## Features
+
+![T2 - Week 6 - In Progress](T2-W6/Features.png)
+<!-- ![T2 - Week 3 - In Progress](T2-W3/Features1.png) -->
+
+## Recap
+
+- For term 2 week 6, I worked on Creating user skills page and "Open save locations" function
+  + Things that went well: My machine magically able to run the GUI again
+  - Things that did not went well: Merge conflicts
+- I will have to plan with my team for week 8. We have a presentation on Week 8
+
+## Additional Context
+## Team Survey:
+
+
+![Week 14 - Team Survey](W14/Team_Survey_(1).png)
+![Week 14 - Team Survey](W14/Team_Survey_(2).png)
+![Week 14 - Team Survey](W14/Team_Survey_(3).png)
+
+# T2 - Week 5 (2/02/2026 - 2/08/2026)
 
 ![T2 - Week 5 - Task Completed](T2-W5/Done.png)
 
