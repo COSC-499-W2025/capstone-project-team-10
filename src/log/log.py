@@ -244,6 +244,48 @@ def follow_log(
                 time.sleep(poll_interval)
 
 
+# Binding, blocks all reads and writes
+def get_project(project_id):
+    """
+    Get all log entries for a given project id, as FileAnalysis objects.
+    """
+    entries = []
+    for log_file in _get_all_log_files():
+        try:
+            with log_lock:
+                with open(log_file, "r", encoding="utf-8", newline="") as f:
+                    reader = csv.reader(f)
+                    header = next(reader, None)
+                    if header is None:
+                        continue
+
+                    project_id_col = header.index("Project id")
+
+                    for row in reader:
+                        if (
+                            len(row) > project_id_col
+                            and row[project_id_col] == project_id
+                        ):
+                            entries.append(
+                                FileAnalysis(
+                                    file_path=row[0],
+                                    file_name=row[1],
+                                    file_type=row[2],
+                                    last_modified=row[3],
+                                    created_time=row[4],
+                                    extra_data=row[5],
+                                    importance=float(row[6]) if row[6] else 0.0,
+                                    customized=row[7].strip().lower() == "true",
+                                    project_id=row[8],
+                                    file_hash=row[9],
+                                )
+                            )
+        except Exception as e:
+            print(f"Warning: Could not read log file {log_file}: {e}")
+            continue
+    return entries
+
+
 def _get_all_log_files() -> list[Path]:
     """
     Returns a list of all log files in the log folder,
