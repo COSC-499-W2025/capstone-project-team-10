@@ -1,6 +1,7 @@
 import csv
-import time
 import re
+import threading
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -11,6 +12,7 @@ from src.fas.fas import FileAnalysis
 
 # Newest Log is always max count after maximum logs are being stored
 current_log_file: str = ""
+log_lock = threading.RLock()
 
 
 # resumes the last log file used
@@ -130,7 +132,10 @@ def write(fileAnalysis: FileAnalysis) -> None:
     global current_log_file
     if current_log_file == "" or not Path(current_log_file).exists():
         resume_log_file()
-    with open(current_log_file, "a", encoding="utf-8", newline="") as log_file:
+    with (
+        log_lock,
+        open(current_log_file, "a", encoding="utf-8", newline="") as log_file,
+    ):
         writer = csv.writer(log_file)
         writer.writerow(
             [
@@ -157,54 +162,59 @@ def update(fileAnalysis: FileAnalysis, forceUpdate: bool = False) -> None:
     temp_path = str(Path(param.result_log_folder_path) / "log.tmp")
     updated = False
 
-    with (
-        open(current_log_file, "r", newline="") as current_log,
-        open(temp_path, "w", newline="") as temp_log,
-    ):
-        reader = csv.reader(current_log)
-        writer = csv.writer(temp_log)
+    with log_lock:
+        with (
+            open(current_log_file, "r", newline="") as current_log,
+            open(temp_path, "w", newline="") as temp_log,
+        ):
+            reader = csv.reader(current_log)
+            writer = csv.writer(temp_log)
 
-        header = next(reader)
-        writer.writerow(header)
+            header = next(reader)
+            writer.writerow(header)
 
-        for row in reader:
-            if row[0] == fileAnalysis.file_path:
-                # Write updated row
-                if row[7] == "False" or forceUpdate:
-                    writer.writerow(
-                        [
-                            fileAnalysis.file_path,
-                            fileAnalysis.file_name,
-                            fileAnalysis.file_type,
-                            fileAnalysis.last_modified,
-                            fileAnalysis.created_time,
-                            fileAnalysis.extra_data,
-                            fileAnalysis.importance,
-                            fileAnalysis.customized,
-                            fileAnalysis.project_id,
-                            fileAnalysis.file_hash,
-                    ]
-                    )
+            for row in reader:
+                if row[0] == fileAnalysis.file_path:
+                    # Write updated row
+                    if row[7] == "False" or forceUpdate:
+                        writer.writerow(
+                            [
+                                fileAnalysis.file_path,
+                                fileAnalysis.file_name,
+                                fileAnalysis.file_type,
+                                fileAnalysis.last_modified,
+                                fileAnalysis.created_time,
+                                fileAnalysis.extra_data,
+                                fileAnalysis.importance,
+                                fileAnalysis.customized,
+                                fileAnalysis.project_id,
+                                fileAnalysis.file_hash,
+                            ]
+                        )
+                    else:
+                        # Keep original row if customized is True and not forcing update
+                        writer.writerow(row)
+                    updated = True
                 else:
-                    # Keep original row if customized is True and not forcing update
+                    # Write original row
                     writer.writerow(row)
-                updated = True
-            else:
-                # Write original row
-                writer.writerow(row)
 
-    if not updated:
-        # remove temp file if no update was made
-        Path(temp_path).unlink()
-        # write the line to file if no update can be made
-        write(fileAnalysis)
-    else:
-        # Replace original file with updated file
-        Path(temp_path).replace(current_log_file)
+        if not updated:
+            # remove temp file if no update was made
+            Path(temp_path).unlink()
+            # write the line to file if no update can be made
+            write(fileAnalysis)
+        else:
+            # Replace original file with updated file
+            Path(temp_path).replace(current_log_file)
 
 
-def follow_log(file_path: str | None = None, include_header: bool = False, poll_interval: float = 0.5,
-               stop_signal: str = "!close!"):
+def follow_log(
+    file_path: str | None = None,
+    include_header: bool = False,
+    poll_interval: float = 0.5,
+    stop_signal: str = "!close!",
+):
     """
     Generator that yields log lines as they appear in the file.
     Polls the file and waits for new lines to be added.
@@ -222,7 +232,9 @@ def follow_log(file_path: str | None = None, include_header: bool = False, poll_
             f.readline()  # skip header line
 
         while True:
-            line = f.readline()
+            line = ""
+            with log_lock:
+                line = f.readline()
             if line:
                 stripped = line.rstrip("\r\n")
                 yield stripped
@@ -230,6 +242,49 @@ def follow_log(file_path: str | None = None, include_header: bool = False, poll_
                     break
             else:
                 time.sleep(poll_interval)
+
+
+# Binding, blocks all reads and writes
+def get_project(project_id):
+    """
+    Get all log entries for a given project id, as FileAnalysis objects.
+    """
+    entries = []
+    for log_file in _get_all_log_files():
+        try:
+            with log_lock:
+                with open(log_file, "r", encoding="utf-8", newline="") as f:
+                    reader = csv.reader(f)
+                    header = next(reader, None)
+                    if header is None:
+                        continue
+
+                    project_id_col = header.index("Project id")
+
+                    for row in reader:
+                        if (
+                            len(row) > project_id_col
+                            and row[project_id_col] == project_id
+                        ):
+                            entries.append(
+                                FileAnalysis(
+                                    file_path=row[0],
+                                    file_name=row[1],
+                                    file_type=row[2],
+                                    last_modified=row[3],
+                                    created_time=row[4],
+                                    extra_data=row[5],
+                                    importance=float(row[6]) if row[6] else 0.0,
+                                    customized=row[7].strip().lower() == "true",
+                                    project_id=row[8],
+                                    file_hash=row[9],
+                                )
+                            )
+        except Exception as e:
+            print(f"Warning: Could not read log file {log_file}: {e}")
+            continue
+    return entries
+
 
 def _get_all_log_files() -> list[Path]:
     """
@@ -247,6 +302,7 @@ def _get_all_log_files() -> list[Path]:
             if match:
                 log_files.append(file)
     return log_files
+
 
 def find_existing_analysis(file_hash: str) -> Optional[FileAnalysis]:
     """

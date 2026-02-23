@@ -250,7 +250,7 @@ class TestLog:
 
         assert lines[0].startswith("File path analyzed")  # Header
         assert "!close!" in lines[-1]
-        
+
     def test_log_update_blocked(self):
         setup_log_tests()
         log.open_log_file()
@@ -294,7 +294,7 @@ class TestLog:
         log.write(test_file_analysis_customized)
 
         log_files = log._get_all_log_files()
-        assert len(log_files) == 2 
+        assert len(log_files) == 2
 
     def test_find_existing_analysis(self):
         # Creates a log with 'x' as file hash and uses function to retreive the analysis from the hash
@@ -308,3 +308,176 @@ class TestLog:
         assert fa.file_hash == "x"
 
 
+def test_log_thread_safety():
+    """
+    Test that log outputs are not broken when logs are updated and read from multiple threads.
+    """
+    import threading
+    import time
+
+    setup_log_tests()
+    log.open_log_file()
+    log_file_path = str(os.path.join(param.result_log_folder_path, "0.log"))
+
+    global test_file_analysis
+
+    write_count = 10
+    read_results = []
+
+    def writer(idx):
+        entry = FileAnalysis(
+            file_path=f"tests/testdata/fakeTestFile/file{idx}.txt",
+            file_name=f"file{idx}.txt",
+            file_type="txt",
+            last_modified="2023-10-01T12:00:00",
+            created_time="2023-09-30T11:00:00",
+            extra_data=f"DATA {idx}",
+            importance=0.0,
+            customized=False,
+            project_id=f"ID-{idx}",
+            file_hash=f"hash{idx}",
+        )
+        log.write(entry)
+        # Simulate update
+        entry.extra_data = f"UPDATED DATA {idx}"
+        log.update(entry)
+
+    def reader():
+        time.sleep(0.1)
+        with open(log_file_path, "r") as f:
+            lines = f.readlines()
+            read_results.append(lines)
+
+    # Start writer threads
+    writers = [threading.Thread(target=writer, args=(i,)) for i in range(write_count)]
+    readers = [threading.Thread(target=reader) for _ in range(3)]
+
+    for w in writers:
+        w.start()
+    for r in readers:
+        r.start()
+    for w in writers:
+        w.join()
+    for r in readers:
+        r.join()
+
+    # Check that all log lines are well-formed and not broken
+    for lines in read_results:
+        for line in lines[1:]:  # skip header
+            parts = line.strip().split(",")
+            assert len(parts) == 10  # Should match the number of fields in FileAnalysis
+
+    clean_up_log_tests()
+
+
+def test_follow_log_multithreaded():
+    """
+    Test that follow_log yields all lines correctly when the log is updated from multiple threads.
+    """
+    import threading
+    import time
+
+    setup_log_tests()
+    log.open_log_file()
+    log_file_path = str(os.path.join(param.result_log_folder_path, "0.log"))
+
+    global test_file_analysis
+
+    write_count = 10
+    lines_written = []
+
+    def writer(idx):
+        entry = FileAnalysis(
+            file_path=f"tests/testdata/fakeTestFile/file{idx}.txt",
+            file_name=f"file{idx}.txt",
+            file_type="txt",
+            last_modified="2023-10-01T12:00:00",
+            created_time="2023-09-30T11:00:00",
+            extra_data=f"DATA {idx}",
+            importance=0.0,
+            customized=False,
+            project_id=f"ID-{idx}",
+            file_hash=f"hash{idx}",
+        )
+        log.write(entry)
+        lines_written.append(entry)
+
+    # Start the follow_log reader in a thread
+    read_lines = []
+
+    def reader():
+        for line in log.follow_log(log_file_path, include_header=False):
+            read_lines.append(line)
+            if len(read_lines) == write_count:
+                break
+
+    reader_thread = threading.Thread(target=reader)
+    writer_threads = [
+        threading.Thread(target=writer, args=(i,)) for i in range(write_count)
+    ]
+
+    reader_thread.start()
+    # Give the reader a moment to start
+    time.sleep(0.1)
+    for w in writer_threads:
+        w.start()
+    for w in writer_threads:
+        w.join()
+    reader_thread.join(timeout=2)
+
+    # Check that all lines were read and are well-formed
+    assert len(read_lines) == write_count
+    for line in read_lines:
+        parts = line.strip().split(",")
+        assert len(parts) == 10  # Should match FileAnalysis fields
+
+    clean_up_log_tests()
+
+
+def test_get_project():
+    setup_log_tests()
+    log.open_log_file()
+
+    # Add entries for two different projects
+    entry1 = FileAnalysis(
+        file_path="tests/testdata/fakeTestFile/fileA.txt",
+        file_name="fileA.txt",
+        file_type="txt",
+        last_modified="2023-10-01T12:00:00",
+        created_time="2023-09-30T11:00:00",
+        extra_data="DATA A",
+        importance=0.0,
+        customized=False,
+        project_id="PROJECT-1",
+        file_hash="hashA",
+    )
+    entry2 = FileAnalysis(
+        file_path="tests/testdata/fakeTestFile/fileB.txt",
+        file_name="fileB.txt",
+        file_type="txt",
+        last_modified="2023-10-02T12:00:00",
+        created_time="2023-09-29T11:00:00",
+        extra_data="DATA B",
+        importance=0.0,
+        customized=False,
+        project_id="PROJECT-2",
+        file_hash="hashB",
+    )
+    log.write(entry1)
+    log.write(entry2)
+
+    # Should only return entry1 for PROJECT-1
+    project_entries = log.get_project("PROJECT-1")
+    assert len(project_entries) == 1
+    assert isinstance(project_entries[0], FileAnalysis)
+    assert project_entries[0].file_name == "fileA.txt"
+    assert project_entries[0].project_id == "PROJECT-1"
+
+    # Should only return entry2 for PROJECT-2
+    project_entries = log.get_project("PROJECT-2")
+    assert len(project_entries) == 1
+    assert isinstance(project_entries[0], FileAnalysis)
+    assert project_entries[0].file_name == "fileB.txt"
+    assert project_entries[0].project_id == "PROJECT-2"
+
+    clean_up_log_tests()

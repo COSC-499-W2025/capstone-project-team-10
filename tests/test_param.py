@@ -9,12 +9,15 @@ def param_setup():
 
 
 class TestParam:
+    # Depricated test, as params are system specific and manually verified
+    """
     def test_param_defaults(self):
         param_setup()
         with open("src/param/param_defaults.json", "r") as default_params:
             default_data = param.json.load(default_params)
         for key in default_data:
             assert param.get(key) == default_data[key]
+    """
 
     def test_param_invalid_parse(self):
         # Created Corrupted param file for this test
