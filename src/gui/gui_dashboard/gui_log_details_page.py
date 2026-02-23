@@ -8,36 +8,6 @@ from pathlib import Path
 from src.fas.fas import FileAnalysis
 import src.log.log as log
 
-# Updates a file's Project id in the log file
-def update_project_id(log_path: Path, file_name: str, old_project_id: str, new_project_id: str) -> bool:
-    if not log_path or not log_path.exists():
-        return False
-
-    rows = []
-    updated = False
-    try:
-        with open(log_path, 'r', encoding='utf-8', newline='') as f:
-            reader = csv.DictReader(f)
-            fieldnames = reader.fieldnames
-            for row in reader:
-                if row.get("File name", "").strip() == file_name and \
-                   row.get("Project id", "").strip() == old_project_id:
-                    row["Project id"] = new_project_id
-                    updated = True
-                rows.append(row)
-
-        # Write changes back only if a matching row was found
-        if updated:
-            with open(log_path, 'w', encoding='utf-8', newline='') as f:
-                writer = csv.DictWriter(f, fieldnames=fieldnames)
-                writer.writeheader()
-                writer.writerows(rows)
-    except Exception as e:
-        print(f"Error updating CSV: {e}")
-        return False
-
-    return updated
-
 # Shows all files not currently in project but in the same log
 class AddFileDialog(QDialog):
 
@@ -114,7 +84,7 @@ class AddFileDialog(QDialog):
         buttons.button(QDialogButtonBox.Ok).setText("Add Selected")
         buttons.button(QDialogButtonBox.Ok).setStyleSheet(btn_style)
         buttons.button(QDialogButtonBox.Cancel).setStyleSheet(btn_style)
-        buttons.accepted.connect(self._on_accept)
+        buttons.accepted.connect(self.on_accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
 
@@ -142,7 +112,7 @@ class AddFileDialog(QDialog):
             self.table.setItem(idx, 3, QTableWidgetItem(row.get("Importance", "")))
             self.table.setItem(idx, 4, QTableWidgetItem(row.get("Project id", "")))
 
-    def _on_accept(self):
+    def on_accept(self):
         selected_rows = set(idx.row() for idx in self.table.selectedIndexes())
         self.selected_files = [self._rows[r] for r in selected_rows]
         self.accept()
@@ -255,7 +225,7 @@ class ProjectFilesPage(QWidget):
                 color: white;
             }
         """)
-        self.table.itemSelectionChanged.connect(self._on_selection_changed)
+        self.table.itemSelectionChanged.connect(self.on_selection_changed)
         layout.addWidget(self.table)
 
     # Load files into table for given project
@@ -266,25 +236,29 @@ class ProjectFilesPage(QWidget):
 
         for idx, fa in enumerate(files):
             self.table.insertRow(idx)
-            self.table.setItem(idx, 0, QTableWidgetItem(str(fa.file_name)))
+        
+            name_item = QTableWidgetItem(str(fa.file_name))
+        
+            name_item.setData(Qt.UserRole, fa) 
+        
+            self.table.setItem(idx, 0, name_item)
             self.table.setItem(idx, 1, QTableWidgetItem(str(fa.file_type)))
             self.table.setItem(idx, 2, QTableWidgetItem(str(fa.created_time)))
             self.table.setItem(idx, 3, QTableWidgetItem(str(fa.importance)))
 
         self.remove_btn.setEnabled(False)
 
-    def _on_selection_changed(self):
+    def on_selection_changed(self):
         has_selection = bool(self.table.selectedItems())
         self.remove_btn.setEnabled(has_selection)
 
     # Remove selected file from given project
     def on_file_remove(self):
-        selected_rows = sorted(
-            set(idx.row() for idx in self.table.selectedIndexes()),
-            reverse=True
-        )
+        selected_rows = self.table.selectionModel().selectedRows()
         if not selected_rows:
             return
+
+        rows_to_remove = sorted([index.row() for index in selected_rows], reverse=True)
 
         # Confirmation box for user
         btn_style = """
@@ -310,49 +284,56 @@ class ProjectFilesPage(QWidget):
         if confirm != QMessageBox.Yes:
             return
 
-        # Removes file and changes the project id to be blank
-        for row in selected_rows:
-            file_name = self.table.item(row, 0).text()
-            ok = update_project_id(
-                self._log_path,
-                file_name,
-                self._current_project_id,
-                ""
-            )
-            if ok:
-                self.table.removeRow(row)
-            else:
-                QMessageBox.warning(self, "Warning", f"Could not update log for '{file_name}'.")
+        # Removes file by setting its project_id to blank via log.update()
+        for row in rows_to_remove:
+            fa = self.table.item(row, 0).data(Qt.UserRole)
+        
+            if fa:
+                try:
+                    fa.project_id = "" 
+                    log.update(fa, forceUpdate=True)
+                    self.table.removeRow(row)
+                except Exception as e:
+                    QMessageBox.warning(self, "Warning", f"Could not remove '{fa.file_name}': {e}")
 
     # Add selected file to a given project
     def on_file_add(self):
         if not self._current_project_id:
             return
-        
+
         dlg = AddFileDialog(self._current_project_id, self._log_path, parent=self)
         if dlg.exec_() != QDialog.Accepted:
             return
 
-        chosen = dlg.selected_files
-        if not chosen:
-            return
+        for row_dict in dlg.selected_files:
+            fa = FileAnalysis(
+                file_path=row_dict.get("File path analyzed", "").strip(),
+                file_name=row_dict.get("File name", "").strip(),
+                file_type=row_dict.get("File type", "").strip(),
+                last_modified=row_dict.get("Last modified", "").strip(),
+                created_time=row_dict.get("Created time", "").strip(),
+                extra_data=row_dict.get("Extra data", "").strip(),
+                importance=row_dict.get("Importance", "").strip(),
+                customized=row_dict.get("Customized", "False").strip(),
+                project_id=self._current_project_id,
+                file_hash=row_dict.get("File hash", "").strip(),
+            )
+            try:
+                log.update(fa, forceUpdate=True)
 
-        added = False
-        for raw_row in chosen:
-            file_name = raw_row.get("File name", "").strip()
-            source_project = raw_row.get("Project id", "").strip()
-
-            # Update file in the log and add it to the GUI page
-            if update_project_id(self._log_path, file_name, source_project, self._current_project_id):
                 row_idx = self.table.rowCount()
                 self.table.insertRow(row_idx)
-                self.table.setItem(row_idx, 0, QTableWidgetItem(file_name))
-                self.table.setItem(row_idx, 1, QTableWidgetItem(raw_row.get("File type", "")))
-                self.table.setItem(row_idx, 2, QTableWidgetItem(raw_row.get("Created time", "")))
-                self.table.setItem(row_idx, 3, QTableWidgetItem(raw_row.get("Importance", "")))
-                added = True
-            else:
-                QMessageBox.warning(self, "Warning", f"Could not update log for '{file_name}'.")
+
+                name_item = QTableWidgetItem(fa.file_name)
+                name_item.setData(Qt.UserRole, fa)
+
+                self.table.setItem(row_idx, 0, name_item)
+                self.table.setItem(row_idx, 1, QTableWidgetItem(fa.file_type))
+                self.table.setItem(row_idx, 2, QTableWidgetItem(fa.created_time))
+                self.table.setItem(row_idx, 3, QTableWidgetItem(fa.importance))
+
+            except Exception as e:
+                QMessageBox.warning(self, "Warning", f"Could not add file: {e}")
 
 # Lists all project ids in selected log
 class LogDetailsPage(QWidget):
