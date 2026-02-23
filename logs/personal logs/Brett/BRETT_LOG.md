@@ -1,3 +1,13 @@
+# Week 20 (1/26/2026 = 2/8/2026) ** TERM 2 Week 6 **
+
+## Features
+
+![Week 20 Tasks](Week20/Week20KanBan1.png)
+![Week 20 Tasks](Week20/Week20KanBan2.png)
+
+## Recap
+Fixed a simple bug in fss that miscounted the number of files scanned during a search. Added thumbnail setting functionality to the gui for projects.
+
 # Week 18/19 (1/26/2026 = 2/8/2026) ** TERM 2 Week 4/5 **
 
 ![Week 18/19 Tasks](Week18&19/Week18&19Tasks.png)
