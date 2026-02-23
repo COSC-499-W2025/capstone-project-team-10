@@ -8,9 +8,17 @@ import src.param.param as param
 
 class ResumeManager:
     def __init__(self):
-        self.storage_dir = Path(param.internal_resume_storage_path)
-        self.index_file = self.storage_dir / "index.json"
-        self._ensure_storage()
+        # We no longer evaluate the path here to prevent early execution bugs
+        pass
+
+    @property
+    def storage_dir(self) -> Path:
+        # Dynamically grabs the Application Data folder AFTER param.init() runs
+        return Path(param.program_file_path) / "storage" / "resumes"
+
+    @property
+    def index_file(self) -> Path:
+        return self.storage_dir / "index.json"
 
     def _ensure_storage(self):
         """this creates storage directory and index file if they do not exist"""
@@ -18,9 +26,12 @@ class ResumeManager:
             self.storage_dir.mkdir(parents=True, exist_ok=True)
         
         if not self.index_file.exists():
-            self._save_index({"next_id": 1, "resumes": {}})
+            # Create a default index file
+            with open(self.index_file, "w") as f:
+                json.dump({"next_id": 1, "resumes": {}}, f, indent=4)
 
     def _load_index(self) -> dict:
+        self._ensure_storage() # Guarantee folder exists before reading
         try:
             with open(self.index_file, "r") as f:
                 return json.load(f)
@@ -28,6 +39,7 @@ class ResumeManager:
             return {"next_id": 1, "resumes": {}}
 
     def _save_index(self, data: dict):
+        self._ensure_storage() # Guarantee folder exists before writing
         with open(self.index_file, "w") as f:
             json.dump(data, f, indent=4)
 
@@ -57,7 +69,7 @@ class ResumeManager:
         index["next_id"] += 1
         self._save_index(index)
         
-        print(f"[ResumeManager] Stored resume {resume_id} internally.")
+        print(f"[ResumeManager] Stored resume {resume_id} internally at {destination}")
         return resume_id
 
     def get(self, resume_id: int) -> Optional[Path]:
