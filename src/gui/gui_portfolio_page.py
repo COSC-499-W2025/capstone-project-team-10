@@ -187,5 +187,5 @@ class PortfolioPage(QWidget):
         """Generate full portfolio PDF using current project data."""
         pdf_path = self.manager.get_full_portfolio()
         if pdf_path:
-            append_generated_item(pdf_path, "portfolio")
+            append_generated_item(pdf_path, "portfolio", self.manager.log_file)
             print(f"Portfolio PDF generated at: {pdf_path}")

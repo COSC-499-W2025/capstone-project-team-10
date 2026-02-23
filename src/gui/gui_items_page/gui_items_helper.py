@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 
 
-def append_generated_item(generated_file_path: str, file_type: str) -> None:
+def append_generated_item(generated_file_path: str, file_type: str, log_file: str = None) -> None:
     """
       Helper for .json entry generation
     """
@@ -12,11 +12,14 @@ def append_generated_item(generated_file_path: str, file_type: str) -> None:
 
     generated = Path(generated_file_path)
     entry = {
-        "name": generated.stem,  # changed: removes file extension
+        "name": generated.stem,
         "path": str(generated.resolve()),
         "type": file_type,
         "created_at": datetime.now().isoformat(timespec="seconds"),
     }
+    
+    if log_file:
+        entry["log"] = str(Path(log_file).resolve())
 
     data = []
     if items_path.exists():

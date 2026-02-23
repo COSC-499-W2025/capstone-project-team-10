@@ -187,5 +187,5 @@ class ResumePage(QWidget):
         """Generate full resume PDF using current project data."""
         pdf_path = self.manager.get_full_resume_pdf()
         if pdf_path:
-            append_generated_item(pdf_path, "resume")
+            append_generated_item(pdf_path, "resume", self.manager.log_file)
             print(f"Resume PDF generated at: {pdf_path}")
