@@ -733,3 +733,5 @@ python -m pytest
 ```
 
 All tests are stored in the src/tests folder, and are organized by API. Each test file starts with "test\_" and contains a class that also starts with "Test\_" followed by the name of the API being tested. Each test function within the class starts with "test\_" and tests a specific functionality of the API.
+
+Milestone 2 Presentation link: https://docs.google.com/presentation/d/1M87aeStGNRQF6zvMkJJcOk76a_6EyGdyV-xHyRwfgJQ/edit?usp=sharing

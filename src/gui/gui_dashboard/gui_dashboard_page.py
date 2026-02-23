@@ -64,7 +64,7 @@ class DashboardPage(QWidget):
         self.table.setColumnCount(3)
         self.table.setHorizontalHeaderLabels(["ID", "Size", "Date Created"])
         
-        self.table.cellClicked.connect(self.on_cell_clicked)
+        self.table.cellDoubleClicked.connect(self.on_cell_clicked)
         
         self.table.setStyleSheet("""
             QTableWidget {
