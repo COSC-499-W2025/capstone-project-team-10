@@ -3,6 +3,9 @@ from PyQt5.QtWidgets import (
     QHBoxLayout, QMessageBox
 )
 from PyQt5.QtCore import Qt
+import subprocess
+import os
+from pathlib import Path
 from .gui_items_manager import GuiItemsManager
 
 
@@ -13,7 +16,6 @@ class ItemsPage(QWidget):
         super().__init__()
         self.manager = GuiItemsManager()
         self.init_ui()
-        self.load_items_table()
 
     def init_ui(self):
         """Initialize the UI"""
@@ -35,21 +37,43 @@ class ItemsPage(QWidget):
         button_layout = QHBoxLayout()
         button_layout.setSpacing(10)
 
-        self.refresh_btn = QPushButton("Refresh")
-        self.refresh_btn.clicked.connect(self.load_items_table)
-
-        self.delete_btn = QPushButton("Delete Selected")
-        self.delete_btn.clicked.connect(self.delete_selected_item)
+        self.visit_btn = QPushButton("Visit File")
+        self.visit_btn.clicked.connect(self.visit_selected_file)
 
         button_layout.addStretch()
-        button_layout.addWidget(self.refresh_btn)
-        button_layout.addWidget(self.delete_btn)
+        button_layout.addWidget(self.visit_btn)
 
         layout.addLayout(button_layout)
 
-    def load_items_table(self):
-        """Load items from manager and populate table"""
+    def showEvent(self, event):
+        """Load and validate items when page is shown"""
+        super().showEvent(event)
+        self.load_and_validate_items()
+
+    def load_and_validate_items(self):
+        """Load items, validate files exist, remove invalid entries, and show popup if items were removed"""
         items = self.manager.load_items()
+        removed_items = []
+
+        # Check which files no longer exist
+        valid_items = []
+        for item in items:
+            file_path = item.get("path", "")
+            if file_path and Path(file_path).exists():
+                valid_items.append(item)
+            else:
+                removed_items.append(item)
+
+        # If items were removed, update the JSON and show popup
+        if removed_items:
+            self.manager.save_items(valid_items)
+            self.show_removed_items_popup(removed_items)
+
+        # Load the validated items into the table
+        self.load_items_table(valid_items)
+
+    def load_items_table(self, items):
+        """Load items from manager and populate table"""
         self.table.setRowCount(len(items))
 
         for row, item in enumerate(items):
@@ -80,22 +104,32 @@ class ItemsPage(QWidget):
         super().resizeEvent(event)
         self.resize_columns()
 
-    def delete_selected_item(self):
-        """Delete the selected item"""
+    def visit_selected_file(self):
+        """Open Windows Explorer at the selected file's location"""
         current_row = self.table.currentRow()
         if current_row < 0:
-            QMessageBox.warning(self, "No Selection", "Please select an item to delete.")
+            QMessageBox.warning(self, "No Selection", "Please select an item to visit.")
             return
 
-        reply = QMessageBox.question(
-            self, "Confirm Delete",
-            "Are you sure you want to delete this item?",
-            QMessageBox.Yes | QMessageBox.No
-        )
+        location = self.table.item(current_row, 2).text()
+        if not location:
+            QMessageBox.warning(self, "Invalid Path", "File path is empty.")
+            return
 
-        if reply == QMessageBox.Yes:
-            if self.manager.delete_item(current_row):
-                self.load_items_table()
-                QMessageBox.information(self, "Success", "Item deleted successfully.")
-            else:
-                QMessageBox.critical(self, "Error", "Failed to delete item.")
+        file_path = Path(location)
+        if not file_path.exists():
+            QMessageBox.critical(self, "File Not Found", f"File not found:\n{location}")
+            return
+
+        # Open Windows Explorer at the file location
+        try:
+            subprocess.Popen(f'explorer /select,"{file_path}"')
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to open file location:\n{str(e)}")
+
+    def show_removed_items_popup(self, removed_items):
+        """Show popup listing removed/invalidated items"""
+        removed_names = [item.get("name", "Unknown") for item in removed_items]
+        message = "The following items were removed because their files no longer exist:\n\n" + "\n".join(removed_names)
+
+        QMessageBox.information(self, "Invalidated Items", message)

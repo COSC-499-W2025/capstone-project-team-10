@@ -26,6 +26,14 @@ class GuiItemsManager:
 
         return []
 
+    def save_items(self, items: List[Dict[str, Any]]) -> None:
+        """Save items to items.json"""
+        try:
+            with self.items_file.open("w", encoding="utf-8") as f:
+                json.dump(items, f, indent=2)
+        except OSError as e:
+            print(f"Error saving items: {e}")
+
     def get_item_by_index(self, index: int) -> Dict[str, Any] | None:
         """Get a specific item by index"""
         items = self.load_items()
