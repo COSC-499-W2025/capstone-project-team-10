@@ -1,12 +1,36 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                              QPushButton, QTableWidget, QTableWidgetItem,
                              QHeaderView, QStackedWidget, QDialog,
-                             QDialogButtonBox, QMessageBox, QAbstractItemView)
-from PyQt5.QtCore import Qt, pyqtSignal
+                             QDialogButtonBox, QMessageBox, QAbstractItemView,
+                             QFileDialog)
+from PyQt5.QtCore import Qt, pyqtSignal, QSize
+from PyQt5.QtGui import QPixmap, QIcon
 import csv
 from pathlib import Path
 from src.fas.fas import FileAnalysis
 import src.log.log as log
+import utils.project_thumbnails as pt
+
+thumbnail_size = 128
+
+def empty_thumbnail(size: int = thumbnail_size) -> QPixmap:
+    pixmap = QPixmap(size, size)
+    pixmap.fill(Qt.transparent)
+    return pixmap
+
+def create_thumbnail(image_path: str, size: int = thumbnail_size) -> QPixmap:
+    """
+    Load an image from disk and scale it to a fixed size.
+    Returns the placeholder if the path is invalid.
+    """
+    if not image_path or not Path(image_path).is_file():
+        return empty_thumbnail(size)
+
+    pixmap = QPixmap(image_path)
+    if pixmap.isNull():
+        return empty_thumbnail(size)
+
+    return pixmap.scaled(size, size, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
 
 # Shows all files not currently in project but in the same log
 class AddFileDialog(QDialog):
@@ -383,14 +407,22 @@ class LogDetailsPage(QWidget):
         header_layout.addStretch()
         layout.addLayout(header_layout)
 
-        # Table containing project ids
+        # Table containing project ids with thumbnail column
         self.table = QTableWidget()
-        self.table.setColumnCount(1)
-        self.table.setHorizontalHeaderLabels(["Project ID"])
-        self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.table.setColumnCount(2)
+        self.table.setHorizontalHeaderLabels(["", "Project ID"])
+
+        # Thumbnail column: fixed width
+        self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Fixed)
+        self.table.setColumnWidth(0, thumbnail_size)
+
+        # Project ID column: stretch
+        self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
+
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setIconSize(QSize(thumbnail_size, thumbnail_size))
         self.table.setStyleSheet("""
             QTableWidget { 
                 background-color: white; 
@@ -416,7 +448,18 @@ class LogDetailsPage(QWidget):
                 color: white; }
         """)
         self.table.cellDoubleClicked.connect(self.on_double_clicked)
+        self.table.itemSelectionChanged.connect(self.on_selection_changed)
         layout.addWidget(self.table)
+
+        bottom_layout = QHBoxLayout()
+        bottom_layout.addStretch()
+
+        self.thumbnail_btn = QPushButton("Select Thumbnail")
+        self.thumbnail_btn.setEnabled(False)
+        self.thumbnail_btn.clicked.connect(self.on_select_thumbnail)
+        bottom_layout.addWidget(self.thumbnail_btn)
+
+        layout.addLayout(bottom_layout)
         self.stack.addWidget(self.projects_widget)
 
         self.project_files_page = ProjectFilesPage()
@@ -454,14 +497,63 @@ class LogDetailsPage(QWidget):
 
             for idx, pid in enumerate(self._project_ids):
                 self.table.insertRow(idx)
-                self.table.setItem(idx, 0, QTableWidgetItem(pid))
+                self.table.setRowHeight(idx, thumbnail_size)
+
+                thumb_path = pt.get_thumbnail(pid)
+                pixmap = create_thumbnail(thumb_path, thumbnail_size)
+                thumb_item = QTableWidgetItem()
+                thumb_item.setIcon(QIcon(pixmap))
+                self.table.setItem(idx, 0, thumb_item)
+
+                # Project ID cell
+                self.table.setItem(idx, 1, QTableWidgetItem(pid))
 
         except Exception as e:
             print(f"Error loading CSV: {e}")
 
+        self.thumbnail_btn.setEnabled(False)
+
+    def on_selection_changed(self):
+        """Enable the thumbnail button only when a project row is selected."""
+        has_selection = bool(self.table.selectedItems())
+        self.thumbnail_btn.setEnabled(has_selection)
+
+    def on_select_thumbnail(self):
+        """Open file dialog to pick a thumbnail for the selected project."""
+        selected_rows = self.table.selectionModel().selectedRows()
+        if not selected_rows:
+            return
+
+        row = selected_rows[0].row()
+        project_id = self.table.item(row, 1).text()
+
+        image_filter = "Images (*.png *.jpg *.jpeg *.bmp *.gif *.svg *.webp);;All Files (*)"
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            f"Select Thumbnail for '{project_id}'",
+            "",
+            image_filter
+        )
+
+        if not file_path:
+            return
+
+        if not Path(file_path).is_file():
+            QMessageBox.warning(self, "Invalid File", "The selected file does not exist.")
+            return
+
+        success = pt.set_thumbnail(project_id, file_path)
+        if not success:
+            QMessageBox.warning(self, "Error", "Could not save thumbnail. File may not exist.")
+            return
+
+        # Update the table cell immediately
+        pixmap = create_thumbnail(file_path, thumbnail_size)
+        self.table.item(row, 0).setIcon(QIcon(pixmap))
+
     # Double click to enter next page
     def on_double_clicked(self, row, _col):
-        project_id = self.table.item(row, 0).text()
+        project_id = self.table.item(row, 1).text()
         files = log.get_project(project_id)
         self.project_files_page.load_project_files(project_id, files)
         self.stack.setCurrentIndex(1)
