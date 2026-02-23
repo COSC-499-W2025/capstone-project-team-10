@@ -14,6 +14,7 @@ from src.gui.gui_scan_page import ScanPage
 from src.gui.gui_scan_results import ScanResultsPage
 from src.gui.gui_settings_page.gui_settings_page import SettingsPage
 from src.gui.gui_dashboard.gui_dashboard_container import DashboardContainer
+from src.gui.gui_items_page.gui_items_page import ItemsPage
 
 
 # ---------- UI Color Constants ----------
@@ -123,8 +124,7 @@ class AppShell(QWidget):
         self.page_scan = ScanPage()
         self.page_scan_results = ScanResultsPage()
 
-        self.page_items = QLabel("Items content goes here")
-        self.page_items.setAlignment(Qt.AlignCenter)
+        self.page_items = ItemsPage()
 
         self.page_resume = ResumePage()
         self.page_portfolio = PortfolioPage()
