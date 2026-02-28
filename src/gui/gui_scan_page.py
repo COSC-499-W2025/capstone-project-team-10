@@ -10,11 +10,8 @@ class ScanPage(QtWidgets.QWidget):
     scan_finished = QtCore.pyqtSignal(int)
     scan_output = QtCore.pyqtSignal(str)
 
-    def __init__(self, resume_page, portfolio_page, parent=None):
+    def __init__(self, parent=None):
         super(ScanPage, self).__init__(parent)
-
-        self.resume_page = resume_page
-        self.portfolio_page = portfolio_page
 
         self.scan_manager = ScanManager()
         self.selected_directory = None
@@ -128,8 +125,6 @@ class ScanPage(QtWidgets.QWidget):
 
     def _on_scan_finished(self, result: int):
         self.scan_finished.emit(result)
-        self.resume_page.refresh_project_list()
-        self.portfolio_page.refresh_project_list()
 
     def _on_scan_failed(self, message: str):
         QtWidgets.QMessageBox.critical(self, "Scan Failed", message)

@@ -5,10 +5,6 @@ import threading
 import time
 from pathlib import Path
 from typing import Optional
-from venv import create
-
-from _pytest.nodes import File
-from pdfminer.psparser import log
 
 import src.param.param as param
 from src.fas.fas import FileAnalysis
