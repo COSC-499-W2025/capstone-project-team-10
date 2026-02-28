@@ -63,12 +63,16 @@ class ShowcaseProject:
 
     def get_skills(self):
         # Create skills text based on file analyses
-        return [
+        max_skills = param.get("showcase.showcase_max_skills_per_project") or 10
+        sorted_skills = [
             skill
             for skill, count in sorted(
                 self.skills.items(), key=lambda item: item[1], reverse=True
             )
         ]
+        if max_skills is not None:
+            return sorted_skills[:max_skills]
+        return sorted_skills
 
     def get_start_date(self):
         return self.date_start.strftime("%Y-%m-%d")
@@ -233,7 +237,7 @@ def generate_resume(
 portfolio_entry_template = """
 <div>
   <h2><a href={new_file_path}>{file_name}</a> - {file_type_upper}</h2>
-  <h3>Date Active: {created} to {modified}</h3>
+  <h3>{created} to {modified}</h3>
   {details}
 </div>
 <hr/>
@@ -244,41 +248,99 @@ def generate_portfolio(
     allow_image: bool = True, output_file_path: Optional[Path] = None
 ) -> Path | None:
     """
-    Generates an HTML portfolio and zips it, copying resources as needed.
+    Generates a web portfolio (HTML/CSS) from the log file and zips it.
     """
+    import tempfile
+    import zipfile
+    from pathlib import Path
 
     todays_date: str = datetime.now().strftime("%m-%d-%y")
-    portfolio_export_path_dir: Path = Path(param.export_folder_path) / (
-        todays_date + "-portfolio"
-    )
-    portfolio_export_zip_path_dir: Path = Path(param.export_folder_path) / (
+    export_zip_path: Path = Path(param.export_folder_path) / (
         todays_date + "-portfolio.zip"
     )
     file_number: int = 0
+    if output_file_path is None:
+        while export_zip_path.exists():
+            file_number += 1
+            export_zip_path = Path(param.export_folder_path) / (
+                todays_date + f"-portfolio-{file_number}.zip"
+            )
+    if output_file_path is not None and isinstance(output_file_path, Path):
+        export_zip_path = output_file_path
 
-    # Ensure unique folder and zip file names
-    while portfolio_export_path_dir.exists() or portfolio_export_zip_path_dir.exists():
-        file_number += 1
-        portfolio_export_path_dir = Path(param.export_folder_path) / (
-            todays_date + f"-portfolio-{file_number}"
-        )
-        portfolio_export_zip_path_dir = Path(param.export_folder_path) / (
-            todays_date + f"-portfolio-{file_number}.zip"
-        )
-
-    # Create portfolio and resources directories
-    portfolio_export_path_dir.mkdir(parents=True, exist_ok=True)
-    portfolio_export_resource_path: Path = portfolio_export_path_dir / "resources"
-    portfolio_export_resource_path.mkdir(parents=True, exist_ok=True)
-
-    portfolio_export_path: Path = portfolio_export_path_dir / (
-        todays_date + "-portfolio.html"
-    )
-    if not portfolio_export_path_dir.exists():
-        print(f"Export folder does not exist: {portfolio_export_path}")
+    log_file: Path = Path(log.current_log_file)
+    if not export_zip_path.parent.exists():
+        print(f"Export folder does not exist: {export_zip_path}")
         return
 
     project_manager: ShowcaseProjectManager = parse_project_entries()
+
+    try:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir_path = Path(tmpdir)
+            # Write CSS
+            css_content = """
+            body { font-family: Arial, sans-serif; background: #f8f8f8; margin: 0; padding: 0; }
+            .container { max-width: 900px; margin: 40px auto; background: #fff; padding: 32px; border-radius: 12px; box-shadow: 0 2px 8px #0001; }
+            .project { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid #eee; }
+            .project:last-child { border-bottom: none; }
+            .project-title { font-size: 2em; font-weight: bold; color: #2a3d66; margin-bottom: 8px; }
+            .project-dates { color: #888; margin-bottom: 8px; }
+            .project-desc { margin-bottom: 8px; }
+            .project-skills { color: #444; font-size: 1em; }
+            """
+            (tmpdir_path / "style.css").write_text(css_content, encoding="utf-8")
+
+            # Write HTML
+            html_parts = [
+                "<!DOCTYPE html>",
+                "<html lang='en'>",
+                "<head>",
+                "<meta charset='UTF-8'>",
+                "<meta name='viewport' content='width=device-width, initial-scale=1.0'>",
+                "<title>My Project Portfolio</title>",
+                "<link rel='stylesheet' href='style.css'>",
+                "</head>",
+                "<body>",
+                "<div class='container'>",
+                "<h1>My Project Portfolio</h1>",
+            ]
+
+            for project in project_manager.get_projects():
+                html_parts.append("<div class='project'>")
+                html_parts.append(f"<div class='project-title'>{project.title}</div>")
+                html_parts.append(
+                    f"<div class='project-dates'>{project.get_start_date()} to {project.get_end_date()}</div>"
+                )
+                html_parts.append(
+                    f"<div class='project-desc'>{project.description or ''}</div>"
+                )
+                skills = ", ".join(project.get_skills())
+                if skills:
+                    html_parts.append(
+                        f"<div class='project-skills'><b>Skills:</b> {skills}</div>"
+                    )
+                html_parts.append("</div>")
+
+            html_parts.append("</div></body></html>")
+            html_content = "\n".join(html_parts)
+            (tmpdir_path / "index.html").write_text(html_content, encoding="utf-8")
+
+            # Zip up the HTML and CSS
+            with zipfile.ZipFile(export_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+                zipf.write(tmpdir_path / "index.html", "index.html")
+                zipf.write(tmpdir_path / "style.css", "style.css")
+
+        try:
+            # Store internally for the GUI history
+            manager.create(
+                export_zip_path, {"type": "web_portfolio", "source_log": str(log_file)}
+            )
+        except Exception as e:
+            print(f"Failed to store portfolio internally: {e}")
+        return export_zip_path
+    except Exception as e:
+        print(f"Something went wrong: {e}")
 
 
 def generate_skill_timeline() -> Path | None:
