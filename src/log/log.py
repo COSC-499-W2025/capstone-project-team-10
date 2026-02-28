@@ -198,7 +198,7 @@ def parse_row(line: list) -> Optional[FileAnalysis]:
             file_type=line[2],
             last_modified=line[3],
             created_time=line[4],
-            extra_data=line[5],
+            extra_data=extra_data,
             importance=float(line[6]) if line[6] else 0.0,
             customized=line[7].strip().lower() == "true",
             project_id=line[8],
@@ -323,7 +323,10 @@ def follow_log(
     Generator that yields log lines as they appear in the file.
     Polls the file and waits for new lines to be added.
     Stops when a line containing stop_signal is encountered.
+    Now uses csv.reader for proper CSV parsing.
     """
+    import csv
+
     global current_log_file
 
     if file_path is None:
@@ -332,23 +335,27 @@ def follow_log(
         file_path = current_log_file
 
     with open(file_path, "r", encoding="utf-8", newline="") as f:
+        reader = csv.reader(f)
         if not include_header:
-            f.readline()  # skip header line
+            next(reader, None)  # skip header row
 
         while True:
-            line = ""
+            row = None
             with log_lock:
-                line = f.readline()
-            if line:
-                stripped = line.rstrip("\r\n")
+                try:
+                    row = next(reader)
+                except StopIteration:
+                    row = None
+            if row is not None:
+                line = ",".join(row)
                 if return_file_analysis:
-                    fa = parse_row(stripped.split(","))
+                    fa = parse_row(row)
                     if fa is None:
                         continue
                     yield fa
                 else:
-                    yield stripped
-                if stop_signal in stripped:
+                    yield line
+                if any(stop_signal in field for field in row):
                     break
             else:
                 if not wait_for_new:
