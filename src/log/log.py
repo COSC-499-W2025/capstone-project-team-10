@@ -437,4 +437,22 @@ def find_existing_analysis(file_hash: str) -> Optional[FileAnalysis]:
             print(f"Warning: Could not read log file {log_file}: {e}")
             continue
 
+def get_project_entries():
+    """
+    Return all FileAnalysis rows from current log.
+    """
+    entries = []
+    for log_file in _get_all_log_files():
+        with open(log_file, "r", encoding="utf-8", newline="") as f:
+            reader = csv.reader(f)
+            header = next(reader, None)
+            if header is None:
+                continue
+
+            for row in reader:
+                fa = parse_row(row)
+                if fa:
+                    entries.append(fa)
+    return entries
+
     return None
