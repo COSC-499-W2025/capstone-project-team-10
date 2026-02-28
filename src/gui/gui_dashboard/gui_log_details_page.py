@@ -455,6 +455,7 @@ class LogDetailsPage(QWidget):
         bottom_layout.addStretch()
 
         self.thumbnail_btn = QPushButton("Select Thumbnail")
+        self.thumbnail_btn.setStyleSheet("""color: black;""")
         self.thumbnail_btn.setEnabled(False)
         self.thumbnail_btn.clicked.connect(self.on_select_thumbnail)
         bottom_layout.addWidget(self.thumbnail_btn)
