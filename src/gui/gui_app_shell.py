@@ -123,7 +123,7 @@ class AppShell(QWidget):
         self.page_resume = ResumePage()
         self.page_portfolio = PortfolioPage()
 
-        self.page_scan = ScanPage(self.page_resume, self.page_portfolio)
+        self.page_scan = ScanPage()
         self.page_scan_results = ScanResultsPage()
 
         self.page_items = ItemsPage()
