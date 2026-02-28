@@ -1,9 +1,14 @@
 import csv
+import json
 import re
 import threading
 import time
 from pathlib import Path
 from typing import Optional
+from venv import create
+
+from _pytest.nodes import File
+from pdfminer.psparser import log
 
 import src.param.param as param
 from src.fas.fas import FileAnalysis
@@ -13,13 +18,36 @@ from src.fas.fas import FileAnalysis
 # Newest Log is always max count after maximum logs are being stored
 current_log_file: str = ""
 log_lock = threading.RLock()
+current_projects = set()
+initialized_log = ""
+
+
+def initialize_log() -> None:
+    global current_log_file
+    global current_projects
+    global initialized_log
+    global log_lock
+    with log_lock:
+        current_projects.clear()
+        with open(current_log_file, "r", encoding="utf-8", newline="") as log_file:
+            reader = csv.reader(log_file)
+            header = next(reader, None)
+            if header is None:
+                return
+
+            project_id_col = header.index("Project id")
+
+            for row in reader:
+                if len(row) > project_id_col:
+                    current_projects.add(row[project_id_col])
+        initialized_log = current_log_file
 
 
 # resumes the last log file used
 # This is the default, we will want to force open a log file when --clean is used
 def resume_log_file() -> None:
     global current_log_file
-
+    global initialized_log
     current_logs = {}
     current_log_file = ""
 
@@ -50,6 +78,8 @@ def resume_log_file() -> None:
             open_log_file()
     else:
         open_log_file()
+    if initialized_log != current_log_file:
+        initialize_log()
 
 
 # Oldest log file is the
@@ -126,39 +156,128 @@ def open_log_file() -> None:
             ]
         )
         param.set("logging.current_log_file", current_log_file)
+    initialize_log()
+
+
+def create_row(fileAnalysis: FileAnalysis) -> list:
+    if fileAnalysis.extra_data is not None and not isinstance(
+        fileAnalysis.extra_data, str
+    ):
+        extra_data_str = json.dumps(fileAnalysis.extra_data)
+    else:
+        extra_data_str = (
+            fileAnalysis.extra_data if fileAnalysis.extra_data is not None else ""
+        )
+    return [
+        fileAnalysis.file_path,
+        fileAnalysis.file_name,
+        fileAnalysis.file_type,
+        fileAnalysis.last_modified,
+        fileAnalysis.created_time,
+        extra_data_str,
+        fileAnalysis.importance,
+        fileAnalysis.customized,
+        fileAnalysis.project_id,
+        fileAnalysis.file_hash,
+    ]
+
+
+def parse_row(line: list) -> Optional[FileAnalysis]:
+    if len(line) < 10:
+        print(f"Skipping malformed log line: {line}")
+        return None
+    try:
+        # Parse extra_data if it's a JSON string
+        extra_data = line[5]
+        if isinstance(extra_data, str):
+            try:
+                extra_data = json.loads(extra_data)
+            except json.JSONDecodeError:
+                print(f"Warning: extra_data is not valid JSON: {extra_data}")
+                # Optionally, set extra_data = None or leave as string
+
+        fa = FileAnalysis(
+            file_path=line[0],
+            file_name=line[1],
+            file_type=line[2],
+            last_modified=line[3],
+            created_time=line[4],
+            extra_data=line[5],
+            importance=float(line[6]) if line[6] else 0.0,
+            customized=line[7].strip().lower() == "true",
+            project_id=line[8],
+            file_hash=line[9],
+        )
+        return fa
+    except Exception as e:
+        print(f"Error parsing log line into FileAnalysis: {e}")
+        return None
+
+
+def check_project_id_exists(project_id: str) -> bool:
+    global current_log_file
+    global initialized_log
+    global current_projects
+    if current_log_file == "" or not Path(current_log_file).exists():
+        resume_log_file()
+
+    if initialized_log != current_log_file:
+        initialize_log()
+
+    if project_id in current_projects:
+        return True
+
+    return False
 
 
 def write(fileAnalysis: FileAnalysis) -> None:
     global current_log_file
+    global initialized_log
     if current_log_file == "" or not Path(current_log_file).exists():
         resume_log_file()
+
+    if initialized_log != current_log_file:
+        initialize_log()
+
     with (
         log_lock,
         open(current_log_file, "a", encoding="utf-8", newline="") as log_file,
     ):
         writer = csv.writer(log_file)
-        writer.writerow(
-            [
-                fileAnalysis.file_path,
-                fileAnalysis.file_name,
-                fileAnalysis.file_type,
-                fileAnalysis.last_modified,
-                fileAnalysis.created_time,
-                fileAnalysis.extra_data,
-                fileAnalysis.importance,
-                fileAnalysis.customized,
-                fileAnalysis.project_id,
-                fileAnalysis.file_hash,
-            ]
-        )
+        if (
+            fileAnalysis.project_id is not None
+            and fileAnalysis.project_id not in current_projects
+        ):
+            # Create project entry
+            project = FileAnalysis(
+                file_path=fileAnalysis.project_id,
+                file_name=fileAnalysis.project_id,
+                file_type="Project",
+                last_modified="",
+                created_time="",
+                extra_data={"description": ""},
+                importance=0.0,
+                customized=False,
+                project_id=fileAnalysis.project_id,
+                file_hash="",
+            )
+            writer.writerow(create_row(project))
+            current_projects.add(fileAnalysis.project_id)
+
+        writer.writerow(create_row(fileAnalysis))
 
 
 # This can be optimized by changing how logs are stored, say as a database or serialized object.
 # But because our log files will be relatively small compared to the total number of files on a system, this should be sufficient for now.
 def update(fileAnalysis: FileAnalysis, forceUpdate: bool = False) -> None:
     global current_log_file
+    global initialized_log
     if current_log_file == "" or not Path(current_log_file).exists():
         resume_log_file()
+
+    if initialized_log != current_log_file:
+        initialize_log()
+
     temp_path = str(Path(param.result_log_folder_path) / "log.tmp")
     updated = False
 
@@ -177,20 +296,7 @@ def update(fileAnalysis: FileAnalysis, forceUpdate: bool = False) -> None:
                 if row[0] == fileAnalysis.file_path:
                     # Write updated row
                     if row[7] == "False" or forceUpdate:
-                        writer.writerow(
-                            [
-                                fileAnalysis.file_path,
-                                fileAnalysis.file_name,
-                                fileAnalysis.file_type,
-                                fileAnalysis.last_modified,
-                                fileAnalysis.created_time,
-                                fileAnalysis.extra_data,
-                                fileAnalysis.importance,
-                                fileAnalysis.customized,
-                                fileAnalysis.project_id,
-                                fileAnalysis.file_hash,
-                            ]
-                        )
+                        writer.writerow(create_row(fileAnalysis))
                     else:
                         # Keep original row if customized is True and not forcing update
                         writer.writerow(row)
@@ -214,6 +320,8 @@ def follow_log(
     include_header: bool = False,
     poll_interval: float = 0.5,
     stop_signal: str = "!close!",
+    wait_for_new: bool = True,
+    return_file_analysis: bool = False,
 ):
     """
     Generator that yields log lines as they appear in the file.
@@ -237,10 +345,18 @@ def follow_log(
                 line = f.readline()
             if line:
                 stripped = line.rstrip("\r\n")
-                yield stripped
+                if return_file_analysis:
+                    fa = parse_row(stripped.split(","))
+                    if fa is None:
+                        continue
+                    yield fa
+                else:
+                    yield stripped
                 if stop_signal in stripped:
                     break
             else:
+                if not wait_for_new:
+                    break
                 time.sleep(poll_interval)
 
 
@@ -266,20 +382,8 @@ def get_project(project_id):
                             len(row) > project_id_col
                             and row[project_id_col] == project_id
                         ):
-                            entries.append(
-                                FileAnalysis(
-                                    file_path=row[0],
-                                    file_name=row[1],
-                                    file_type=row[2],
-                                    last_modified=row[3],
-                                    created_time=row[4],
-                                    extra_data=row[5],
-                                    importance=float(row[6]) if row[6] else 0.0,
-                                    customized=row[7].strip().lower() == "true",
-                                    project_id=row[8],
-                                    file_hash=row[9],
-                                )
-                            )
+                            entries.append(parse_row(row))
+
         except Exception as e:
             print(f"Warning: Could not read log file {log_file}: {e}")
             continue
@@ -325,18 +429,7 @@ def find_existing_analysis(file_hash: str) -> Optional[FileAnalysis]:
 
                 for row in reader:
                     if len(row) > hash_col and row[hash_col] == file_hash:
-                        return FileAnalysis(
-                            file_path=row[0],
-                            file_name=row[1],
-                            file_type=row[2],
-                            last_modified=row[3],
-                            created_time=row[4],
-                            extra_data=row[5],
-                            importance=float(row[6]) if row[6] else 0.0,
-                            customized=row[7].strip().lower() == "true",
-                            project_id=row[8],
-                            file_hash=row[hash_col],
-                        )
+                        return parse_row(row)
         except Exception as e:
             print(f"Warning: Could not read log file {log_file}: {e}")
             continue

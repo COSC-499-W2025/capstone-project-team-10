@@ -1,11 +1,10 @@
 import os
 from typing import Any, Optional
 
-from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
-from utils.libraries_mappings import LIBRARY_SKILL_MAP as lsm
 from src.fas.fas_code_reader import CodeReader
 from src.fas.fas_unknown_file_type import infer_unknown_file
-
+from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
+from utils.libraries_mappings import LIBRARY_SKILL_MAP as lsm
 
 
 def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
@@ -15,49 +14,64 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
 
         print(f"Scanning: {file_path}")
 
-        metadata = None
-
+        metadata: dict[str, Any] = {}
         match file_type:
             case "pdf":
                 from src.fas import fas_pdf
+
                 metadata = fas_pdf.extract_pdf_data(file_path)
 
             case "docx":
                 from src.fas import fas_docx
+
                 metadata = fas_docx.extract_docx_data(file_path)
 
             case "odt":
                 from src.fas import fas_odt
+
                 metadata = fas_odt.extract_odt_data(file_path)
 
             case "rtf":
                 from src.fas import fas_rtf
+
                 metadata = fas_rtf.extract_rtf_data(file_path)
 
             case "xlsx" | "xls":
                 from src.fas import fas_excel
+
                 return fas_excel.extract_excel_data(file_path)
 
             case "psd" | "photoshop":
                 from src.fas import fas_photoshop
+
                 return fas_photoshop.extract_photoshop_data(file_path)
 
             case (
-                "jpeg" | "jpg" | "png" | "gif" | "webp" |
-                "tiff" | "bmp" | "heif" | "heic" | "avif"
+                "jpeg"
+                | "jpg"
+                | "png"
+                | "gif"
+                | "webp"
+                | "tiff"
+                | "bmp"
+                | "heif"
+                | "heic"
+                | "avif"
             ):
                 from src.fas import fas_image_format
+
                 return fas_image_format.analyze_image(file_path)
 
             case "md" | "markdown":
                 from src.fas.fas_md import Markdown
+
                 return Markdown.analyze_markdown(file_path)
 
             case _ if ext in em:
                 return _analyze_code_file(file_path)
-
             case "git":
                 from src.fas.fas_git_grouping import GitGrouping
+
                 return GitGrouping().add_repository(file_path)
 
             case _:
@@ -65,24 +79,20 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
 
         # ---------- Post-processing for text-like documents ----------
         # if file_type in ("docx", "odt", "rtf", "pdf") and isinstance(metadata, dict):
-        if (
-            isinstance(metadata, dict)
-            and "summary" in metadata
-        ):
-
+        if isinstance(metadata, dict) and "summary" in metadata:
             _clean_summary(metadata)
             metadata["key_skills"] = _extract_text_skills(metadata)
-
         return metadata
 
-    except ModuleNotFoundError:
-        print(f"No handler found for file type: {file_type}")
+    except ModuleNotFoundError as e:
+        print(f"No handler found for file type: {file_type}\n{e.msg}")
         return None
 
 
 # -------------------------------------------------------------------
 # Helpers
 # -------------------------------------------------------------------
+
 
 def _analyze_code_file(file_path: str) -> dict:
     reader = CodeReader(file_path)
@@ -139,6 +149,7 @@ def _extract_text_skills(metadata: dict) -> list[str]:
 # -------------------------------------------------------------------
 # Feedback → Skill mapping (moved here)
 # -------------------------------------------------------------------
+
 
 def feedback_to_skill(feedback: str) -> Optional[str]:
     if not feedback:

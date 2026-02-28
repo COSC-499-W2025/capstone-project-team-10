@@ -8,14 +8,13 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
+from src.gui.gui_dashboard.gui_dashboard_container import DashboardContainer
+from src.gui.gui_items_page.gui_items_page import ItemsPage
 from src.gui.gui_portfolio_page import PortfolioPage
 from src.gui.gui_resume_page import ResumePage
 from src.gui.gui_scan_page import ScanPage
 from src.gui.gui_scan_results import ScanResultsPage
 from src.gui.gui_settings_page.gui_settings_page import SettingsPage
-from src.gui.gui_dashboard.gui_dashboard_container import DashboardContainer
-from src.gui.gui_items_page.gui_items_page import ItemsPage
-
 
 # ---------- UI Color Constants ----------
 HEADER_BG_COLOR = "#002145"
@@ -121,13 +120,13 @@ class AppShell(QWidget):
         # ---------- Pages ----------
         self.page_dashboard = DashboardContainer()
 
-        self.page_scan = ScanPage()
+        self.page_resume = ResumePage()
+        self.page_portfolio = PortfolioPage()
+
+        self.page_scan = ScanPage(self.page_resume, self.page_portfolio)
         self.page_scan_results = ScanResultsPage()
 
         self.page_items = ItemsPage()
-
-        self.page_resume = ResumePage()
-        self.page_portfolio = PortfolioPage()
 
         self.page_settings = SettingsPage()
 
@@ -146,7 +145,9 @@ class AppShell(QWidget):
         self.page_scan.scan_finished.connect(self.page_scan_results.on_scan_finished)
         self.page_scan.scan_output.connect(self.page_scan_results.append_output)
         self.page_scan_results.back_to_scan.connect(self.return_to_scan)
-        self.page_scan.scan_finished.connect(lambda result: self.page_scan_results.back_button.setEnabled(True))
+        self.page_scan.scan_finished.connect(
+            lambda result: self.page_scan_results.back_button.setEnabled(True)
+        )
 
         # Add right area to main layout
         main_layout.addWidget(right_area, 1)

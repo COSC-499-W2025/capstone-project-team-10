@@ -18,7 +18,8 @@
     },
     "showcase": {
         "showcase_export_path": "",
-        "showcase_maximum_exports": 10
+        "showcase_maximum_exports": 10,
+        "showcase_max_number_of_projects": 5
     },
     "testing": {
         "test_key": null

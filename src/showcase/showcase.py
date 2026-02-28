@@ -8,7 +8,6 @@ import shutil
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Callable, Dict, Optional
-from src.resume.resume_manager import manager
 
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
@@ -17,6 +16,7 @@ import src.log.log as log
 import src.param.param as param
 from src.fas.fas import FileAnalysis
 from src.log.log_sorter import LogSorter
+from src.resume.resume_manager import manager
 from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
 
 # Template for resume entry in PDF
@@ -245,7 +245,6 @@ def parse_markdown_file(file_analysis: FileAnalysis):
     return f"Project: {header_text}\nWord Count: {word_count} | Languages: {languages_text}\nKey Skills demonstrated in this project: {skills_text}"
 
 
-
 def parse_extra_data(extra_data_raw):
     if isinstance(extra_data_raw, str):
         try:
@@ -344,7 +343,7 @@ def generate_resume(
             return process_psd
         if fa.file_type in ["md", "markdown"]:
             return process_markdown
-        return process_default
+        return None
 
     try:
         with open(log_file, "r", encoding="utf-8") as lf:
@@ -367,9 +366,16 @@ def generate_resume(
                     created_time=row[4],
                     extra_data=row[5],
                     importance=float(row[6]) if row[6] else 0.0,
-                    customized=row[7].strip().lower() == 'true' if len(row) > 7 else False,
+                    customized=row[7].strip().lower() == "true"
+                    if len(row) > 7
+                    else False,
                     project_id=row[8] if len(row) > 8 else None,
                 )
+                _, ext = os.path.splitext(fa.file_path)
+                ext = ext.lower()
+                processor = get_processor(fa, ext)
+                if not processor:
+                    continue
                 entry_headers = (
                     resume_entry_template.format(
                         project_name=fa.file_name,
@@ -389,9 +395,7 @@ def generate_resume(
 
                 pdf_output.set_font("Noto", size=12)
                 fa.extra_data = clean_text(fa.extra_data)
-                _, ext = os.path.splitext(fa.file_path)
-                ext = ext.lower()
-                processor = get_processor(fa, ext)
+
                 lines = processor(fa)
                 for line in lines:
                     # Special handling for image embedding
@@ -411,7 +415,9 @@ def generate_resume(
 
             try:
                 # Store internally for the GUI history
-                manager.create(export_path, {"type": "pdf_resume", "source_log": str(log_file)})
+                manager.create(
+                    export_path, {"type": "pdf_resume", "source_log": str(log_file)}
+                )
             except Exception as e:
                 print(f"Failed to store resume internally: {e}")
             return export_path
@@ -617,7 +623,9 @@ def generate_portfolio(
                         created_time=row[4],
                         extra_data=row[5],
                         importance=float(row[6]) if row[6] else 0.0,
-                        customized=row[7].strip().lower() == 'true' if len(row) > 7 else False,
+                        customized=row[7].strip().lower() == "true"
+                        if len(row) > 7
+                        else False,
                         project_id=row[8] if len(row) > 8 else None,
                     )
                     # Copy file to resources folder with correct extension
@@ -781,7 +789,9 @@ def generate_skill_timeline() -> Path | None:
                     row.get("Created time", ""),
                     row.get("Extra data", ""),
                     float(row.get("Importance", 0)) if row.get("Importance") else 0.0,
-                    row.get("Customized", "").lower() == 'true' if row.get("Customized") else False,
+                    row.get("Customized", "").lower() == "true"
+                    if row.get("Customized")
+                    else False,
                     row.get("Project id", ""),
                 )
                 skills = extract_skills(fa.extra_data)
