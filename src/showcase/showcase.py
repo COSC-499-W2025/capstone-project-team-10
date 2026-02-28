@@ -183,11 +183,6 @@ def generate_resume(
         pdf_output.set_font("Noto", "BI", size=14)
 
         for project in project_manager.get_projects():
-            print("project_name:", project.title)
-            print("created_time:", project.get_start_date())
-            print("last_modified:", project.get_end_date())
-            print("project_description:", repr(project.description))
-            print("project_skills:", repr(", ".join(project.get_skills())))
             entry = resume_entry_template.format(
                 project_name=project.title,
                 created_time=project.get_start_date(),
@@ -206,7 +201,8 @@ def generate_resume(
                         0, 10, line, new_x=XPos.LMARGIN, new_y=YPos.NEXT
                     )
                     header_font_size -= 2
-                elif i == 2:
+                elif i == 2 and project.description != "":
+                    print(f"Description: {project.description}")
                     pdf_output.set_font("Noto", size=14, style="I")
                     pdf_output.multi_cell(
                         0, 10, line, new_x=XPos.LMARGIN, new_y=YPos.NEXT
