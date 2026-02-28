@@ -2,12 +2,16 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+import src.param.param as param
 
-def append_generated_item(generated_file_path: str, file_type: str, log_file: str = None) -> None:
+
+def append_generated_item(
+    generated_file_path: str, file_type: str, log_file: str = ""
+) -> None:
     """
-      Helper for .json entry generation
+    Helper for .json entry generation
     """
-    items_path = Path(__file__).resolve().parent / "items.json"
+    items_path = Path(param.program_file_path) / "storage" / "items.json"
     items_path.parent.mkdir(parents=True, exist_ok=True)
 
     generated = Path(generated_file_path)
@@ -17,8 +21,8 @@ def append_generated_item(generated_file_path: str, file_type: str, log_file: st
         "type": file_type,
         "created_at": datetime.now().isoformat(timespec="seconds"),
     }
-    
-    if log_file:
+
+    if log_file != "":
         entry["log"] = str(Path(log_file).resolve())
 
     data = []
