@@ -43,7 +43,7 @@ class ShowcasePage(QWidget):
 
         self.max_showcase_length = QLineEdit()
         form_layout.addRow(
-            "Maximum Showcase Length In Entries", self.max_showcase_length
+            "Maximum Showcase Length In Projects", self.max_showcase_length
         )
         self.max_showcase_length.setText(
             str(param.get("showcase.showcase_maximum_exports"))
@@ -76,8 +76,8 @@ class ShowcasePage(QWidget):
     def update_max_showcase_length(self):
         new_length = self.max_showcase_length.text().strip()
         if new_length.isdigit():
-            param.set("showcase.showcase_maximum_exports", int(new_length))
+            param.set("showcase.showcase_max_number_of_projects", int(new_length))
         else:
             self.max_showcase_length.setText(
-                str(param.get("showcase.showcase_maximum_exports"))
+                str(param.get("showcase.showcase_max_number_of_projects"))
             )

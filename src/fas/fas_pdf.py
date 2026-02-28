@@ -1,25 +1,27 @@
+import math
 import os
 import re
-import pdfplumber as plum
+from typing import Any, Dict, cast
+
 import fitz
-import math
-from fas.fas_text_analysis import TextSummary
-from typing import Dict, Any, cast
+import pdfplumber as plum
+
+from src.fas.fas_text_analysis import TextSummary
+
 
 def extract_pdf_data(path: str) -> Dict[str, Any]:
     """
-        Extracts data from PDF using pdfplumber library.
-        Args:
-            path (str): Path to the PDF file.
-        Returns:
-            metadata: dictionary holding all the extracted data
+    Extracts data from PDF using pdfplumber library.
+    Args:
+        path (str): Path to the PDF file.
+    Returns:
+        metadata: dictionary holding all the extracted data
     """
     try:
         file_size = os.path.getsize(path)
-            
+
         # Open documents with pdfplumber and pymupdf (fitz) and calls extraction methods
         with plum.open(path) as pdf_p, fitz.open(path) as pdf_f:
-
             basic_metadata = pdf_p.metadata or {}
 
             text_parts = []
@@ -30,29 +32,32 @@ def extract_pdf_data(path: str) -> Dict[str, Any]:
 
             # Iterate over each page with plumber
             for page_num, page in enumerate(pdf_p.pages, 1):
-
                 # Get fitz page number from plumber page number
                 page_fitz = pdf_f[page_num - 1]
 
                 # Extract text using fitz
-                page_text = cast(str,page_fitz.get_text("text", flags=0))
+                page_text = cast(str, page_fitz.get_text("text", flags=0))
                 if page_text:
                     text_parts.append(page_text)
                     # Split on whitespace and filter out single-character symbols
                     words = page_text.split()
-                    filtered_words = [w for w in words if not (len(w) == 1 and not w.isalnum())]
+                    filtered_words = [
+                        w for w in words if not (len(w) == 1 and not w.isalnum())
+                    ]
                     word_count += len(filtered_words)
-                
+
                 # Extract tables using plumber
                 page_tables = page.extract_tables()
                 for table_idx, table in enumerate(page_tables, 1):
-                    tables.append({
-                        'page': page_num,
-                        'table_number': table_idx,
-                        'data': table,
-                        'rows': len(table),
-                        'columns': len(table[0]) if table and table[0] else 0
-                    })
+                    tables.append(
+                        {
+                            "page": page_num,
+                            "table_number": table_idx,
+                            "data": table,
+                            "rows": len(table),
+                            "columns": len(table[0]) if table and table[0] else 0,
+                        }
+                    )
 
                 # Extract Images using fitz
                 image_list = page_fitz.get_images()
@@ -60,33 +65,37 @@ def extract_pdf_data(path: str) -> Dict[str, Any]:
                     xref = img[0]
                     try:
                         base_image = pdf_f.extract_image(xref)
-                        images.append({
-                            'page': page_num,
-                            'image_number': img_idx,
-                            'format': base_image.get("ext"),
-                            'width': base_image.get("width"),
-                            'height': base_image.get("height")
-                        })
+                        images.append(
+                            {
+                                "page": page_num,
+                                "image_number": img_idx,
+                                "format": base_image.get("ext"),
+                                "width": base_image.get("width"),
+                                "height": base_image.get("height"),
+                            }
+                        )
                     except Exception:
                         continue
 
                 # Extracts links using fitz
                 links = page_fitz.get_links()
                 for link_idx, link in enumerate(links, 1):
-                    if link.get('uri'):
-                        hyperlinks.append({
-                            'page': page_num,
-                            'link_number': link_idx,
-                            'url': link.get('uri'),
-                            'type': link.get('type', 'unknown')
-                        })
+                    if link.get("uri"):
+                        hyperlinks.append(
+                            {
+                                "page": page_num,
+                                "link_number": link_idx,
+                                "url": link.get("uri"),
+                                "type": link.get("type", "unknown"),
+                            }
+                        )
 
             text = "\n".join(text_parts)
-            text = re.sub(r'\n\s*\n', '\n', text)
-            text = text.encode('utf-8', errors='ignore').decode('utf-8')
+            text = re.sub(r"\n\s*\n", "\n", text)
+            text = text.encode("utf-8", errors="ignore").decode("utf-8")
             char_count = len(text)
-            line_count = text.count('\n')
-   
+            line_count = text.count("\n")
+
             metadata = {
                 "file_path": path,
                 "file_size_bytes": file_size,
@@ -102,8 +111,8 @@ def extract_pdf_data(path: str) -> Dict[str, Any]:
                     "lines": line_count,
                     "tables": len(tables),
                     "images": len(images),
-                    "hyperlinks": len(hyperlinks)
-                }
+                    "hyperlinks": len(hyperlinks),
+                },
             }
 
             analyzer = TextSummary(text) if text.strip() else None
