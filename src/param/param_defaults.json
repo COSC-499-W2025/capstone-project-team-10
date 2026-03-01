@@ -19,7 +19,8 @@
     "showcase": {
         "showcase_export_path": "",
         "showcase_maximum_exports": 10,
-        "showcase_max_number_of_projects": 5
+        "showcase_max_number_of_projects": 5,
+        "showcase_max_skills_per_project": 10
     },
     "testing": {
         "test_key": null

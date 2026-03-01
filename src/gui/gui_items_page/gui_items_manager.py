@@ -1,13 +1,15 @@
 import json
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
+import src.param.param as param
 
 
 class GuiItemsManager:
     """Manager for reading and managing generated items from items.json"""
 
     def __init__(self):
-        self.items_file = Path(__file__).resolve().parent / "items.json"
+        self.items_file = Path(param.program_file_path) / "storage" / "items.json"
 
     def load_items(self) -> List[Dict[str, Any]]:
         """Load all items from items.json"""
