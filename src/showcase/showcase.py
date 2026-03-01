@@ -31,17 +31,59 @@ class ShowcaseProject:
         self.date_end = datetime.now()
         self.body = ""
         self.description = ""
+        self.project_skills = []
+        self.project_rank = 0
+        self.include = True
 
     def add_file(self, file_analysis: FileAnalysis):
         if file_analysis.file_type == "Project":
             print(f"Processing project entry: {file_analysis.file_name}")
             self.valid_project_entry = True
+            # Get valid dates for project duration
+            if (
+                isinstance(file_analysis.created_time, str)
+                and file_analysis.created_time != "N/A"
+                and file_analysis.created_time != ""
+            ):
+                try:
+                    self.date_start = datetime.fromisoformat(file_analysis.created_time)
+                except Exception as e:
+                    pass
+            if (
+                isinstance(file_analysis.last_modified, str)
+                and file_analysis.last_modified != "N/A"
+                and file_analysis.last_modified != ""
+            ):
+                try:
+                    self.date_end = datetime.fromisoformat(file_analysis.last_modified)
+                except Exception as e:
+                    pass
+
             self.title = file_analysis.file_name
             if isinstance(file_analysis.extra_data, dict):
                 self.description = file_analysis.extra_data.get("description", "")
+
+                # Get Manually set title
                 new_title = file_analysis.extra_data.get("title", "")
                 if new_title:
                     self.title = new_title
+
+                # get manually set skills
+                set_skills = file_analysis.extra_data.get("key_skills", [])
+                if isinstance(set_skills, list):
+                    for skill in set_skills:
+                        if skill in self.skills:
+                            self.skills[str(skill)] += 1
+                        else:
+                            self.skills[str(skill)] = 1
+
+                # get manually set project_rank for project prioritization
+                proj_importance = file_analysis.extra_data.get("project_rank", 0)
+                if isinstance(proj_importance, (int, float)):
+                    self.project_rank = float(proj_importance)
+
+                # check if it should be included in the resume at all
+                self.include = file_analysis.extra_data.get("include", True)
         else:
             if not self.valid_project_entry:
                 if self.date_start > datetime.fromisoformat(file_analysis.created_time):
@@ -63,6 +105,9 @@ class ShowcaseProject:
 
     def get_skills(self):
         # Create skills text based on file analyses
+        if self.project_skills != []:
+            return self.project_skills
+
         max_skills = param.get("showcase.showcase_max_skills_per_project") or 10
         sorted_skills = [
             skill
@@ -99,20 +144,26 @@ class ShowcaseProjectManager:
         return project_id
 
     def get_projects(self):
-        while self.projects:
-            first_key = next(iter(self.projects))
-            yield self.projects.pop(first_key)
+        # Sort projects by rank (lowest first)
+        sorted_projects = sorted(
+            self.projects.items(), key=lambda item: item[1].project_rank, reverse=False
+        )
+        for key, project in sorted_projects:
+            if self.project_counter >= self.project_limit:
+                break
+            self.project_counter += 1
+            if project.include:
+                yield self.projects.pop(key)
+            else:
+                self.projects.pop(key)
 
     def add_file_to_project(self, file_analysis: FileAnalysis) -> bool:
         if file_analysis.project_id is None:
             return False
-
         project_exists = file_analysis.project_id in self.projects
-
-        if not project_exists and self.project_counter < self.project_limit:
+        if not project_exists:
             project = ShowcaseProject(file_analysis.project_id)
             self.projects[file_analysis.project_id] = project
-            self.project_counter += 1
             self.projects[file_analysis.project_id].add_file(file_analysis)
             return True
         elif project_exists:
