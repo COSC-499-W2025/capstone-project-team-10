@@ -619,3 +619,26 @@ def test_projects_with_same_rank_keep_insertion_order():
         mgr.add_file_to_project(fa)
     yielded = [p.project_id for p in mgr.get_projects()]
     assert yielded == ["X", "Y", "Z"]
+
+
+def test_project_skills_override():
+    project = ShowcaseProject("proj_override")
+    # Add a file with some skills
+    fa = FileAnalysis(
+        file_path="some/path",
+        file_name="file1",
+        file_type="Project",
+        last_modified=datetime.now().isoformat(),
+        created_time=datetime.now().isoformat(),
+        extra_data={"key_skills": ["Python", "SQL"]},
+        project_id="proj_override",
+    )
+    project.add_file(fa)
+    # By default, get_skills returns the computed skills
+    computed_skills = project.get_skills()
+    assert set(computed_skills) == {"Python", "SQL"}
+
+    # Now override with project_skills
+    project.project_skills = ["CustomSkill1", "CustomSkill2"]
+    overridden_skills = project.get_skills()
+    assert overridden_skills == ["CustomSkill1", "CustomSkill2"]
