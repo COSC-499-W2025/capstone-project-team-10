@@ -65,8 +65,8 @@ class ResumePage(QWidget):
         self.file_type_edit = QLineEdit()
         self.created_time_edit = QLineEdit()
         self.last_modified_edit = QLineEdit()
-        self.importance_edit = QSpinBox()
-        self.importance_edit.setRange(0, 100)
+        # self.importance_edit = QSpinBox()
+        # self.importance_edit.setRange(0, 100)
         self.customized_checkbox = QCheckBox("Customized")
         self.showcase_checkbox = QCheckBox("Include in Showcase")
         self.rank_spinbox = QSpinBox()
@@ -80,8 +80,8 @@ class ResumePage(QWidget):
         editor_layout.addWidget(self.created_time_edit)
         editor_layout.addWidget(QLabel("Last Modified:"))
         editor_layout.addWidget(self.last_modified_edit)
-        editor_layout.addWidget(QLabel("Importance:"))
-        editor_layout.addWidget(self.importance_edit)
+        # editor_layout.addWidget(QLabel("Importance:"))
+        # editor_layout.addWidget(self.importance_edit)
         editor_layout.addWidget(self.customized_checkbox)
         editor_layout.addWidget(QLabel("Project Rank:"))
         editor_layout.addWidget(self.rank_spinbox)
@@ -182,7 +182,7 @@ class ResumePage(QWidget):
         self.file_type_edit.clear()
         self.created_time_edit.clear()
         self.last_modified_edit.clear()
-        self.importance_edit.setValue(0)
+        # self.importance_edit.setValue(0)
         self.customized_checkbox.setChecked(False)
         self.rank_spinbox.setValue(0)
         self.showcase_checkbox.setChecked(False)
@@ -209,7 +209,7 @@ class ResumePage(QWidget):
         self.file_type_edit.setText(fa.file_type)
         self.created_time_edit.setText(fa.created_time)
         self.last_modified_edit.setText(fa.last_modified)
-        self.importance_edit.setValue(int(float(fa.importance or 0)))
+        # self.importance_edit.setValue(int(float(fa.importance or 0)))
         self.customized_checkbox.setChecked(str(fa.customized).lower() == "true")
 
         extra = self.manager.get_project_extra_attributes(project_name)
@@ -289,15 +289,25 @@ class ResumePage(QWidget):
         fa = self.manager.get_project_info(self.current_project_name)
         if not fa:
             return
+        
+        # Before updating attributes
+        old_name = self.current_project_name
+        new_name = self.name_edit.text()
+
+        if old_name != new_name:
+            self.manager.rename_project(old_name, new_name)
+            self.current_project_name = new_name
 
         # Update attributes directly
         fa.file_name = self.name_edit.text()
         fa.created_time = self.created_time_edit.text()
         fa.last_modified = self.last_modified_edit.text()
-        fa.importance = str(self.importance_edit.value())
+        # fa.importance = str(self.importance_edit.value())
         fa.customized = str(self.customized_checkbox.isChecked())
         self.manager.set_project_rank(self.current_project_name, self.rank_spinbox.value())
         self.manager.set_showcase_flag(self.current_project_name, self.showcase_checkbox.isChecked())
+
+
 
         # Aggregate skills
         agg_skills = [self.agg_skills_container.itemAt(i).widget().layout().itemAt(0).widget().text()
@@ -354,3 +364,25 @@ class ResumePage(QWidget):
         # Optionally reload currently selected project
         if self.current_project_name:
             self.load_project(self.current_project_name)
+
+    def rename_project(self, old_name: str, new_name: str):
+        """Rename a project and all its child rows in the log."""
+        if old_name not in self.projects:
+            return False
+
+        # Update the dictionary key
+        self.projects[new_name] = self.projects.pop(old_name)
+
+        # Update the FileAnalysis object
+        self.projects[new_name].file_name = new_name
+
+        # Update all rows in the log
+        for row in self.all_rows:
+            if row.get("Project id") == old_name:
+                row["Project id"] = new_name  # children reference new project_id
+            if row.get("File type") == "Project" and row.get("File name") == old_name:
+                row["File name"] = new_name
+
+        self._rewrite_log()
+        self.load_log()
+        return True

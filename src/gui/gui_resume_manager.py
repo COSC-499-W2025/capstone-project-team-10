@@ -190,7 +190,45 @@ class ResumeManager:
             log.current_log_file = str(self.log_file)
 
     def get_full_portfolio(self, output_path: Optional[Path] = None):
-        return showcase.generate_portfolio(output_file_path=output_path)
+        original_log = log.current_log_file
+
+        try:
+            log.current_log_file = str(self.log_file)
+
+            # Only include projects marked for showcase
+            showcase_projects = [
+                p.file_name
+                for p in self.projects.values()
+                if self.get_project_extra_attributes(p.file_name).get("showcase", False)
+            ]
+
+            # If none are checked, fallback to full portfolio
+            if not showcase_projects:
+                return showcase.generate_portfolio(output_file_path=output_path)
+
+            # Otherwise, create a temp CSV containing only showcase projects
+            import tempfile, csv
+
+            with tempfile.NamedTemporaryFile("w+", delete=False, newline="", suffix=".log") as tmpfile:
+                writer = csv.DictWriter(tmpfile, fieldnames=self.all_rows[0].keys())
+                writer.writeheader()
+                for row in self.all_rows:
+                    # Include parent Project row only if in showcase_projects
+                    if row.get("File type") == "Project" and row.get("File name") not in showcase_projects:
+                        continue
+
+                    # Include child rows only if parent is in showcase_projects
+                    project_id = row.get("Project id")
+                    if project_id and project_id not in showcase_projects:
+                        continue
+
+                    writer.writerow(row)
+
+                tmpfile.flush()
+                log.current_log_file = tmpfile.name
+                return showcase.generate_portfolio(output_file_path=output_path)
+        finally:
+            log.current_log_file = str(self.log_file)
     
     def set_project_rank(self, project_name: str, rank: int):
         """Set display rank for project."""
@@ -251,3 +289,25 @@ class ResumeManager:
             "importance": project.importance,
             "customized": project.customized
         }
+    
+    def rename_project(self, old_name: str, new_name: str):
+        """Rename a project and all its child rows in the log."""
+        if old_name not in self.projects:
+            return False
+
+        # Update the dictionary key
+        self.projects[new_name] = self.projects.pop(old_name)
+
+        # Update the FileAnalysis object
+        self.projects[new_name].file_name = new_name
+
+        # Update all rows in the log
+        for row in self.all_rows:
+            if row.get("Project id") == old_name:
+                row["Project id"] = new_name  # children reference new project_id
+            if row.get("File type") == "Project" and row.get("File name") == old_name:
+                row["File name"] = new_name
+
+        self._rewrite_log()
+        self.load_log()
+        return True
