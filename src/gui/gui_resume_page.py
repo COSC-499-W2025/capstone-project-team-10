@@ -163,7 +163,7 @@ class ResumePage(QWidget):
     # ---------------- Project List ----------------
     def refresh_project_list(self):
         self.project_list.blockSignals(True)
-        self.project_list.clear()  # <-- very important to clear first
+        self.project_list.clear()  
 
         projects_sorted = sorted(
             self.manager.projects.values(),
@@ -262,11 +262,11 @@ class ResumePage(QWidget):
             self.add_aggregate_skill_row(skill)
 
     def remove_aggregate_skill(self, row, skill_name):
-        # Remove row widget
-        for i in reversed(range(row.count())):
-            item = row.itemAt(i).widget()
-            if item:
-                item.setParent(None)
+        # row is a QHBoxLayout inside a QWidget
+        container = row.parentWidget()  # get the QWidget that holds this row
+        if container:
+            self.agg_skills_container.removeWidget(container)
+            container.setParent(None)
 
     def add_highlighted_skill(self):
         # Show only skills that exist in aggregate
@@ -277,10 +277,10 @@ class ResumePage(QWidget):
             self.add_highlight_skill_row(skill)
 
     def remove_highlight_skill(self, row, skill_name):
-        for i in reversed(range(row.count())):
-            item = row.itemAt(i).widget()
-            if item:
-                item.setParent(None)
+        container = row.parentWidget()
+        if container:
+            self.highlight_skills_container.removeWidget(container)
+            container.setParent(None)
 
     # ---------------- Save Changes ----------------
     def save_changes(self):
@@ -345,3 +345,12 @@ class ResumePage(QWidget):
     def open_skills_page(self):
         self.skills_page = SkillsPage(self.manager)
         self.skills_page.show()
+
+    def refresh_from_scan(self):
+        # Re-load log
+        self.manager.load_log()
+        self.refresh_project_list()
+        
+        # Optionally reload currently selected project
+        if self.current_project_name:
+            self.load_project(self.current_project_name)

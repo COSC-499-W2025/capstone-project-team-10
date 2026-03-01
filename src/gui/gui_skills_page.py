@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QLabel,
     QPushButton, QTableWidget,
-    QTableWidgetItem, QHBoxLayout , QHeaderView
+    QTableWidgetItem, QHBoxLayout, QHeaderView
 )
 from PyQt5.QtCore import Qt
 
@@ -9,6 +9,7 @@ from PyQt5.QtCore import Qt
 class SkillsPage(QWidget):
     """
     Page that displays all unique skills and how many times they appear.
+    Works with the updated ResumeManager.
     """
 
     def __init__(self, resume_manager):
@@ -27,13 +28,10 @@ class SkillsPage(QWidget):
 
         # ---- Sort Controls ----
         sort_layout = QHBoxLayout()
-
         self.sort_alpha_btn = QPushButton("Sort A–Z")
         self.sort_count_btn = QPushButton("Sort by Frequency")
-
         self.sort_alpha_btn.clicked.connect(self.sort_alphabetical)
         self.sort_count_btn.clicked.connect(self.sort_by_count)
-
         sort_layout.addWidget(self.sort_alpha_btn)
         sort_layout.addWidget(self.sort_count_btn)
 
@@ -42,13 +40,8 @@ class SkillsPage(QWidget):
         self.table.setColumnCount(2)
         self.table.setHorizontalHeaderLabels(["Skill", "Frequency"])
         header = self.table.horizontalHeader()
-
-        # Skills column expands
-        header.setSectionResizeMode(0, QHeaderView.Stretch)
-
-        # Frequency column auto-sizes to content (small)
-        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-
+        header.setSectionResizeMode(0, QHeaderView.Stretch)  # Skills column expands
+        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)  # Frequency column small
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
 
         layout.addWidget(title)
@@ -65,11 +58,11 @@ class SkillsPage(QWidget):
         self.skill_counts.clear()
 
         for project_name in self.manager.projects.keys():
-            skills_csv = self.manager.get_key_skills_csv(project_name)
+            skills_list = self.manager.get_project_skills(project_name)  # <-- use list directly
 
-            if skills_csv:
-                skills = [s.strip() for s in skills_csv.split(",") if s.strip()]
-                for skill in skills:
+            for skill in skills_list:
+                skill = skill.strip()
+                if skill:
                     self.skill_counts[skill] = self.skill_counts.get(skill, 0) + 1
 
         self.populate_table(self.skill_counts)
@@ -83,9 +76,7 @@ class SkillsPage(QWidget):
         for row, (skill, count) in enumerate(skill_dict.items()):
             self.table.setItem(row, 0, QTableWidgetItem(skill))
             self.table.setItem(row, 1, QTableWidgetItem(str(count)))
-            item = self.table.item(row, 1)
-            item.setTextAlignment(Qt.AlignCenter)
-
+            self.table.item(row, 1).setTextAlignment(Qt.AlignCenter)
 
     # ------------------------------
     # Sorting
