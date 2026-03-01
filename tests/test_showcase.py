@@ -574,3 +574,48 @@ def test_non_project_entry_does_not_update_if_valid_project_entry():
     # Dates should not change after valid project entry
     assert project.date_start == project_start
     assert project.date_end == project_end
+
+
+def make_ranked_file_analysis(
+    project_id,
+    project_rank,
+    file_type="Project",
+    file_name=None,
+):
+    now = datetime.now().isoformat()
+    return FileAnalysis(
+        file_path="some/path",
+        file_name=file_name or f"Project_{project_id}",
+        file_type=file_type,
+        last_modified=now,
+        created_time=now,
+        extra_data={"project_rank": project_rank},
+        project_id=project_id,
+    )
+
+
+def test_projects_are_sorted_by_rank():
+    mgr = ShowcaseProjectManager()
+    mgr.project_limit = 99  # Ensure all projects are yielded
+    projects = [
+        ("A", 5),
+        ("B", 1),
+        ("C", 3),
+        ("D", 2),
+        ("E", 4),
+    ]
+    for pid, rank in projects:
+        fa = make_ranked_file_analysis(pid, rank)
+        mgr.add_file_to_project(fa)
+    yielded = [p.project_id for p in mgr.get_projects()]
+    assert yielded == ["B", "D", "C", "E", "A"]
+
+
+def test_projects_with_same_rank_keep_insertion_order():
+    mgr = ShowcaseProjectManager()
+    mgr.project_limit = 99  # Ensure all projects are yielded
+    for pid in ["X", "Y", "Z"]:
+        fa = make_ranked_file_analysis(pid, 0)
+        mgr.add_file_to_project(fa)
+    yielded = [p.project_id for p in mgr.get_projects()]
+    assert yielded == ["X", "Y", "Z"]
