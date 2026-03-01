@@ -364,25 +364,3 @@ class ResumePage(QWidget):
         # Optionally reload currently selected project
         if self.current_project_name:
             self.load_project(self.current_project_name)
-
-    def rename_project(self, old_name: str, new_name: str):
-        """Rename a project and all its child rows in the log."""
-        if old_name not in self.projects:
-            return False
-
-        # Update the dictionary key
-        self.projects[new_name] = self.projects.pop(old_name)
-
-        # Update the FileAnalysis object
-        self.projects[new_name].file_name = new_name
-
-        # Update all rows in the log
-        for row in self.all_rows:
-            if row.get("Project id") == old_name:
-                row["Project id"] = new_name  # children reference new project_id
-            if row.get("File type") == "Project" and row.get("File name") == old_name:
-                row["File name"] = new_name
-
-        self._rewrite_log()
-        self.load_log()
-        return True
