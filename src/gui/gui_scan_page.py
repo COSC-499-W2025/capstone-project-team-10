@@ -73,20 +73,41 @@ class ScanPage(QtWidgets.QWidget):
         self.layout.addWidget(self.filter_summary)
 
     def browse_files(self):
-        file_dialog = QtWidgets.QFileDialog(
-            self, "Select a directory or zip file to scan"
-        )
-        file_dialog.setFileMode(QtWidgets.QFileDialog.AnyFile)
-        file_dialog.setOption(QtWidgets.QFileDialog.ShowDirsOnly, False)
-        file_dialog.setNameFilter("Zip files (*.zip);;All files (*)")
-        selected_path = ""
-        if file_dialog.exec_():
-            selected_path = file_dialog.selectedFiles()[0]
+        # QFileDialog can't reliably "click-select" a directory when it's configured
+        # for file selection. Use the dedicated directory picker for folders.
+        chooser = QtWidgets.QMessageBox(self)
+        chooser.setWindowTitle("Select Input")
+        chooser.setText("What would you like to scan?")
+        folder_btn = chooser.addButton("Folder", QtWidgets.QMessageBox.ActionRole)
+        zip_btn = chooser.addButton("Zip file (.zip)", QtWidgets.QMessageBox.ActionRole)
+        chooser.addButton(QtWidgets.QMessageBox.Cancel)
+        chooser.exec_()
 
-        if selected_path:
-            self.selected_directory = selected_path
-            # Display on GUI
-            self.directory_label.setText(f"Directory: {selected_path}")
+        if chooser.clickedButton() is folder_btn:
+            selected_path = QtWidgets.QFileDialog.getExistingDirectory(
+                self,
+                "Select a directory to scan",
+                "",
+                QtWidgets.QFileDialog.ShowDirsOnly,
+            )
+            if not selected_path:
+                return
+
+        elif chooser.clickedButton() is zip_btn:
+            selected_path, _ = QtWidgets.QFileDialog.getOpenFileName(
+                self,
+                "Select a zip file to scan",
+                "",
+                "Zip files (*.zip)",
+            )
+            if not selected_path:
+                return
+
+        else:
+            return
+
+        self.selected_directory = selected_path
+        self.directory_label.setText(f"Selected: {self.selected_directory}")
 
     def open_filter_dialog(self):
         filter_dialog = FilterDialog(self)
@@ -97,7 +118,7 @@ class ScanPage(QtWidgets.QWidget):
     def start_scan(self):
         if not self.selected_directory:
             QtWidgets.QMessageBox.warning(
-                self, "No Directory", "Please select a directory first."
+                self, "No Input", "Please select a directory or .zip file first."
             )
             return
 
