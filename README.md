@@ -454,27 +454,28 @@ Fulfilled by PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull
 
 - [x] Fulfilled by having the GUI access lines from the log file through the log API and the showcase page
 
-Fulfilled by PR: TODO
+Fulfilled by PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/250
 
 #### GET /skills
 
 Some additional work may need to be completed for this feature, as we could create a different log to store extracted skills but this may require a
 non-trivial amount of rework for the CLI
 
-- [ ] I highly recommend that this be completed in order to abide by the requirements, even though it is not strictly necessary from a
-      functionality perspective
+- [x] Skills are viewable in the GUI
 
-Fulfilled by PR: TODO
+Fulfilled by PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/240
 
 #### GET /resume/{id}
 
-- [x] A new resume API is needed to fulfill this requirement, making the program store created resumes in application storage
+- [x] completed
 
 Fulfilled by PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/219
 
 #### POST /resume/generate
 
 - [x] Fulfilled by Showcase functionality
+
+PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/251
 
 #### POST /resume/{id}/edit
 
@@ -487,9 +488,9 @@ Fullfilled by PRs:
 
 #### GET /portfolio/{id}
 
-- [ ] A new portfolio API is needed to fulfill this requirement, making the program store created portfolios in application storage
+- [x] completed
 
-Fulfilled by PR: TODO
+Fulfilled by PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/219
 
 #### POST /portfolio/generate
 
@@ -528,9 +529,9 @@ Uncertain what this means, but we do create user specific skills and outcomes fo
 
 Users measures of success (amount of contributions, and skills contributed) are recorded for collaborative projects
 
-#### - [ ] Allow user to associate a portfolio image for a given project to use as the thumbnail
+#### - [X] Allow user to associate a portfolio image for a given project to use as the thumbnail
 
-TODO: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/226
+Fulfilled by PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/246
 
 #### - [X] Customize and save information about a portfolio showcase project
 
@@ -660,9 +661,9 @@ To upload a project simply call the FSS search function. The FSS search function
 
 - Project information is retrieved from the log file through the logging API, which acts as a simple database for storing project information. The GUI can access lines from the log file through the log API to display project information to the user.
 
-### GET /projects/{id} -> TODO
+### GET /projects/{id} -> log.get_project(project_id)
 
-- TODO: This is currently fulfilled by the GUI accessing lines from the log file through the log API and the showcase page, but we may want to implement a specific API endpoint for this functionality to better separate concerns and make it more API like. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/229
+- This is currently fulfilled by having the GUI access lines from the log file through the log API and the showcase page. The log API has a function get_project(project_id) that retrieves project information based on the project ID, which can then be displayed to the user in the GUI.
 
 ### GET /skills -> showcase.generate_skill_timeline()
 
@@ -692,9 +693,9 @@ The FileAnalysis object has the following parameters:
 - customized: bool = False,
 - project_id: Optional[str] = None,
 
-### GET /portfolio/{id} -> TODO
+### GET /portfolio/{id} -> resume_manager.get()
 
-- TODO: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/225
+- This is fulfilled by calling the get function from the resume_manager with the resume id, the resume manager will then return the resume object with a matching ID.
 
 ### POST /portfolio/generate showcase.generate_portfolio()
 
