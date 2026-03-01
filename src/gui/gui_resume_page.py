@@ -229,7 +229,7 @@ class ResumePage(QWidget):
         include_flag = extra.get("include", True)
         self.showcase_checkbox.setChecked(include_flag)
 
-        self.description_edit.setText(extra.get("project_description", ""))
+        self.description_edit.setText(extra.get("description", ""))
 
         # Load aggregated skills
         self.clear_skill_lists()
@@ -269,41 +269,7 @@ class ResumePage(QWidget):
             container.setParent(None)
 
     # ---------------- SAVE ----------------
-    # def save_changes(self):
-    #     if not self.current_project_id:
-    #         return
 
-    #     fa = self.manager.get_project_info(self.current_project_id)
-    #     if not fa:
-    #         return
-
-    #     # Rename display name only
-    #     new_name = self.name_edit.text()
-    #     if fa.file_name != new_name:
-    #         self.manager.rename_project(self.current_project_id, new_name)
-
-    #     fa.file_name = new_name
-    #     # fa.last_modified = self.last_modified_edit.text()
-
-    #     # Save extra fields
-    #     self.manager.set_project_rank(self.current_project_id, self.rank_spinbox.value())
-    #     self.manager.set_showcase_flag(self.current_project_id, self.showcase_checkbox.isChecked())
-    #     self.manager.set_project_description(self.current_project_id, self.description_edit.text())
-
-    #     self.manager.set_project_dates(
-    #         self.current_project_id,
-    #         start_date=self.start_date_edit.date().toString("yyyy-MM-dd"),
-    #         end_date=self.end_date_edit.date().toString("yyyy-MM-dd")
-    #     )
-
-    #     # Aggregate skills
-    #     agg_skills = [
-    #         self.agg_skills_container.itemAt(i).widget().layout().itemAt(0).widget().text()
-    #         for i in range(self.agg_skills_container.count())
-    #     ]
-    #     self.manager.set_project_skills(self.current_project_id, ", ".join(agg_skills))
-
-    #     self.refresh_project_list()
     def save_changes(self):
         if not self.current_project_id:
             return
