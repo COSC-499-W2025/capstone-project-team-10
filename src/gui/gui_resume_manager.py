@@ -153,8 +153,8 @@ class ResumeManager:
         if not isinstance(fa.extra_data, dict):
             fa.extra_data = {}
 
-        fa.extra_data["start_date"] = start_date
-        fa.extra_data["end_date"] = end_date
+        fa.created_time = start_date
+        fa.last_modified = end_date
         log.update(fa, forceUpdate=True)
 
     # ---------------------------------------------------
