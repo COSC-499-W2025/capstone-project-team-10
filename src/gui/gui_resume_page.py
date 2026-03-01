@@ -215,8 +215,20 @@ class ResumePage(QWidget):
         self.name_edit.setText(fa.file_name)
 
         extra = self.manager.get_project_extra_attributes(project_id)
-        start_date = extra.get("start_date", QDate.currentDate().toString("yyyy-MM-dd"))
-        end_date = extra.get("end_date", QDate.currentDate().toString("yyyy-MM-dd"))
+        # start_date = fa.get("created_time", QDate.currentDate().toString("yyyy-MM-dd"))
+        # end_date = fa.get("last_modified", QDate.currentDate().toString("yyyy-MM-dd"))
+
+        start_date = fa.created_time
+        end_date = fa.last_modified
+
+        if not start_date:
+            start_date = QDate.currentDate().toString("yyyy-MM-dd")
+
+        if not end_date:
+            end_date = QDate.currentDate().toString("yyyy-MM-dd")
+
+        self.start_date_edit.setDate(QDate.fromString(start_date, "yyyy-MM-dd"))
+        self.end_date_edit.setDate(QDate.fromString(end_date, "yyyy-MM-dd"))
 
         self.start_date_edit.setDate(QDate.fromString(start_date, "yyyy-MM-dd"))
         self.end_date_edit.setDate(QDate.fromString(end_date, "yyyy-MM-dd"))
