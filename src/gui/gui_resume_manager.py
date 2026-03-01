@@ -16,7 +16,10 @@ class ResumeManager:
     """
 
     def __init__(self, log_file: Optional[Path] = None):
-        self.log_file = log_file or Path(log.current_log_file)
+        if log_file:
+            self.log_file = log_file
+        else:
+            self.log_file = Path(log.current_log_file)
 
         # Only project-level entries
         self.projects: Dict[str, FileAnalysis] = {}
@@ -144,7 +147,47 @@ class ResumeManager:
     # PDF
     # ---------------------------------------------------
     def get_full_resume_pdf(self, output_path: Optional[Path] = None):
-        return showcase.generate_resume(output_file_path=output_path)
+        original_log = log.current_log_file
+
+        try:
+            # Start from the log file chosen by the user
+            log.current_log_file = str(self.log_file)
+
+            # Check if any projects are marked for showcase
+            showcase_projects = [
+                p.file_name
+                for p in self.projects.values()
+                if self.get_project_extra_attributes(p.file_name).get("showcase", False)
+            ]
+
+            # If none are checked, fallback to full resume
+            if not showcase_projects:
+                return showcase.generate_resume(output_file_path=output_path)
+
+            # Otherwise, create a temp CSV containing only showcase projects
+            import tempfile, csv
+
+            with tempfile.NamedTemporaryFile("w+", delete=False, newline="", suffix=".log") as tmpfile:
+                writer = csv.DictWriter(tmpfile, fieldnames=self.all_rows[0].keys())
+                writer.writeheader()
+                for row in self.all_rows:
+                    # Include parent Project row only if in showcase_projects
+                    if row.get("File type") == "Project" and row.get("File name") not in showcase_projects:
+                        continue
+
+                    # Include child rows only if parent is in showcase_projects
+                    project_id = row.get("Project id")
+                    if project_id and project_id not in showcase_projects:
+                        continue
+
+                    writer.writerow(row)
+
+                tmpfile.flush()
+                log.current_log_file = tmpfile.name
+                return showcase.generate_resume(output_file_path=output_path)
+        finally:
+            # Restore original log (user-chosen one)
+            log.current_log_file = str(self.log_file)
 
     def get_full_portfolio(self, output_path: Optional[Path] = None):
         return showcase.generate_portfolio(output_file_path=output_path)

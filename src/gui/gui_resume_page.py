@@ -120,11 +120,14 @@ class ResumePage(QWidget):
         self.skills_page_btn.clicked.connect(self.open_skills_page)
         self.save_btn = QPushButton("Save Changes")
         self.save_btn.clicked.connect(self.save_changes)
-        self.generate_pdf_btn = QPushButton("Generate Resume PDF")
-        self.generate_pdf_btn.clicked.connect(self.generate_pdf)
+        self.generate_resume_btn = QPushButton("Generate Resume PDF")
+        self.generate_resume_btn.clicked.connect(self.generate_resume)
         btn_layout.addWidget(self.skills_page_btn)
         btn_layout.addWidget(self.save_btn)
-        btn_layout.addWidget(self.generate_pdf_btn)
+        btn_layout.addWidget(self.generate_resume_btn)
+        self.generate_portfolio_btn = QPushButton("Generate Portfolio")
+        self.generate_portfolio_btn.clicked.connect(self.generate_portfolio)
+        btn_layout.addWidget(self.generate_portfolio_btn)
         editor_layout.addLayout(btn_layout)
 
         editor_widget = QWidget()
@@ -144,22 +147,32 @@ class ResumePage(QWidget):
         if not chosen.exists():
             QMessageBox.warning(self, "Invalid file", "That file does not exist.")
             return
+
+        print(f"[ResumePage] User selected new log: {chosen}")
+
+        # Clear GUI first
+        self.current_project_name = ""
+        self.clear_editor()
+        self.project_list.clear()
+
+        # Load new log
         self.manager = ResumeManager(log_file=chosen)
+
         self.log_path_label.setText(str(self.manager.log_file))
         self.refresh_project_list()
-        self.clear_editor()
-
     # ---------------- Project List ----------------
     def refresh_project_list(self):
         self.project_list.blockSignals(True)
-        self.project_list.clear()
-        # Sort by rank
+        self.project_list.clear()  # <-- very important to clear first
+
         projects_sorted = sorted(
             self.manager.projects.values(),
             key=lambda x: self.manager.get_project_extra_attributes(x.file_name).get("rank", 0)
         )
+
         for proj in projects_sorted:
             self.project_list.addItem(proj.file_name)
+
         self.project_list.blockSignals(False)
         self.current_project_name = ""
 
@@ -274,14 +287,15 @@ class ResumePage(QWidget):
         if not self.current_project_name:
             return
         fa = self.manager.get_project_info(self.current_project_name)
-        mods = {
-            "file_name": self.name_edit.text(),
-            "created_time": self.created_time_edit.text(),
-            "last_modified": self.last_modified_edit.text(),
-            "importance": self.importance_edit.value(),
-            "customized": self.customized_checkbox.isChecked()
-        }
-        self.manager.update_project_info(self.current_project_name, mods)
+        if not fa:
+            return
+
+        # Update attributes directly
+        fa.file_name = self.name_edit.text()
+        fa.created_time = self.created_time_edit.text()
+        fa.last_modified = self.last_modified_edit.text()
+        fa.importance = str(self.importance_edit.value())
+        fa.customized = str(self.customized_checkbox.isChecked())
         self.manager.set_project_rank(self.current_project_name, self.rank_spinbox.value())
         self.manager.set_showcase_flag(self.current_project_name, self.showcase_checkbox.isChecked())
 
@@ -298,7 +312,7 @@ class ResumePage(QWidget):
         self.refresh_project_list()
 
     # ---------------- Generate PDF ----------------
-    def generate_pdf(self):
+    def generate_resume(self):
         pdf_path = self.manager.get_full_resume_pdf()
         if not pdf_path:
             QMessageBox.warning(self, "Error", "Failed to generate resume PDF.")
@@ -312,6 +326,21 @@ class ResumePage(QWidget):
         msg.exec_()
         if msg.clickedButton() == open_btn:
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(pdf_path.parent)))
+
+    def generate_portfolio(self):
+        portfolio_path = self.manager.get_full_portfolio()
+        if not portfolio_path:
+            QMessageBox.warning(self, "Error", "Failed to generate portfolio.")
+            return
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Portfolio Generated")
+        msg.setText("Portfolio ZIP generated successfully!")
+        msg.setInformativeText(str(portfolio_path))
+        open_btn = msg.addButton("Open Folder", QMessageBox.ActionRole)
+        msg.addButton(QMessageBox.Ok)
+        msg.exec_()
+        if msg.clickedButton() == open_btn:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(portfolio_path.parent)))
 
     def open_skills_page(self):
         self.skills_page = SkillsPage(self.manager)

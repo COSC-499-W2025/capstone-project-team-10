@@ -93,8 +93,7 @@ class AppShell(QWidget):
             "Dashboard",
             "Scan",
             "Items",
-            "Resume",
-            "Portfolio",
+            "Resume/Portfolio",
             "Settings",
         ]
         self.sidebar.addItems(self.sidebar_items)
@@ -121,7 +120,7 @@ class AppShell(QWidget):
         self.page_dashboard = DashboardContainer()
 
         self.page_resume = ResumePage()
-        self.page_portfolio = PortfolioPage()
+        # self.page_portfolio = PortfolioPage()
 
         self.page_scan = ScanPage()
         self.page_scan_results = ScanResultsPage()
@@ -135,7 +134,7 @@ class AppShell(QWidget):
         self.content_stack.addWidget(self.page_scan)  # index 1
         self.content_stack.addWidget(self.page_items)  # index 2
         self.content_stack.addWidget(self.page_resume)  # index 3
-        self.content_stack.addWidget(self.page_portfolio)  # index 4
+        # self.content_stack.addWidget(self.page_portfolio)  # index 4
         self.content_stack.addWidget(self.page_settings)  # index 5
         self.content_stack.addWidget(self.page_scan_results)  # index 6
 
@@ -167,11 +166,11 @@ class AppShell(QWidget):
         elif page_name == "Items":
             self.content_stack.setCurrentWidget(self.page_items)
 
-        elif page_name == "Resume":
+        elif page_name == "Resume/Portfolio":
             self.content_stack.setCurrentWidget(self.page_resume)
 
-        elif page_name == "Portfolio":
-            self.content_stack.setCurrentWidget(self.page_portfolio)
+        # elif page_name == "Portfolio":
+        #     self.content_stack.setCurrentWidget(self.page_portfolio)
 
         elif page_name == "Settings":
             self.content_stack.setCurrentWidget(self.page_settings)
