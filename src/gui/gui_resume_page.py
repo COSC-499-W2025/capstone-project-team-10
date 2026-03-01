@@ -25,7 +25,7 @@ class ResumePage(QWidget):
         self.manager = ResumeManager()
         self.current_project_id = None
         # Local include-in-showcase flags (session-only)
-        self.session_include_flags = {}  # project_id -> bool
+        # self.session_include_flags = {} 
 
         layout = QHBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
@@ -95,9 +95,9 @@ class ResumePage(QWidget):
 
         self.showcase_checkbox = QCheckBox("Include in Showcase")
         editor_layout.addWidget(self.showcase_checkbox)
-        self.showcase_checkbox.stateChanged.connect(
-            lambda state: self.update_include_flag(self.current_project_id, state)
-        )
+        # self.showcase_checkbox.stateChanged.connect(
+        #     lambda state: self.update_include_flag(self.current_project_id, state)
+        # )
 
         # Project Description
         editor_layout.addWidget(QLabel("Project Description:"))
@@ -171,10 +171,10 @@ class ResumePage(QWidget):
         self.project_list.blockSignals(True)
         self.project_list.clear()
 
-        # Reset local session include flags
-        self.session_include_flags = {
-            proj.project_id: True for proj in self.manager.projects.values()
-        }
+        # # Reset local session include flags
+        # self.session_include_flags = {
+        #     proj.project_id: True for proj in self.manager.projects.values()
+        # }
 
         projects_sorted = sorted(
             self.manager.projects.values(),
@@ -223,7 +223,10 @@ class ResumePage(QWidget):
         self.rank_spinbox.setValue(extra.get("project_rank", 0))
 
         # ---------------- USE SESSION FLAG ----------------
-        include_flag = self.session_include_flags.get(project_id, True)
+        # include_flag = self.session_include_flags.get(project_id, True)
+        # self.showcase_checkbox.setChecked(include_flag)
+
+        include_flag = extra.get("include", True)
         self.showcase_checkbox.setChecked(include_flag)
 
         self.description_edit.setText(extra.get("project_description", ""))
@@ -346,22 +349,7 @@ class ResumePage(QWidget):
     # ---------------- GENERATION ----------------
 
     def generate_resume(self):
-        # Save original include flags
-        original_flags = {
-            pid: self.manager.get_project_extra_attributes(pid).get("include", True)
-            for pid in self.manager.projects
-        }
-
-        # Temporarily override include flags based on session_include_flags
-        for pid, proj in self.manager.projects.items():
-            include = self.session_include_flags.get(pid, True)
-            self.manager.set_showcase_flag(pid, include)
-
         pdf_path = self.manager.get_full_resume_pdf()
-        
-        # Restore original include flags
-        for pid, flag in original_flags.items():
-            self.manager.set_showcase_flag(pid, flag)
 
         if not pdf_path:
             QMessageBox.warning(self, "Error", "Failed to generate resume PDF.")
@@ -373,7 +361,7 @@ class ResumePage(QWidget):
         msg.setInformativeText(str(pdf_path))
 
         open_btn = msg.addButton("Open Folder", QMessageBox.ActionRole)
-        ok_btn = msg.addButton(QMessageBox.Ok)
+        msg.addButton(QMessageBox.Ok)
         msg.exec_()
 
         if msg.clickedButton() == open_btn:
@@ -381,21 +369,7 @@ class ResumePage(QWidget):
 
 
     def generate_portfolio(self):
-        # Same temporary masking trick
-        original_flags = {
-            pid: self.manager.get_project_extra_attributes(pid).get("include", True)
-            for pid in self.manager.projects
-        }
-
-        for pid, proj in self.manager.projects.items():
-            include = self.session_include_flags.get(pid, True)
-            self.manager.set_showcase_flag(pid, include)
-
         portfolio_path = self.manager.get_full_portfolio()
-
-        # Restore original flags
-        for pid, flag in original_flags.items():
-            self.manager.set_showcase_flag(pid, flag)
 
         if not portfolio_path:
             QMessageBox.warning(self, "Error", "Failed to generate portfolio ZIP.")
@@ -407,7 +381,7 @@ class ResumePage(QWidget):
         msg.setInformativeText(str(portfolio_path))
 
         open_btn = msg.addButton("Open Folder", QMessageBox.ActionRole)
-        ok_btn = msg.addButton(QMessageBox.Ok)
+        msg.addButton(QMessageBox.Ok)
         msg.exec_()
 
         if msg.clickedButton() == open_btn:
@@ -422,6 +396,6 @@ class ResumePage(QWidget):
         self.manager.load_log()
         self.refresh_project_list()
 
-    def update_include_flag(self, project_id, state):
-        if project_id:
-            self.session_include_flags[project_id] = bool(state)
+    # def update_include_flag(self, project_id, state):
+    #     if project_id:
+    #         self.session_include_flags[project_id] = bool(state)
