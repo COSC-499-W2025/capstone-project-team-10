@@ -1,3 +1,68 @@
+# Term 2 Week 6, 7, and 8 (02/15/2026 - 03/01/2026):
+
+## Completed tasks
+
+All in review features will be merged by the end of the week
+
+![Term 2 Week 8 Tasks completed](T2W8/image.png)
+
+## Features
+
+![Term 2 Week 8 Inprogress](T2W8/image-1.png)
+
+## Recap
+
+### PRs:
+
+#### PR 1
+
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/251
+
+A rewrite of the showcase to allow for better control over outputs and to allow for the implementation of resume editing and persistence. This is a major rewrite that changes how the showcase works, but it allows us to have a much more flexible system for generating outputs and allows us to implement the features we need for milestone 2.
+
+#### PR 2
+
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/250
+
+A rewrite of the logging module to help better track the projects in a log file and to allow for better parsing of the logs for the showcase and other features. This is a major rewrite that changes how the logging works, but it allows us to have a much more flexible system for logging and allows us to implement the features we need for milestone 2.
+
+#### Reading week and week 6 PRs
+
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/238
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/237
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/236
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/234
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/231
+- https://github.com/COSC-499-W2025/capstone-project-team-10/pull/214
+
+My work for these weeks was primarily focused on project planning and management, as well as the implementation of the settings page for the GUI.
+
+#### Summary
+
+My work these past few weeks has revolved around the development of the showcase and the settings page for the GUI, as well as project planning and management. I have been working to ensure that our team is on track to meet our milestones and that we are developing features that will allow us to have a polished final product. I completed the implementation of the showcase and the new project focus on resume editing and persistence.
+
+## Additional Context
+
+N/A
+
+### What went well:
+
+I think my Code and work on the project planning over these last few weeks has been amazing. We remain on track to finish ahead of the deadline and have a very polished product, and I am proud of the work I have done to help the team get to this point.
+
+### What didnt go well:
+
+No major problems on my end, motivating the team is difficult
+
+### For Next Week:
+
+for next week I will be working on improvements to the showcase to allow the user to add a profile, work experience, etc for the generated resume.
+
+Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/254
+
+## Team Survey:
+
+Survey Complete
+
 # Term 2 Week 5 (02/02/2026 - 02/08/2026):
 
 ## Completed tasks
@@ -17,7 +82,6 @@ All in review features will be merged by the end of the week
 For this week I completed a settings page for the GUI and allowed it to modify the parameters using the param API. This will allow users to modify the preserved settings for the program
 
 PRS: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/214
-
 
 ##### Tickets:
 
@@ -67,7 +131,6 @@ For this week I compiled a collection of test data for the testing of our Milest
 
 PRS: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/205
 
-
 ##### Tickets:
 
 1. https://github.com/COSC-499-W2025/capstone-project-team-10/issues/172
@@ -86,7 +149,7 @@ I was originally going to be making the resume editor, but Toby ended taking it 
 
 ### What went well:
 
-I found a number of good files for use in our milestone 2 demo 
+I found a number of good files for use in our milestone 2 demo
 
 ### What didnt go well:
 
