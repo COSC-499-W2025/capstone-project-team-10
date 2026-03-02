@@ -1,3 +1,25 @@
+# Term 2 Week 8 (02/23/2026 - 03/01/2026)
+
+![Term Two Week Eight Tasks](Term2Week8/Week8Tasks.png)
+
+# Features
+
+![Term Two Week Seven Feature](Term2Week8/Week7Feature1.png)
+
+Contributed bug fixes to:
+
+![Term Two Week Eight Feature One](Term2Week8/Week8Feature1.png)
+
+Worked on the Milestone 2 demo video:
+
+![Term Two Week Eight Feature Two](Term2Week8/Week8Feature2.png)
+
+# Recap
+
+These past few weeks I created the dashboard page and implemented multiple features to allow for greater user customization adn control. As well I contributed to the milestone 2 demo video and bug fixes to the resume and portfolio generation rewrite PR.
+
+Over the next weeks I intend to focus on cleaning up the GUI and refining the outputs of the resume and portfolio generation to look like a proper out through markdown or Latex formatting.
+
 # Term 2 Week 5 (02/02/2026 - 02/08/2026)
 
 ![Term Two Week Five Tasks](Term2Week5/Term2Week5Tasks.png)
