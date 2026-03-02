@@ -93,8 +93,7 @@ class AppShell(QWidget):
             "Dashboard",
             "Scan",
             "Items",
-            "Resume",
-            "Portfolio",
+            "Resume/Portfolio",
             "Settings",
         ]
         self.sidebar.addItems(self.sidebar_items)
@@ -121,7 +120,7 @@ class AppShell(QWidget):
         self.page_dashboard = DashboardContainer()
 
         self.page_resume = ResumePage()
-        self.page_portfolio = PortfolioPage()
+        # self.page_portfolio = PortfolioPage()
 
         self.page_scan = ScanPage()
         self.page_scan_results = ScanResultsPage()
@@ -135,7 +134,7 @@ class AppShell(QWidget):
         self.content_stack.addWidget(self.page_scan)  # index 1
         self.content_stack.addWidget(self.page_items)  # index 2
         self.content_stack.addWidget(self.page_resume)  # index 3
-        self.content_stack.addWidget(self.page_portfolio)  # index 4
+        # self.content_stack.addWidget(self.page_portfolio)  # index 4
         self.content_stack.addWidget(self.page_settings)  # index 5
         self.content_stack.addWidget(self.page_scan_results)  # index 6
 
@@ -143,6 +142,7 @@ class AppShell(QWidget):
         self.page_scan.scan_started.connect(self.page_scan_results.on_scan_started)
         self.page_scan.scan_started.connect(self.on_scan_started)
         self.page_scan.scan_finished.connect(self.page_scan_results.on_scan_finished)
+        self.page_scan.scan_finished.connect(self.page_resume.refresh_from_scan)
         self.page_scan.scan_output.connect(self.page_scan_results.append_output)
         self.page_scan_results.back_to_scan.connect(self.return_to_scan)
         self.page_scan.scan_finished.connect(
@@ -167,11 +167,11 @@ class AppShell(QWidget):
         elif page_name == "Items":
             self.content_stack.setCurrentWidget(self.page_items)
 
-        elif page_name == "Resume":
+        elif page_name == "Resume/Portfolio":
             self.content_stack.setCurrentWidget(self.page_resume)
 
-        elif page_name == "Portfolio":
-            self.content_stack.setCurrentWidget(self.page_portfolio)
+        # elif page_name == "Portfolio":
+        #     self.content_stack.setCurrentWidget(self.page_portfolio)
 
         elif page_name == "Settings":
             self.content_stack.setCurrentWidget(self.page_settings)

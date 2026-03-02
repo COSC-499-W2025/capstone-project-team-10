@@ -1,127 +1,168 @@
 from pathlib import Path
-import csv
-from typing import Dict, Any, Optional
+from typing import Optional, Dict, List
+
 import src.log.log as log
 import src.showcase.showcase as showcase
-import ast
-
 from src.fas.fas import FileAnalysis
-
 
 
 class ResumeManager:
     """
-    API-style manager for resume data.
-    Provides project-level access and editing for the resume.
+    API-compliant ResumeManager.
+    Uses ONLY log.py public functions.
     """
 
     def __init__(self, log_file: Optional[Path] = None):
-        self.log_file = log_file or Path(log.current_log_file)
+        if log_file:
+            log.current_log_file = str(log_file)
+
+        self.log_file = Path(log.current_log_file)
         self.projects: Dict[str, FileAnalysis] = {}
         self.load_log()
 
+    # ---------------------------------------------------
+    # LOAD PROJECTS
+    # ---------------------------------------------------
+
     def load_log(self):
-        """Load projects from the current log into memory."""
         self.projects.clear()
-        if not self.log_file.exists():
-            return
-        with open(self.log_file, "r", encoding="utf-8") as lf:
-            reader = csv.DictReader(lf)
-            for row in reader:
-                fa = FileAnalysis(
-                    row.get("File path analyzed", ""),
-                    row.get("File name", ""),
-                    row.get("File type", ""),
-                    row.get("Last modified", ""),
-                    row.get("Created time", ""),
-                    row.get("Extra data", ""),
-                    row.get("Importance", ""),
-                    row.get("Customized", ""),
-                )
-                self.projects[fa.file_name] = fa
 
+        entries = log.get_project_entries()
+        for fa in entries:
+            if fa.file_type == "Project":
+                self.projects[fa.project_id] = fa
 
-    def get_project_info(self, project_name: str) -> Optional[FileAnalysis]:
-        """Return the FileAnalysis for a single project."""
-        return self.projects.get(project_name)
+    # ---------------------------------------------------
+    # PROJECT INFO
+    # ---------------------------------------------------
 
-    def update_project_info(self, project_name: str, modifications: Dict[str, Any]):
-        """
-        Update a single project with modifications.
-        Saves immediately to the log via log.update.
-        """
-        fa = self.projects.get(project_name)
+    def get_project_info(self, project_id: str) -> Optional[FileAnalysis]:
+        return self.projects.get(project_id)
+
+    def get_project_extra_attributes(self, project_id: str) -> dict:
+        fa = self.get_project_info(project_id)
         if not fa:
-            return False
-
-        # Apply modifications
-        for key, value in modifications.items():
-            if hasattr(fa, key):
-                setattr(fa, key, value)
-
-        # Persist to log
-        log.update(fa, forceUpdate=True)
-        # Refresh in-memory
-        self.projects[project_name] = fa
-        return True
-
-    def get_full_resume_pdf(self, output_path: Optional[Path] = None) -> Path | None:
-        """Generate full resume PDF from current projects."""
-        # Ensure current log is up-to-date
-        return showcase.generate_resume(output_file_path=output_path)
-    
-    def get_full_portfolio(self, output_path: Optional[Path] = None) -> Path | None:
-        """Generate full portfolio from current projects."""
-        # Ensure current log is up-to-date
-        return showcase.generate_portfolio(output_file_path=output_path)
-    
-    def _parse_extra_data(self, extra_data_raw):
-        if isinstance(extra_data_raw, dict):
-            return extra_data_raw
-
-        if isinstance(extra_data_raw, str):
-            try:
-                parsed = ast.literal_eval(extra_data_raw)
-                if isinstance(parsed, dict):
-                    return parsed
-            except:
-                pass
-
+            return {}
+        if isinstance(fa.extra_data, dict):
+            return fa.extra_data
         return {}
-    
-    # Note that the CSV here is a simple comma-separated list of skills and not a full .CSV format
-    def get_key_skills_csv(self, project_name: str) -> str:
-        fa = self.projects.get(project_name)
+
+    # ---------------------------------------------------
+    # PROJECT SKILLS
+    # ---------------------------------------------------
+
+    def get_project_skills(self, project_id: str) -> List[str]:
+        skills = {}
+
+        entries = log.get_project(project_id)
+        for fa in entries:
+            if isinstance(fa.extra_data, dict):
+                file_skills = fa.extra_data.get("key_skills", [])
+                if isinstance(file_skills, list):
+                    for s in file_skills:
+                        skills[s] = skills.get(s, 0) + 1
+
+        # return sorted by frequency
+        return sorted(skills.keys(), key=lambda x: skills[x], reverse=True)
+
+    def set_project_skills(self, project_id: str, skills_csv: str):
+        skills = [s.strip() for s in skills_csv.split(",") if s.strip()]
+
+        entries = log.get_project(project_id)
+        for fa in entries:
+            if isinstance(fa.extra_data, dict):
+                fa.extra_data["key_skills"] = skills
+                log.update(fa, forceUpdate=True)
+
+    # ---------------------------------------------------
+    # PROJECT DESCRIPTION
+    # ---------------------------------------------------
+
+    def get_project_description(self, project_id: str) -> str:
+        fa = self.get_project_info(project_id)
         if not fa:
             return ""
 
-        extra_dict = self._parse_extra_data(fa.extra_data)
-        key_skills = extra_dict.get("key_skills", [])
-
-        if isinstance(key_skills, list):
-            return ", ".join([str(x).strip() for x in key_skills if str(x).strip()])
-
-        # if it was stored weirdly
-        if isinstance(key_skills, str):
-            return key_skills.strip()
+        if isinstance(fa.extra_data, dict):
+            return fa.extra_data.get("description", "")
 
         return ""
-
-    def set_key_skills_from_csv(self, project_name: str, skills_csv: str) -> bool:
-        fa = self.projects.get(project_name)
+    
+    def set_project_description(self, project_id: str, description: str):
+        fa = self.get_project_info(project_id)
         if not fa:
-            return False
+            return
 
-        extra_dict = self._parse_extra_data(fa.extra_data)
+        if not isinstance(fa.extra_data, dict):
+            fa.extra_data = {}
 
-        # turn "Python, SQL, Git" -> ["Python", "SQL", "Git"]
-        skills = [s.strip() for s in skills_csv.split(",") if s.strip()]
-
-        extra_dict["key_skills"] = skills
-
-        # store back as string (same format your log expects)
-        fa.extra_data = str(extra_dict)
-
+        fa.extra_data["description"] = description
         log.update(fa, forceUpdate=True)
-        self.projects[project_name] = fa
-        return True
+    # ---------------------------------------------------
+    # RANK + SHOWCASE
+    # ---------------------------------------------------
+
+    def set_project_rank(self, project_id: str, rank: int):
+        fa = self.get_project_info(project_id)
+        if not fa:
+            return
+
+        if not isinstance(fa.extra_data, dict):
+            fa.extra_data = {}
+
+        fa.extra_data["project_rank"] = rank
+        log.update(fa, forceUpdate=True)
+
+    def set_showcase_flag(self, project_id: str, include: bool):
+        fa = self.get_project_info(project_id)
+        if not fa:
+            return
+
+        if not isinstance(fa.extra_data, dict):
+            fa.extra_data = {}
+
+        fa.extra_data["include"] = include
+        log.update(fa, forceUpdate=True)
+
+    # ---------------------------------------------------
+    # RENAME PROJECT
+    # ---------------------------------------------------
+
+    def rename_project(self, project_id: str, new_name: str):
+        entries = log.get_project(project_id)
+
+        for fa in entries:
+            if fa.file_type == "Project":
+                fa.file_name = new_name
+                log.update(fa, forceUpdate=True)
+
+        self.load_log()
+
+    # ------------------------------
+    # DATE
+    # ------------------------------
+    def set_project_dates(self, project_id: str, start_date: str, end_date: str):
+        """
+        Save the start and end dates for a project in extra_data.
+        Dates should be strings in yyyy-MM-dd format.
+        """
+        fa = self.get_project_info(project_id)
+        if not fa:
+            return
+
+        if not isinstance(fa.extra_data, dict):
+            fa.extra_data = {}
+
+        fa.created_time = start_date
+        fa.last_modified = end_date
+        log.update(fa, forceUpdate=True)
+
+    # ---------------------------------------------------
+    # GENERATION
+    # ---------------------------------------------------
+
+    def get_full_resume_pdf(self, output_path: Optional[Path] = None):
+        return showcase.generate_resume(output_file_path=output_path)
+
+    def get_full_portfolio(self, output_path: Optional[Path] = None):
+        return showcase.generate_portfolio(output_file_path=output_path)

@@ -1,40 +1,41 @@
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QListWidget,
-    QPushButton, QLineEdit, QTextEdit, QFileDialog, QMessageBox
+    QListWidgetItem, QPushButton, QLineEdit, QFileDialog,
+    QMessageBox, QSpinBox, QScrollArea, QInputDialog, QDateEdit, QCheckBox, QTextEdit
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QUrl, QDate
 from PyQt5.QtGui import QDesktopServices
-from PyQt5.QtCore import QUrl
-
 from pathlib import Path
-from src.gui.gui_resume_manager import ResumeManager
-from src.gui.gui_items_page.gui_items_helper import append_generated_item
+
 from src.gui.gui_skills_page import SkillsPage
+from src.gui.gui_resume_manager import ResumeManager
 
 
 class ResumePage(QWidget):
     """
-    GUI page for editing the Resume.
+    Resume editor page.
+    - Uses QDateEdit for start/end date (calendar popup)
+    - No file_type
+    - No customized checkbox
+    - Uses project_description
     """
 
     def __init__(self):
         super().__init__()
-
         self.manager = ResumeManager()
+        self.current_project_id = None
+        # Local include-in-showcase flags (session-only)
+        # self.session_include_flags = {} 
 
         layout = QHBoxLayout(self)
         layout.setContentsMargins(10, 10, 10, 10)
         layout.setSpacing(20)
 
-        # --- Left Panel (Log + Projects) ---
-
+        # ---------------- LEFT PANEL ----------------
         left_panel = QVBoxLayout()
-        left_panel.setSpacing(10)
 
-        # --- Log chooser UI ---
+        # Log chooser
         log_row = QHBoxLayout()
-        log_row.setSpacing(8)
-
         self.log_label = QLabel("Current log:")
         self.log_path_label = QLabel(str(self.manager.log_file))
         self.log_path_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -44,63 +45,98 @@ class ResumePage(QWidget):
 
         log_row.addWidget(self.log_label)
         log_row.addWidget(self.choose_log_btn)
+
         left_panel.addLayout(log_row)
         left_panel.addWidget(self.log_path_label)
 
-        # --- Project list ---
+        # Project list
         self.project_list = QListWidget()
-        self.project_list.addItems(self.manager.projects.keys())
-        self.project_list.currentTextChanged.connect(self.load_project)
+        self.project_list.setDragDropMode(QListWidget.InternalMove)
+        self.project_list.currentItemChanged.connect(self.load_project)
 
         left_panel.addWidget(QLabel("Projects:"))
-        left_panel.addWidget(self.project_list, 1)
+        left_panel.addWidget(self.project_list)
 
-        # Put left panel into a QWidget so we can add it to main layout
         left_widget = QWidget()
         left_widget.setLayout(left_panel)
         layout.addWidget(left_widget, 1)
 
-        # --- Right Panel (Editor) ---
+        # ---------------- RIGHT PANEL ----------------
         editor_layout = QVBoxLayout()
-        editor_layout.setSpacing(10)
 
-        self.name_edit = QLineEdit()
-        self.file_type_edit = QLineEdit()
-        self.last_modified_edit = QLineEdit()
-        self.created_time_edit = QLineEdit()
-        self.extra_data_edit = QTextEdit()
-
+        # Project Name
         editor_layout.addWidget(QLabel("Project Name:"))
+        self.name_edit = QLineEdit()
         editor_layout.addWidget(self.name_edit)
 
-        editor_layout.addWidget(QLabel("File Type:"))
-        editor_layout.addWidget(self.file_type_edit)
+        # Start / End Dates using QDateEdit
+        editor_layout.addWidget(QLabel("Start Date:"))
+        self.start_date_edit = QDateEdit()
+        self.start_date_edit.setCalendarPopup(True)
+        self.start_date_edit.setDisplayFormat("yyyy-MM-dd")
+        editor_layout.addWidget(self.start_date_edit)
 
-        editor_layout.addWidget(QLabel("Created Time:"))
-        editor_layout.addWidget(self.created_time_edit)
+        editor_layout.addWidget(QLabel("End Date:"))
+        self.end_date_edit = QDateEdit()
+        self.end_date_edit.setCalendarPopup(True)
+        self.end_date_edit.setDisplayFormat("yyyy-MM-dd")
+        editor_layout.addWidget(self.end_date_edit)
 
-        editor_layout.addWidget(QLabel("Last Modified:"))
-        editor_layout.addWidget(self.last_modified_edit)
+        # # Last Modified
+        # editor_layout.addWidget(QLabel("Last Modified:"))
+        # self.last_modified_edit = QLineEdit()
+        # editor_layout.addWidget(self.last_modified_edit)
 
-        editor_layout.addWidget(QLabel("Extra Data:"))
-        editor_layout.addWidget(self.extra_data_edit, 1)
+        # Project Rank & Showcase
+        editor_layout.addWidget(QLabel("Project Rank:"))
+        self.rank_spinbox = QSpinBox()
+        self.rank_spinbox.setRange(0, 1000)
+        editor_layout.addWidget(self.rank_spinbox)
 
-        # --- Buttons ---
+        self.showcase_checkbox = QCheckBox("Include in Showcase")
+        editor_layout.addWidget(self.showcase_checkbox)
+        # self.showcase_checkbox.stateChanged.connect(
+        #     lambda state: self.update_include_flag(self.current_project_id, state)
+        # )
+
+        # Project Description
+        editor_layout.addWidget(QLabel("Project Description:"))
+        # self.description_edit = QTextEdit()
+        self.description_edit = QLineEdit()
+        editor_layout.addWidget(self.description_edit)
+
+        # ---------------- AGGREGATED SKILLS ----------------
+        editor_layout.addWidget(QLabel("Skills (all files):"))
+        self.agg_skills_container = QVBoxLayout()
+        agg_scroll = QScrollArea()
+        agg_scroll.setWidgetResizable(True)
+        agg_widget = QWidget()
+        agg_widget.setLayout(self.agg_skills_container)
+        agg_scroll.setWidget(agg_widget)
+        editor_layout.addWidget(agg_scroll)
+
+        add_agg_btn = QPushButton("+ Add Skill")
+        add_agg_btn.clicked.connect(self.add_aggregate_skill)
+        editor_layout.addWidget(add_agg_btn)
+
+        # ---------------- BUTTONS ----------------
         btn_layout = QHBoxLayout()
-
         self.skills_page_btn = QPushButton("View Skills")
         self.skills_page_btn.clicked.connect(self.open_skills_page)
-
-        btn_layout.addWidget(self.skills_page_btn)
 
         self.save_btn = QPushButton("Save Changes")
         self.save_btn.clicked.connect(self.save_changes)
 
-        self.generate_pdf_btn = QPushButton("Generate Resume PDF")
-        self.generate_pdf_btn.clicked.connect(self.generate_pdf)
+        self.generate_resume_btn = QPushButton("Generate Resume PDF")
+        self.generate_resume_btn.clicked.connect(self.generate_resume)
 
+        self.generate_portfolio_btn = QPushButton("Generate Portfolio")
+        self.generate_portfolio_btn.clicked.connect(self.generate_portfolio)
+
+        btn_layout.addWidget(self.skills_page_btn)
         btn_layout.addWidget(self.save_btn)
-        btn_layout.addWidget(self.generate_pdf_btn)
+        btn_layout.addWidget(self.generate_resume_btn)
+        btn_layout.addWidget(self.generate_portfolio_btn)
 
         editor_layout.addLayout(btn_layout)
 
@@ -108,97 +144,190 @@ class ResumePage(QWidget):
         editor_widget.setLayout(editor_layout)
         layout.addWidget(editor_widget, 3)
 
-        # Track currently selected project
-        self.current_project_name: str = ""
+        self.refresh_project_list()
 
-    # --- Log choosing / reloading ---
+    # ---------------- LOG ----------------
     def choose_log_file(self):
-        """
-        Let user pick a CSV log file and reload the ResumeManager.
-        """
         file_path, _ = QFileDialog.getOpenFileName(
-            self,
-            "Choose a log file",
-            "",
-            "Log Files (*.log);;All Files (*)"
+            self, "Choose a log file", "", "Log Files (*.log);;All Files (*)"
         )
-
         if not file_path:
             return
-
         chosen = Path(file_path)
         if not chosen.exists():
             QMessageBox.warning(self, "Invalid file", "That file does not exist.")
             return
 
-        # Reload manager using chosen log
+        self.current_project_id = None
+        self.clear_editor()
+        self.project_list.clear()
+
         self.manager = ResumeManager(log_file=chosen)
         self.log_path_label.setText(str(self.manager.log_file))
-
-        # Refresh list + clear editor
         self.refresh_project_list()
-        self.clear_editor()
 
+    # ---------------- PROJECT LIST ----------------
     def refresh_project_list(self):
         self.project_list.blockSignals(True)
         self.project_list.clear()
-        self.project_list.addItems(self.manager.projects.keys())
+
+        # # Reset local session include flags
+        # self.session_include_flags = {
+        #     proj.project_id: True for proj in self.manager.projects.values()
+        # }
+
+        projects_sorted = sorted(
+            self.manager.projects.values(),
+            key=lambda x: self.manager.get_project_extra_attributes(
+                x.project_id
+            ).get("project_rank", 0)
+        )
+
+        for proj in projects_sorted:
+            item = QListWidgetItem(proj.file_name)
+            item.setData(Qt.UserRole, proj.project_id)
+            self.project_list.addItem(item)
+
         self.project_list.blockSignals(False)
+        self.current_project_id = None
 
-        # Reset current selection
-        self.current_project_name = ""
-
+    # ---------------- EDITOR ----------------
     def clear_editor(self):
         self.name_edit.clear()
-        self.file_type_edit.clear()
-        self.created_time_edit.clear()
-        self.last_modified_edit.clear()
-        self.extra_data_edit.clear()
+        self.start_date_edit.setDate(QDate.currentDate())
+        self.end_date_edit.setDate(QDate.currentDate())
+        # self.last_modified_edit.clear()
+        self.rank_spinbox.setValue(0)
+        self.showcase_checkbox.setChecked(False)
+        self.description_edit.clear()
+        self.clear_skill_lists()
 
-    def load_project(self, project_name: str):
-        """Load project data into editor."""
-        self.current_project_name = project_name
-        fa = self.manager.get_project_info(project_name)
+    def load_project(self, current, previous=None):
+        if not current:
+            return
+
+        project_id = current.data(Qt.UserRole)
+        self.current_project_id = project_id
+        fa = self.manager.get_project_info(project_id)
         if not fa:
             return
 
         self.name_edit.setText(fa.file_name)
-        self.file_type_edit.setText(fa.file_type)
-        self.created_time_edit.setText(fa.created_time)
-        self.last_modified_edit.setText(fa.last_modified)
-        # self.extra_data_edit.setText(fa.extra_data)
-        self.extra_data_edit.setText(self.manager.get_key_skills_csv(project_name))
 
+        extra = self.manager.get_project_extra_attributes(project_id)
+        # start_date = fa.get("created_time", QDate.currentDate().toString("yyyy-MM-dd"))
+        # end_date = fa.get("last_modified", QDate.currentDate().toString("yyyy-MM-dd"))
+
+        start_date = fa.created_time
+        end_date = fa.last_modified
+
+        if not start_date:
+            start_date = QDate.currentDate().toString("yyyy-MM-dd")
+
+        if not end_date:
+            end_date = QDate.currentDate().toString("yyyy-MM-dd")
+
+        self.start_date_edit.setDate(QDate.fromString(start_date, "yyyy-MM-dd"))
+        self.end_date_edit.setDate(QDate.fromString(end_date, "yyyy-MM-dd"))
+
+        self.start_date_edit.setDate(QDate.fromString(start_date, "yyyy-MM-dd"))
+        self.end_date_edit.setDate(QDate.fromString(end_date, "yyyy-MM-dd"))
+        self.rank_spinbox.setValue(extra.get("project_rank", 0))
+
+        # ---------------- USE SESSION FLAG ----------------
+        # include_flag = self.session_include_flags.get(project_id, True)
+        # self.showcase_checkbox.setChecked(include_flag)
+
+        include_flag = extra.get("include", True)
+        self.showcase_checkbox.setChecked(include_flag)
+
+        self.description_edit.setText(extra.get("description", ""))
+
+        # Load aggregated skills
+        self.clear_skill_lists()
+        agg_skills = self.manager.get_project_skills(project_id)
+        for skill in agg_skills:
+            self.add_aggregate_skill_row(skill)
+
+    # ---------------- SKILLS ----------------
+    def clear_skill_lists(self):
+        for i in reversed(range(self.agg_skills_container.count())):
+            widget = self.agg_skills_container.itemAt(i).widget()
+            if widget:
+                widget.setParent(None)
+
+    def add_aggregate_skill_row(self, skill_name):
+        row = QHBoxLayout()
+        label = QLabel(skill_name)
+        remove_btn = QPushButton("-")
+        remove_btn.setMaximumWidth(30)
+        remove_btn.clicked.connect(lambda: self.remove_skill_row(row))
+        row.addWidget(label)
+        row.addWidget(remove_btn)
+
+        container = QWidget()
+        container.setLayout(row)
+        self.agg_skills_container.addWidget(container)
+
+    def add_aggregate_skill(self):
+        text, ok = QInputDialog.getText(self, "Add Skill", "Skill Name:")
+        if ok and text.strip():
+            self.add_aggregate_skill_row(text.strip())
+
+    def remove_skill_row(self, row):
+        container = row.parentWidget()
+        if container:
+            self.agg_skills_container.removeWidget(container)
+            container.setParent(None)
+
+    # ---------------- SAVE ----------------
 
     def save_changes(self):
-        """Save current edits back to the ResumeManager (and log)."""
-        if not self.current_project_name:
+        if not self.current_project_id:
             return
 
-        mods = {
-            "file_name": self.name_edit.text(),
-            "file_type": self.file_type_edit.text(),
-            "created_time": self.created_time_edit.text(),
-            "last_modified": self.last_modified_edit.text(),
-            # "extra_data": self.extra_data_edit.toPlainText(),
-        }
+        fa = self.manager.get_project_info(self.current_project_id)
+        if not fa:
+            return
 
-        self.manager.update_project_info(self.current_project_name, mods)
-        
-        self.manager.set_key_skills_from_csv(
-            self.current_project_name,
-            self.extra_data_edit.toPlainText()
+        # Update project name if changed
+        new_name = self.name_edit.text()
+        if fa.file_name != new_name:
+            self.manager.rename_project(self.current_project_id, new_name)
+            fa.file_name = new_name
+
+        # Update extra fields
+        self.manager.set_project_rank(self.current_project_id, self.rank_spinbox.value())
+        self.manager.set_showcase_flag(self.current_project_id, self.showcase_checkbox.isChecked())
+        self.manager.set_project_description(self.current_project_id, self.description_edit.text())
+
+        # Update start/end dates
+        self.manager.set_project_dates(
+            self.current_project_id,
+            start_date=self.start_date_edit.date().toString("yyyy-MM-dd"),
+            end_date=self.end_date_edit.date().toString("yyyy-MM-dd")
         )
 
-        # Refresh project list in case name changed
-        self.refresh_project_list()
+        # Aggregate skills
+        agg_skills = [
+            self.agg_skills_container.itemAt(i).widget().layout().itemAt(0).widget().text()
+            for i in range(self.agg_skills_container.count())
+        ]
+        self.manager.set_project_skills(self.current_project_id, ", ".join(agg_skills))
 
-    def generate_pdf(self):
-        """Generate full resume PDF using current project data."""
+        # Refresh left sidebar list and keep selection
+        self.refresh_project_list()
+        items = self.project_list.findItems(fa.file_name, Qt.MatchExactly)
+        if items:
+            self.project_list.setCurrentItem(items[0])
+
+        # Show confirmation alert
+        QMessageBox.information(self, "Saved", f"Project '{fa.file_name}' saved successfully!")
+
+    # ---------------- GENERATION ----------------
+
+    def generate_resume(self):
         pdf_path = self.manager.get_full_resume_pdf()
-        if pdf_path:
-            append_generated_item(pdf_path, "resume", self.manager.log_file)
-            print(f"Resume PDF generated at: {pdf_path}")
 
         if not pdf_path:
             QMessageBox.warning(self, "Error", "Failed to generate resume PDF.")
@@ -208,14 +337,43 @@ class ResumePage(QWidget):
         msg.setWindowTitle("Resume Generated")
         msg.setText("Resume PDF generated successfully!")
         msg.setInformativeText(str(pdf_path))
+
         open_btn = msg.addButton("Open Folder", QMessageBox.ActionRole)
         msg.addButton(QMessageBox.Ok)
-
         msg.exec_()
 
         if msg.clickedButton() == open_btn:
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(pdf_path.parent)))
 
+
+    def generate_portfolio(self):
+        portfolio_path = self.manager.get_full_portfolio()
+
+        if not portfolio_path:
+            QMessageBox.warning(self, "Error", "Failed to generate portfolio ZIP.")
+            return
+
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Portfolio Generated")
+        msg.setText("Portfolio ZIP generated successfully!")
+        msg.setInformativeText(str(portfolio_path))
+
+        open_btn = msg.addButton("Open Folder", QMessageBox.ActionRole)
+        msg.addButton(QMessageBox.Ok)
+        msg.exec_()
+
+        if msg.clickedButton() == open_btn:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(portfolio_path.parent)))
+
+    # ---------------- OTHER ----------------
     def open_skills_page(self):
         self.skills_page = SkillsPage(self.manager)
         self.skills_page.show()
+
+    def refresh_from_scan(self):
+        self.manager.load_log()
+        self.refresh_project_list()
+
+    # def update_include_flag(self, project_id, state):
+    #     if project_id:
+    #         self.session_include_flags[project_id] = bool(state)
