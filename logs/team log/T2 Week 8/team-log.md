@@ -37,6 +37,10 @@
 - https://github.com/COSC-499-W2025/capstone-project-team-10/issues/242
 - https://github.com/COSC-499-W2025/capstone-project-team-10/issues/247
 
+## In progress
+- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/254
+- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/153
+
 ## Tests
 <img width="581" height="229" alt="image" src="https://github.com/user-attachments/assets/76c76392-1d37-4ec0-8009-33fe866733e1" />
 <img width="457" height="96" alt="image" src="https://github.com/user-attachments/assets/a0be13bf-26ac-44c0-9124-bdebdca1e205" />
