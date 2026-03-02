@@ -1,3 +1,35 @@
+# T2 - Week 8 (2/09/2026 - 2/15/2026) 
+
+![T2 - Week 8 - Task Completed](T2-W8/Done.png)
+
+
+## Features
+
+![T2 - Week 8 - In Progress](T2-W8/Features.png)
+![T2 - Week 8 - In Progress](T2-W8/Features1.png)
+![T2 - Week 8 - In Progress](T2-W8/Features2.png)
+
+
+## Recap
+
+- For term 2 week 8, I worked on rewriting the resume page and portfolio into 1 with new features:
+  - Projects ordering (Project Rank - Default ordering by alphabet)
+  - What projects to include in the resume/portfolio generation
+  - Aggregate skills (with new improve GUI)
+  - Projeect Description
+  - Fix bug projects not reloading when scan finished
+  
++ Things that went well: Milestone 2 done
+- Things that did not went well: A lot of rewrite due to having to follow API compliance. 
+- I will have to plan with my team for week 8. We have a presentation on Week 8
+
+## Additional Context
+## Team Survey:
+
+
+![Term 2 Week 8 - Team Survey](T2-W8/Team_Survey_(1).png)
+![Term 2 Week 8 - Team Survey](T2-W8/Team_Survey_(2).png)
+![Term 2 Week 8 - Team Survey](T2-W8/Team_Survey_(3).png)
 # T2 - Week 7 (1/18/2026 - 1/25/2026) Reading Week
 
 # T2 - Week 6 (2/09/2026 - 2/15/2026) 
