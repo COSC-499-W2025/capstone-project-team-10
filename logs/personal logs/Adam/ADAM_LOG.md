@@ -1,3 +1,58 @@
+# Term 2 Week 9 (03/01/2026 - 03/08/2026):
+
+## Completed tasks
+
+All in review features will be merged by the end of the week
+
+![Term 2 Week 8 Tasks completed](T2W9/image.png)
+
+## Features
+
+![Term 2 Week 9 Inprogress](T2W9/image-1.png)
+
+## Recap
+
+### PRs:
+
+#### Showcase functionality for additional resume sections
+
+This pull request introduces a Title, Skills, Education, Experience, and Awards section to the resume, these are configurable through the param system, and are fetched directly from there
+
+Profile param additions:
+
+Added a new profile section to param_defaults.json with fields for name, email, phone number, GitHub, LinkedIn, highlighted skills, work experience, education, and awards.
+Test data enhancements:
+
+Created a new test data file ResumeTestParams.json containing sample values for the profile section, including realistic entries for highlighted skills, work experience, and education, as well as configuration, scan, logging, showcase, and testing sections. This param file is used for testing full functionality
+
+PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/258
+
+#### Summary
+
+This week I focused on improving our outputs for the showcase resume, and making them more useful for students
+
+## Additional Context
+
+N/A
+
+### What went well:
+
+I think everything went well, the new resume looks very clean and contains a lot of room for customizable information
+
+### What didnt go well:
+
+No major problems on my end
+
+### For Next Week:
+
+for next week I will be working on improvements to the GUI to allow the user to add a profile, work experience, etc for the generated resume for the new showcase functionality.
+
+Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/256
+
+## Team Survey:
+
+Survey Complete
+
 # Term 2 Week 6, 7, and 8 (02/15/2026 - 03/01/2026):
 
 ## Completed tasks
