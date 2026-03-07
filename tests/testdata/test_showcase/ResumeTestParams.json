@@ -107,6 +107,36 @@
                 "description": " BEING SUPER FREAKING AWESOME",
                 "include": false
             }
+        ],
+        "awards": [
+            {
+                "title": "Biggest Clown Award",
+                "issuer": "University of British Columbia",
+                "date": "September, 2021",
+                "description": "Award for the biggest clown in all of British Columbia",
+                "include": true
+            },
+            {
+                "title": "Best Clown Award",
+                "issuer": "University of British Columbia",
+                "date": "September, 2021",
+                "description": "Award for the best clown in all of British Columbia",
+                "include": false
+            },
+            {
+                "title": "Most Likely to be a Clown Award",
+                "issuer": "University of British Columbia",
+                "date": "September, 2021",
+                "description": "Award for the person most likely to be a clown in all of British Columbia",
+                "include": true
+            },
+            {
+                "title": "A Job",
+                "issuer": "No one",
+                "date": "September, 2026",
+                "description": "No Job, and a ton of debt",
+                "include": false
+            }
         ]
     },
     "testing": {
