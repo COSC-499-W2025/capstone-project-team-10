@@ -38,16 +38,23 @@ class ActivityHeatmap:
 
     def generate_html(self):
         """Generate HTML heatmap."""
-        print("Activity keys in dict:", list(self.activity.keys()))
-
         start, end = self.get_range()
+
+        # Align start to Sunday
+        start -= timedelta(days=(start.weekday() + 1) % 7)
+
+        # Extend end to Saturday
+        end += timedelta(days=(5 - end.weekday()) % 7)
+
         current = start
         days = []
+        week_index = 0
+        month_labels = []
+        seen_months = set()
 
         while current <= end:
             count = self.activity.get(current, 0)
 
-            # Determine intensity level (0-4)
             if count == 0:
                 level = 0
             elif count == 1:
@@ -63,10 +70,29 @@ class ActivityHeatmap:
                 f'<div class="heatmap-day level-{level}" title="{current} ({count})"></div>'
             )
 
+            # Detect first day of a month
+            if current.day == 1 and current.month not in seen_months:
+                seen_months.add(current.month)
+
+                # calculate week column
+                week_index = (current - start).days // 7
+
+                month_name = current.strftime("%b")
+
+                month_labels.append(
+                    f'<div class="month-label" style="grid-column:{week_index + 1};">{month_name}</div>'
+                )
+
             current += timedelta(days=1)
 
         return f"""
-        <div class="heatmap-container">
-            {''.join(days)}
+        <div class="heatmap">
+            <div class="heatmap-months">
+                {''.join(month_labels)}
+            </div>
+
+            <div class="heatmap-container">
+                {''.join(days)}
+            </div>
         </div>
         """

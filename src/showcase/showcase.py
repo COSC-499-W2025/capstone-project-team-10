@@ -344,10 +344,37 @@ def generate_portfolio(
             .project-skills { color: #444; font-size: 1em; }
 
             .heatmap-wrapper { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 30px; }
-            .heatmap-days { display: flex; flex-direction: column; font-size: 10px; color: #555; margin-right: 4px; }
-            .heatmap-days div { height: 12px; line-height: 12px; }
-            .heatmap-months { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 10px; color: #555; }
-            .heatmap-container { display: grid; grid-template-columns: repeat(53, 12px); grid-auto-rows: 12px; gap: 3px; }
+            .heatmap-days {
+                display: grid;
+                grid-template-rows: repeat(7, 15px);
+                font-size: 10px;
+                color: #555;
+            }
+
+            .heatmap-days div {
+                display: flex;
+                align-items: center;
+            }
+            .heatmap-months {
+                display: grid;
+                grid-auto-flow: column;
+                grid-auto-columns: 15px;
+                margin-bottom: 4px;
+                font-size: 10px;
+                color: #555;
+                position: relative;
+            }
+
+            .month-label {
+                text-align: left;
+            }
+            .heatmap-container {
+                display: grid;
+                grid-auto-flow: column;
+                grid-template-rows: repeat(7, 12px);
+                grid-auto-columns: 12px;
+                gap: 3px;
+            }
             .heatmap-day { width: 12px; height: 12px; border-radius: 2px; }
             .level-0 { background: #ebedf0; }
             .level-1 { background: #c6e48b; }
@@ -370,15 +397,11 @@ def generate_portfolio(
             <button class="toggle-button" onclick="document.querySelector('.heatmap-wrapper').classList.toggle('hidden')">Toggle Heatmap</button>
             <div class="heatmap-wrapper">
                 <div class="heatmap-days">
-                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div>
+                    <div></div><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div>
                     <div>Thu</div><div>Fri</div><div>Sat</div>
                 </div>
                 <div>
-                    <div class="heatmap-months">
-                        <div>Jan</div><div>Feb</div><div>Mar</div><div>Apr</div>
-                        <div>May</div><div>Jun</div><div>Jul</div><div>Aug</div>
-                        <div>Sep</div><div>Oct</div><div>Nov</div><div>Dec</div>
-                    </div>
+
                     {heatmap.generate_html()}
                 </div>
             </div>
