@@ -546,7 +546,7 @@ class LogDetailsPage(QWidget):
         self.thumbnail_btn.clicked.connect(self.on_select_thumbnail)
         bottom_layout.addWidget(self.thumbnail_btn)
 
-        self.new_project_btn = QPushButton("＋ New Project")
+        self.new_project_btn = QPushButton("New Project")
         self.new_project_btn.setStyleSheet("""color: black;""")
         self.new_project_btn.setToolTip("Create a new custom project in this log")
         self.new_project_btn.clicked.connect(self.on_new_project)
