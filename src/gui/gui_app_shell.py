@@ -92,7 +92,7 @@ class AppShell(QWidget):
         self.sidebar_items = [
             "Dashboard",
             "Scan",
-            "Items",
+            "Backup",
             "Resume/Portfolio",
             "Settings",
         ]
@@ -164,7 +164,7 @@ class AppShell(QWidget):
         elif page_name == "Scan":
             self.content_stack.setCurrentWidget(self.page_scan)
 
-        elif page_name == "Items":
+        elif page_name == "Backup":
             self.content_stack.setCurrentWidget(self.page_items)
 
         elif page_name == "Resume/Portfolio":

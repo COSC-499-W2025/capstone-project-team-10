@@ -28,7 +28,6 @@ class GuiItemsManager:
         return {"resumes": {}}
 
     def load_items(self) -> List[Dict[str, Any]]:
-        """Load all items from index.json and map to GUI row format."""
         resumes = self._load_index().get("resumes", {})
 
         items: List[Dict[str, Any]] = []
@@ -38,16 +37,17 @@ class GuiItemsManager:
 
             filename = resume.get("filename", "")
             full_path = str(Path(param.internal_resume_storage_path) / filename) if filename else ""
+            metadata = resume.get("metadata", {}) if isinstance(resume.get("metadata", {}), dict) else {}
 
             items.append(
                 {
                     "id": resume.get("id"),
-                    "filename": filename,
-                    "name": resume.get("original_name", filename),
-                    "type": resume.get("metadata", {}).get("type", ""),
-                    "path": full_path,
+                    "file_name": filename,
+                    "original": resume.get("original_name", filename),
                     "created_at": resume.get("created_at", ""),
-                    "log": resume.get("metadata", {}).get("source_log", ""),
+                    "type": metadata.get("type", ""),
+                    "source_log": metadata.get("source_log", ""),
+                    "path": full_path,  # internal use
                 }
             )
 
@@ -55,7 +55,6 @@ class GuiItemsManager:
         return items
 
     def save_items(self, items: List[Dict[str, Any]]) -> None:
-        """Save GUI items back into index.json schema."""
         resumes: Dict[str, Dict[str, Any]] = {}
 
         for item in items:
@@ -63,15 +62,15 @@ class GuiItemsManager:
             if not isinstance(item_id, int):
                 continue
 
-            filename = item.get("filename") or Path(item.get("path", "")).name
+            filename = item.get("file_name") or Path(item.get("path", "")).name
             resumes[str(item_id)] = {
                 "id": item_id,
                 "filename": filename,
-                "original_name": item.get("name", filename),
+                "original_name": item.get("original", filename),
                 "created_at": item.get("created_at", ""),
                 "metadata": {
                     "type": item.get("type", ""),
-                    "source_log": item.get("log", ""),
+                    "source_log": item.get("source_log", ""),
                 },
             }
 
