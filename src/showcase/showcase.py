@@ -7,10 +7,12 @@ import re
 import shutil
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Callable, Dict, Optional
+from typing import Callable, Dict, List, Optional
 
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
+from pandas.core.arrays.period import com
+from typing_extensions import Any
 
 import src.log.log as log
 import src.param.param as param
@@ -188,12 +190,394 @@ def parse_project_entries() -> ShowcaseProjectManager:
     return project_manager
 
 
+def load_format_defaults(pdf: FPDF):
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_font("Noto", size=12)
+    pdf.set_text_color(0, 0, 0)
+    pdf.set_draw_color(0, 0, 0)
+    pdf.set_line_width(0.5)
+
+
+def end_section(pdf: FPDF, color=(0, 0, 0), thickness=0.5, spacing=4):
+    # Set color and thickness
+    pdf.ln(spacing)  # Add vertical space before the line
+    pdf.set_draw_color(*color)
+    pdf.set_line_width(thickness)
+    y = pdf.get_y() + spacing  # Current y position + offset
+
+    # Use page margins for line width
+    left = pdf.l_margin
+    right = pdf.w - pdf.r_margin
+
+    pdf.line(left, y, right, y)
+    pdf.ln(spacing + 2)  # Add vertical space after the line
+
+
+def start_section(pdf: FPDF, color=(0, 0, 0), thickness=0.2, spacing=1):
+    # Set color and thickness
+    pdf.ln(spacing)  # Add vertical space before the line
+    pdf.set_draw_color(*color)
+    pdf.set_line_width(thickness)
+    y = pdf.get_y() + spacing  # Current y position + offset
+
+    # Use page margins for line width
+    left = pdf.l_margin
+    right = pdf.w - pdf.r_margin
+
+    pdf.line(left, y, right, y)
+    pdf.ln(spacing + 1)  # Add vertical space after the line
+
+
+def create_resume_header(pdf: FPDF, personal_info: Dict[str, str]):
+    load_format_defaults(pdf)
+    name = personal_info.get("name", "")
+    # write name title to pdf
+    if name:
+        pdf.set_font("Noto", "B", size=24)
+        pdf.multi_cell(
+            0, 8, clean_text(name), align="C", new_x=XPos.LMARGIN, new_y=YPos.NEXT
+        )
+
+    email = personal_info.get("email", "")
+    phone_number = personal_info.get("phone_number", "")
+    github = personal_info.get("github", "")
+    linkedin = personal_info.get("linkedin", "")
+    contact_items = []
+
+    # Set formatting for contact info
+    pdf.set_font("Noto", "B", size=10)
+
+    if email:
+        contact_items.append((email, None))
+    if phone_number:
+        contact_items.append((phone_number, None))
+    if github:
+        contact_items.append(("Github", github))
+    if linkedin:
+        contact_items.append(("LinkedIn", linkedin))
+    if contact_items:
+        item_widths = []
+        for text, link in contact_items:
+            item_widths.append(pdf.get_string_width(text) + 2)  # Add padding
+
+        sep_width = pdf.get_string_width(" | ") if len(contact_items) > 1 else 0
+        total_width = sum(item_widths) + sep_width * (len(contact_items) - 1)
+
+        # Center the line
+        page_width = pdf.w - 2 * pdf.l_margin
+        start_x = pdf.l_margin + (page_width - total_width) / 2
+        pdf.set_x(start_x)
+
+        for i, (text, link) in enumerate(contact_items):
+            if link:
+                pdf.set_text_color(0, 0, 255)
+            else:
+                pdf.set_text_color(0, 0, 0)
+            width = item_widths[i]
+            pdf.cell(width, 6, text, ln=False, align="C", link=link)
+            if i < len(contact_items) - 1:
+                pdf.set_text_color(0, 0, 0)
+                pdf.cell(sep_width, 6, " | ", ln=False, align="C")
+        pdf.set_text_color(0, 0, 0)  #
+    # end section if there is any header info to separate from the rest of the resume content
+    if name or contact_items:
+        end_section(pdf)
+
+
+"""format for skill highlight list in param:
+    { "skill": "", "include": false }
+"""
+
+
+def create_skill_highlight_section(pdf: FPDF, skill_highlight: List[Dict[str, str]]):
+    load_format_defaults(pdf)
+    if skill_highlight:
+        skills = []
+        for skill in skill_highlight:
+            include = skill.get("include", True)
+            skill = clean_text(skill.get("skill", ""))
+            if include and skill:
+                skills.append(skill)
+
+        if not skills:
+            return
+
+        pdf.set_font("Noto", "B", size=18)
+        pdf.multi_cell(0, 8, "Skills", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        start_section(pdf)
+        pdf.set_font("Noto", size=12)
+        for skill in skills:
+            pdf.multi_cell(0, 5, "- " + skill, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        end_section(pdf)
+
+
+"""
+param format for education list in profile:
+    {
+        "title": "",
+        "institution": "",
+        "location": "",
+        "completion_date": "",
+        "description": "",
+        "include": false
+    }
+"""
+
+
+def create_education_section(pdf: FPDF, education: List[Dict[str, Any]]):
+    load_format_defaults(pdf)
+    if education:
+        education_entries = []
+        for edu in education:
+            include = edu.get("include", True)
+            if not include:
+                continue
+            education_entries.append(edu)
+        if not education_entries:
+            return
+        pdf.set_font("Noto", "B", size=18)
+        pdf.multi_cell(0, 8, "Education", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        start_section(pdf)
+        pdf.set_font("Noto", size=12)
+        for edu in education_entries:
+            title = clean_text(edu.get("title", ""))
+            institution = clean_text(edu.get("institution", ""))
+            completion_date = clean_text(edu.get("completion_date", ""))
+            description = clean_text(edu.get("description", ""))
+            location = clean_text(edu.get("location", ""))
+
+            header_line = f"{title}" if title else "Personal development"
+            location_line = (
+                f"{institution}, {location} - {completion_date}"
+                if institution and location and completion_date
+                else f"{institution}, {location}"
+                if location
+                else f"{institution}"
+                if institution
+                else ""
+            )
+
+            pdf.set_font("Noto", "B", size=14)
+            pdf.multi_cell(0, 7, header_line, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if location_line:
+                pdf.set_font("Noto", "I", size=10)
+                pdf.multi_cell(0, 5, location_line, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if description:
+                pdf.set_font("Noto", size=10)
+                pdf.multi_cell(0, 5, description, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(1)
+        end_section(pdf)
+
+
+"""
+param format for experience section in profile:
+    {
+        "company": "",
+        "position": "",
+        "location": "",
+        "date_start": "",
+        "date_end": "",
+        "description": "",
+        "responsibilities": [""],
+        "include": false
+    }
+"""
+
+
+def create_experience_section(pdf: FPDF, experience: List[Dict[str, Any]]):
+    load_format_defaults(pdf)
+    if experience:
+        experience_entries = []
+        for exp in experience:
+            include = exp.get("include", True)
+            if not include:
+                continue
+            experience_entries.append(exp)
+
+        if not experience_entries:
+            return
+
+        pdf.set_font("Noto", "B", size=18)
+        pdf.multi_cell(0, 8, "Experience", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+        start_section(pdf)
+        pdf.set_font("Noto", size=12)
+
+        for exp in experience_entries:
+            company = clean_text(exp.get("company", ""))
+            position = clean_text(exp.get("position", ""))
+            location = clean_text(exp.get("location", ""))
+            date_start = clean_text(exp.get("date_start", ""))
+            date_end = clean_text(exp.get("date_end", ""))
+            description = clean_text(exp.get("description", ""))
+            responsibilities = exp.get("responsibilities", [])
+            if responsibilities and isinstance(responsibilities, list):
+                responsibilities = [
+                    clean_text(r) for r in responsibilities if clean_text(r)
+                ]
+            else:
+                responsibilities = []
+
+            header_line = (
+                f"{position} at {company}"
+                if position and company
+                else company or position or "Work experience"
+            )
+            location_line = (
+                f"{location} - {date_start} to {date_end}"
+                if location and date_start and date_end
+                else f"{location}"
+                if location
+                else f"{date_start} to {date_end}"
+                if date_start and date_end
+                else ""
+            )
+
+            pdf.set_font("Noto", "B", size=14)
+            pdf.multi_cell(0, 7, header_line, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if location_line:
+                pdf.set_font("Noto", "I", size=12)
+                pdf.multi_cell(0, 5, location_line, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if description:
+                pdf.set_font("Noto", size=12)
+                pdf.multi_cell(0, 5, description, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            if responsibilities:
+                pdf.set_font("Noto", "I", size=11)
+                for responsibility in responsibilities:
+                    pdf.multi_cell(
+                        0, 5, "- " + responsibility, new_x=XPos.LMARGIN, new_y=YPos.NEXT
+                    )
+            pdf.ln(1)
+        end_section(pdf)
+
+
 # Template for resume entry in PDF
 resume_entry_template = """{project_name}
 {created_time} to {last_modified}
-{project_description}
-Skills: {project_skills}
 """
+
+
+def create_project_section(pdf_output: FPDF):
+    load_format_defaults(pdf_output)
+    project_manager: ShowcaseProjectManager = parse_project_entries()
+    if not project_manager.projects:
+        return
+    # write section header
+    pdf_output.set_font("Noto", "B", size=18)
+    pdf_output.multi_cell(0, 8, "Projects", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    start_section(pdf_output)
+
+    for project in project_manager.get_projects():
+        entry = resume_entry_template.format(
+            project_name=project.title,
+            created_time=project.get_start_date(),
+            last_modified=project.get_end_date(),
+            project_description=project.description,
+            project_skills="\n- ".join(project.get_skills()),
+        )
+
+        if project.title and isinstance(project.title, str):
+            pdf_output.set_font("Noto", size=14, style="B")
+            pdf_output.multi_cell(
+                0, 8, project.title, new_x=XPos.LMARGIN, new_y=YPos.NEXT
+            )
+        else:
+            pdf_output.set_font("Noto", size=14, style="B")
+            pdf_output.multi_cell(
+                0, 8, "Untitled Project", new_x=XPos.LMARGIN, new_y=YPos.NEXT
+            )
+
+        if (
+            project.get_start_date()
+            and project.get_end_date()
+            and isinstance(project.get_start_date(), str)
+            and isinstance(project.get_end_date(), str)
+        ):
+            pdf_output.set_font("Noto", size=12, style="I")
+            pdf_output.multi_cell(
+                0,
+                6,
+                f"{project.get_start_date()} to {project.get_end_date()}",
+                new_x=XPos.LMARGIN,
+                new_y=YPos.NEXT,
+            )
+
+        if project.description and isinstance(project.description, str):
+            pdf_output.set_font("Noto", size=12)
+            pdf_output.multi_cell(
+                0, 6, project.description, new_x=XPos.LMARGIN, new_y=YPos.NEXT
+            )
+        skills = project.get_skills()
+        if skills and isinstance(skills, list):
+            pdf_output.set_font("Noto", size=11, style="I")
+            for skill in skills:
+                pdf_output.multi_cell(
+                    0, 5, "- " + skill, new_x=XPos.LMARGIN, new_y=YPos.NEXT
+                )
+        pdf_output.ln(1)
+    end_section(pdf_output)
+
+
+"""
+Format for awards list in param:
+    {
+        "title": "",
+        "issuer": "",
+        "date": "",
+        "description": "",
+        "include": false
+    }
+"""
+
+
+def create_awards_section(pdf_output: FPDF, awards_info: List[Dict[str, Any]]):
+    load_format_defaults(pdf_output)
+    if awards_info:
+        awards_entries = []
+        for award in awards_info:
+            include = award.get("include", True)
+            if not include:
+                continue
+            awards_entries.append(award)
+
+        if not awards_entries:
+            return
+
+        pdf_output.set_font("Noto", "B", size=18)
+        pdf_output.multi_cell(
+            0, 8, "Awards & Certifications", new_x=XPos.LMARGIN, new_y=YPos.NEXT
+        )
+        start_section(pdf_output)
+        pdf_output.set_font("Noto", size=12)
+
+        for award in awards_entries:
+            title = clean_text(award.get("title", ""))
+            issuer = clean_text(award.get("issuer", ""))
+            date = clean_text(award.get("date", ""))
+            description = clean_text(award.get("description", ""))
+
+            header_line = (
+                f"{title} from {issuer}"
+                if title and issuer
+                else title or issuer or "Award/Certification"
+            )
+            date_line = f"{date}" if date else ""
+
+            pdf_output.set_font("Noto", "B", size=14)
+            pdf_output.multi_cell(
+                0, 7, header_line, new_x=XPos.LMARGIN, new_y=YPos.NEXT
+            )
+            if date_line:
+                pdf_output.set_font("Noto", "I", size=12)
+                pdf_output.multi_cell(
+                    0, 5, date_line, new_x=XPos.LMARGIN, new_y=YPos.NEXT
+                )
+            if description:
+                pdf_output.set_font("Noto", size=12)
+                pdf_output.multi_cell(
+                    0, 5, description, new_x=XPos.LMARGIN, new_y=YPos.NEXT
+                )
+            pdf_output.ln(1)
+        end_section(pdf_output)
 
 
 def generate_resume(
@@ -220,9 +604,6 @@ def generate_resume(
     if not export_path.parent.exists():
         print(f"Export folder does not exist: {export_path}")
         return
-
-    project_manager: ShowcaseProjectManager = parse_project_entries()
-
     try:
         pdf_output = FPDF()
         pdf_output.add_page()
@@ -233,39 +614,60 @@ def generate_resume(
 
         pdf_output.set_font("Noto", "BI", size=14)
 
-        for project in project_manager.get_projects():
-            entry = resume_entry_template.format(
-                project_name=project.title,
-                created_time=project.get_start_date(),
-                last_modified=project.get_end_date(),
-                project_description=project.description,
-                project_skills=", ".join(project.get_skills()),
+        # Write header
+
+        personal_info = param.get("profile") or {}
+        if not isinstance(personal_info, dict):
+            print(
+                "Warning: 'profile' parameter is not a dictionary. Skipping resume header generation."
             )
-            header_font_size = 18
+            personal_info = {}
+        else:
+            create_resume_header(pdf_output, personal_info)
 
-            entry_lines = entry.splitlines()
+        # Optional Skill highlight section
 
-            for i, line in enumerate(entry_lines):
-                if i < 2:
-                    pdf_output.set_font("Noto", size=header_font_size, style="B")
-                    pdf_output.multi_cell(
-                        0, 10, line, new_x=XPos.LMARGIN, new_y=YPos.NEXT
-                    )
-                    header_font_size -= 2
-                elif i == 2 and project.description != "":
-                    print(f"Description: {project.description}")
-                    pdf_output.set_font("Noto", size=14, style="I")
-                    pdf_output.multi_cell(
-                        0, 10, line, new_x=XPos.LMARGIN, new_y=YPos.NEXT
-                    )
-                else:
-                    pdf_output.set_font("Noto", size=12)
-                    pdf_output.multi_cell(
-                        0, 10, line, new_x=XPos.LMARGIN, new_y=YPos.NEXT
-                    )
+        skill_highlight = personal_info.get("highlighted_skills", [])
+        if not isinstance(skill_highlight, list):
+            print(
+                "Warning: 'highlighted_skills' in profile is not a dictionary. Skipping skill highlight section."
+            )
+            skill_highlight = []
+        else:
+            create_skill_highlight_section(pdf_output, skill_highlight)
 
-            pdf_output.set_font("Noto", size=12)
-            pdf_output.ln(10)
+        # Education section
+
+        education = personal_info.get("education", [])
+        if not isinstance(education, list):
+            print(
+                "Warning: 'education' in profile is not a list. Skipping education section."
+            )
+        elif education:
+            create_education_section(pdf_output, education)
+
+        # work experience section
+
+        experience = personal_info.get("work_experience", [])
+        if not isinstance(experience, list):
+            print(
+                "Warning: 'work_experience' in profile is not a list. Skipping work experience section."
+            )
+        elif experience:
+            create_experience_section(pdf_output, experience)
+
+        # project section
+        create_project_section(pdf_output)
+
+        # awards section
+        awards_info = personal_info.get("awards", [])
+        if not isinstance(awards_info, list):
+            print(
+                "Warning: 'awards' in profile is not a list. Skipping awards section."
+            )
+        elif awards_info:
+            create_awards_section(pdf_output, awards_info)
+
         pdf_output.output(str(export_path))
 
         try:

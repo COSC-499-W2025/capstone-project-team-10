@@ -22,6 +22,17 @@
         "showcase_max_number_of_projects": 5,
         "showcase_max_skills_per_project": 10
     },
+    "profile": {
+        "name": "",
+        "email": "",
+        "phone_number": "",
+        "github": "",
+        "linkedin": "",
+        "highlighted_skills": [],
+        "work_experience": [],
+        "education": [],
+        "awards": []
+    },
     "testing": {
         "test_key": null
     }

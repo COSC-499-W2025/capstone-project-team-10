@@ -1,0 +1,145 @@
+{
+    "config": {
+        "project_name": "Capstone Project Team 10",
+        "config_info": "1.0.0"
+    },
+    "scan": {
+        "scan_hidden_files": false,
+        "scan_system_files": false,
+        "supported_file_types": [],
+        "excluded_file_types": [],
+        "excluded_file_paths": [],
+        "github_username": "sk3tch7y"
+    },
+    "logging": {
+        "log_max_count": 11,
+        "log_file_naming_regex": "^(\\d+)\\.log$",
+        "current_log_file": "/Users/sk3tch7y/Library/Application Support/Capstone Project Team 10/logs/0.log"
+    },
+    "showcase": {
+        "showcase_export_path": "/Users/sk3tch7y/Downloads",
+        "showcase_maximum_exports": 10,
+        "showcase_max_number_of_projects": 5,
+        "showcase_max_skills_per_project": 10
+    },
+    "profile": {
+        "name": "Adam Badry",
+        "email": "test@gmail.com",
+        "phone_number": "123-456-7890",
+        "github": "https://github.com/Sk3tch7y",
+        "linkedin": "https://www.linkedin.com/in/adam-b-2241451b2/",
+        "highlighted_skills": [
+            {
+                "skill": "Embedded programming",
+                "include": true
+            },
+            {
+                "skill": "Python programming and data analysis",
+                "include": false
+            },
+            {
+                "skill": "Audio and Analog Signal Processing",
+                "include": true
+            }
+        ],
+        "work_experience": [
+            {
+                "company": "The Clown Factory",
+                "position": "Head Clown",
+                "location": "University of British Columbia",
+                "date_start": "Birth",
+                "date_end": "Death",
+                "description": "Head clown at the clown factory, responsible for overseeing all clowning activities and ensuring the success of each performance.",
+                "responsibilities": [
+                    "Overseeing clowning activities",
+                    "Coordinating performances",
+                    "Managing the clown team"
+                ],
+                "include": true
+            },
+            {
+                "company": "The Circus",
+                "position": "Clown",
+                "location": "University of British Columbia",
+                "date_start": "Birth",
+                "date_end": "Death",
+                "description": "Clown at the circus, responsible for performing various clowning acts and entertaining the audience.",
+                "responsibilities": ["Clownery", "Balloon Animals", "Laughter"],
+                "include": false
+            },
+            {
+                "company": "The Big Top",
+                "position": "Assistant Clown",
+                "location": "University of British Columbia",
+                "date_start": "Birth",
+                "date_end": "Death",
+                "description": "Assistant clown at the big top, responsible for supporting the head clown and performing various clowning acts.",
+                "responsibilities": [
+                    "Supporting the head clown",
+                    "Performing clowning acts",
+                    "Entertaining the audience"
+                ],
+                "include": true
+            }
+        ],
+        "education": [
+            {
+                "title": "Bachelors Of Science in Computer Science",
+                "institution": "The University of British Columbia",
+                "location": "Kelowna, BC",
+                "completion_date": "June 2026",
+                "description": "Bachelors of Science in Computer Science with a focus on embedded and low level systems",
+                "include": true
+            },
+            {
+                "title": "Doctorate in being super freaking awesome",
+                "institution": "The University of British Columbia",
+                "location": "Kelowna, BC",
+                "completion_date": "The beginning of time",
+                "description": " BEING SUPER FREAKING AWESOME",
+                "include": true
+            },
+            {
+                "title": "Masters in being super freaking awesome",
+                "institution": "The University of British Columbia",
+                "location": "Kelowna, BC",
+                "completion_date": "The beginning of time",
+                "description": " BEING SUPER FREAKING AWESOME",
+                "include": false
+            }
+        ],
+        "awards": [
+            {
+                "title": "Biggest Clown Award",
+                "issuer": "University of British Columbia",
+                "date": "September, 2021",
+                "description": "Award for the biggest clown in all of British Columbia",
+                "include": true
+            },
+            {
+                "title": "Best Clown Award",
+                "issuer": "University of British Columbia",
+                "date": "September, 2021",
+                "description": "Award for the best clown in all of British Columbia",
+                "include": false
+            },
+            {
+                "title": "Most Likely to be a Clown Award",
+                "issuer": "University of British Columbia",
+                "date": "September, 2021",
+                "description": "Award for the person most likely to be a clown in all of British Columbia",
+                "include": true
+            },
+            {
+                "title": "A Job",
+                "issuer": "No one",
+                "date": "September, 2026",
+                "description": "No Job, and a ton of debt",
+                "include": false
+            }
+        ]
+    },
+    "testing": {
+        "test_key": null
+    }
+}
