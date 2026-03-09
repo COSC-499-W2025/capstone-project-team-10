@@ -67,11 +67,11 @@ class CreateProjectDialog(QDialog):
         form.setLabelAlignment(Qt.AlignRight)
 
         self.id_edit = QLineEdit()
-        self.id_edit.setPlaceholderText("e.g. my-project-2024")
+        self.id_edit.setPlaceholderText("Enter Project ID")
         self.id_edit.setStyleSheet("color: black; padding: 6px; border: 1px solid #ccc; border-radius: 4px;")
 
         self.desc_edit = QLineEdit()
-        self.desc_edit.setPlaceholderText("Optional short description")
+        self.desc_edit.setPlaceholderText("Optional description")
         self.desc_edit.setStyleSheet("color: black; padding: 6px; border: 1px solid #ccc; border-radius: 4px;")
 
         lbl_style = "color: black; font-size: 13px;"
