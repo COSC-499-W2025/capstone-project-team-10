@@ -12,8 +12,8 @@ from src.gui.gui_dashboard.gui_dashboard_container import DashboardContainer
 from src.gui.gui_items_page.gui_items_page import ItemsPage
 from src.gui.gui_portfolio_page import PortfolioPage
 from src.gui.gui_resume_page import ResumePage
-from src.gui.gui_scan_page import ScanPage
-from src.gui.gui_scan_results import ScanResultsPage
+from src.gui.gui_scan_page.gui_scan_page import ScanPage
+from src.gui.gui_scan_page.gui_scan_results import ScanResultsPage
 from src.gui.gui_settings_page.gui_settings_page import SettingsPage
 
 # ---------- UI Color Constants ----------

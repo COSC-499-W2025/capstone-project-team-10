@@ -1,8 +1,8 @@
 import PyQt5.QtCore as QtCore
 import PyQt5.QtWidgets as QtWidgets
 
-from src.gui.gui_scan_filtering import FilterDialog
-from src.gui.gui_scan_manager import ScanManager
+from src.gui.gui_scan_page.gui_scan_filtering import FilterDialog
+from src.gui.gui_scan_page.gui_scan_manager import ScanManager
 
 
 class ScanPage(QtWidgets.QWidget):
