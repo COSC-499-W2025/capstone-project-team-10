@@ -33,6 +33,29 @@ class ItemsPage(QWidget):
         self.table.setSelectionMode(QTableWidget.SingleSelection)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
 
+        # Remove dashed focus rectangle on cells
+        self.table.setFocusPolicy(Qt.NoFocus)
+
+        # Header border + clean cell focus/selection visuals
+        self.table.setStyleSheet(
+            """
+            QHeaderView::section {
+                border: 1px solid #bfbfbf;
+                border-left: none;
+                border-top: none;
+                padding: 6px;
+                font-weight: bold;
+                background: #f5f5f5;
+            }
+            QHeaderView::section:first {
+                border-left: 1px solid #bfbfbf;
+            }
+            QTableWidget::item:focus {
+                outline: none;
+            }
+            """
+        )
+
         # Bold headers
         header_font = self.table.horizontalHeader().font()
         header_font.setBold(True)
