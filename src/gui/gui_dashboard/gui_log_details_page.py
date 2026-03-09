@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
                              QPushButton, QTableWidget, QTableWidgetItem,
                              QHeaderView, QStackedWidget, QDialog,
                              QDialogButtonBox, QMessageBox, QAbstractItemView,
-                             QFileDialog)
+                             QFileDialog, QLineEdit, QFormLayout)
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
 from PyQt5.QtGui import QPixmap, QIcon
 import csv
@@ -31,6 +31,91 @@ def create_thumbnail(image_path: str, size: int = thumbnail_size) -> QPixmap:
         return empty_thumbnail(size)
 
     return pixmap.scaled(size, size, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+
+def styled_msgbox(parent, title: str, text: str, icon=QMessageBox.Information) -> QMessageBox:
+    msg = QMessageBox(parent)
+    msg.setWindowTitle(title)
+    msg.setText(text)
+    msg.setIcon(icon)
+    msg.setStyleSheet("""
+        QLabel { color: black; font-weight: normal; }
+        QPushButton {
+            background-color: #002145;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        QPushButton:hover { background-color: #003366; }
+    """)
+    return msg
+
+class CreateProjectDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Create New Project")
+        self.resize(420, 200)
+        self._init_ui()
+
+    def _init_ui(self):
+        layout = QVBoxLayout(self)
+        layout.setSpacing(12)
+        layout.setContentsMargins(20, 20, 20, 20)
+
+        form = QFormLayout()
+        form.setLabelAlignment(Qt.AlignRight)
+
+        self.id_edit = QLineEdit()
+        self.id_edit.setPlaceholderText("Enter Project ID")
+        self.id_edit.setStyleSheet("color: black; padding: 6px; border: 1px solid #ccc; border-radius: 4px;")
+
+        self.desc_edit = QLineEdit()
+        self.desc_edit.setPlaceholderText("Optional description")
+        self.desc_edit.setStyleSheet("color: black; padding: 6px; border: 1px solid #ccc; border-radius: 4px;")
+
+        lbl_style = "color: black; font-size: 13px;"
+        id_lbl = QLabel("Project ID:")
+        id_lbl.setStyleSheet(lbl_style)
+        desc_lbl = QLabel("Description:")
+        desc_lbl.setStyleSheet(lbl_style)
+
+        form.addRow(id_lbl, self.id_edit)
+        form.addRow(desc_lbl, self.desc_edit)
+        layout.addLayout(form)
+
+        BUTTON_STYLE = """
+            QPushButton {
+                background-color: #002145;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+            QPushButton:hover { background-color: #003366; }
+            QPushButton:disabled { background-color: #aaa; }
+        """
+
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        buttons.button(QDialogButtonBox.Ok).setText("Create Project")
+        buttons.button(QDialogButtonBox.Ok).setStyleSheet(BUTTON_STYLE)
+        buttons.button(QDialogButtonBox.Cancel).setStyleSheet(BUTTON_STYLE)
+        buttons.accepted.connect(self._on_accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    def _on_accept(self):
+        if not self.id_edit.text().strip():
+            QMessageBox.warning(self, "Missing Field", "Project ID cannot be empty.")
+            return
+        self.accept()
+
+    def project_id(self) -> str:
+        return self.id_edit.text().strip()
+
+    def description(self) -> str:
+        return self.desc_edit.text().strip()
 
 # Shows all files not currently in project but in the same log
 class AddFileDialog(QDialog):
@@ -318,7 +403,7 @@ class ProjectFilesPage(QWidget):
                     log.update(fa, forceUpdate=True)
                     self.table.removeRow(row)
                 except Exception as e:
-                    QMessageBox.warning(self, "Warning", f"Could not remove '{fa.file_name}': {e}")
+                    styled_msgbox(self, "Warning", f"Could not remove '{fa.file_name}': {e}", QMessageBox.Warning).exec_()
 
     # Add selected file to a given project
     def on_file_add(self):
@@ -363,6 +448,7 @@ class ProjectFilesPage(QWidget):
 class LogDetailsPage(QWidget):
     # Return to previous page
     back_clicked = pyqtSignal()
+    project_created = pyqtSignal(str, str)
 
     def __init__(self, log_path=None, parent=None):
         super().__init__(parent)
@@ -460,6 +546,14 @@ class LogDetailsPage(QWidget):
         self.thumbnail_btn.clicked.connect(self.on_select_thumbnail)
         bottom_layout.addWidget(self.thumbnail_btn)
 
+        self.new_project_btn = QPushButton("New Project")
+        self.new_project_btn.setStyleSheet("""color: black;""")
+        self.new_project_btn.setToolTip("Create a new custom project in this log")
+        self.new_project_btn.clicked.connect(self.on_new_project)
+        bottom_layout.addWidget(self.new_project_btn)
+
+        layout.addLayout(bottom_layout)
+
         layout.addLayout(bottom_layout)
         self.stack.addWidget(self.projects_widget)
 
@@ -551,6 +645,53 @@ class LogDetailsPage(QWidget):
         # Update the table cell immediately
         pixmap = create_thumbnail(file_path, thumbnail_size)
         self.table.item(row, 0).setIcon(QIcon(pixmap))
+
+    def on_new_project(self):
+        dlg = CreateProjectDialog(parent=self)
+        if dlg.exec_() != QDialog.Accepted:
+            return
+
+        new_id = dlg.project_id()
+        description = dlg.description()
+
+        if new_id in self._project_ids:
+            styled_msgbox(self, "Duplicate ID", f"A project with ID '{new_id}' already exists in this log.", QMessageBox.Warning).exec_()
+            return
+
+        # Write the new project entry to the log
+        try:
+            project_fa = FileAnalysis(
+                file_path=new_id,
+                file_name=new_id,
+                file_type="Project",
+                last_modified="",
+                created_time="",
+                extra_data={"description": description},
+                importance=0.0,
+                customized=True,
+                project_id=new_id,
+                file_hash= "", # Set to be empty in accordance with the other projects
+            )
+            log.current_projects.add(new_id)
+            log.write(project_fa)
+        except Exception as e:
+            styled_msgbox(self, "Error", f"Could not save project to log: {e}", QMessageBox.Warning).exec_()
+            return
+
+        # Insert into the table
+        row_idx = self.table.rowCount()
+        self.table.insertRow(row_idx)
+        self.table.setRowHeight(row_idx, thumbnail_size)
+
+        thumb_item = QTableWidgetItem()
+        thumb_item.setIcon(QIcon(empty_thumbnail(thumbnail_size)))
+        self.table.setItem(row_idx, 0, thumb_item)
+        self.table.setItem(row_idx, 1, QTableWidgetItem(new_id))
+
+        self._project_ids.append(new_id)
+        self.project_created.emit(new_id, description)
+
+        styled_msgbox(self, "Project Created", f"Project '<b>{new_id}</b>' has been created.").exec_()
 
     # Double click to enter next page
     def on_double_clicked(self, row, _col):
