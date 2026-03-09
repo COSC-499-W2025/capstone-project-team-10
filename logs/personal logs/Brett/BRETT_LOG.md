@@ -1,3 +1,11 @@
+# Week 21 (3/2/2026 = 3/8/2026) ** TERM 2 Week 9 **
+
+## Features
+Team Log
+
+## Recap
+This week I filled out the team log. I also looked into and identified areas of the project that can be polished such as the gui pages. Next week I want to work on removing useless or old code as well as updating comments and documentation.
+
 # Week 20 (1/26/2026 = 2/8/2026) ** TERM 2 Week 6 **
 
 ## Features
