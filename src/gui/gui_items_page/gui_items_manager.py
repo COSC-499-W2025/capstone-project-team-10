@@ -39,15 +39,23 @@ class GuiItemsManager:
             full_path = str(Path(param.internal_resume_storage_path) / filename) if filename else ""
             metadata = resume.get("metadata", {}) if isinstance(resume.get("metadata", {}), dict) else {}
 
+            original_path = (
+                resume.get("original_path")
+                or metadata.get("original_path")       # legacy
+                or metadata.get("original_file_path")  # legacy
+                or ""
+            )
+
             items.append(
                 {
                     "id": resume.get("id"),
                     "file_name": filename,
                     "original": resume.get("original_name", filename),
+                    "original_path": original_path,
                     "created_at": resume.get("created_at", ""),
                     "type": metadata.get("type", ""),
                     "source_log": metadata.get("source_log", ""),
-                    "path": full_path,  # internal use
+                    "path": full_path,
                 }
             )
 
@@ -63,14 +71,18 @@ class GuiItemsManager:
                 continue
 
             filename = item.get("file_name") or Path(item.get("path", "")).name
+            original_path = item.get("original_path", "")
+
             resumes[str(item_id)] = {
                 "id": item_id,
                 "filename": filename,
                 "original_name": item.get("original", filename),
+                "original_path": original_path,  # primary field
                 "created_at": item.get("created_at", ""),
                 "metadata": {
                     "type": item.get("type", ""),
                     "source_log": item.get("source_log", ""),
+                    "original_file_path": original_path,  # legacy compatibility
                 },
             }
 

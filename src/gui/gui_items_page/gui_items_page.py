@@ -69,8 +69,12 @@ class ItemsPage(QWidget):
         self.visit_btn = QPushButton("Visit File")
         self.visit_btn.clicked.connect(self.visit_selected_file)
 
+        self.visit_original_btn = QPushButton("Visit Original File")
+        self.visit_original_btn.clicked.connect(self.visit_selected_original_file)
+
         button_layout.addStretch()
         button_layout.addWidget(self.visit_btn)
+        button_layout.addWidget(self.visit_original_btn)
 
         layout.addLayout(button_layout)
 
@@ -174,6 +178,39 @@ class ItemsPage(QWidget):
             subprocess.Popen(f'explorer /select,"{file_path}"')
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to open file location:\n{str(e)}")
+
+    def visit_selected_original_file(self):
+        current_row = self.table.currentRow()
+        if current_row < 0:
+            QMessageBox.warning(self, "No Selection", "Please select an item to visit.")
+            return
+
+        if current_row >= len(self.current_items):
+            QMessageBox.warning(self, "Invalid Selection", "Selected row is invalid.")
+            return
+
+        original_location = self.current_items[current_row].get("original_path", "")
+        if not original_location:
+            QMessageBox.information(
+                self,
+                "Original File Not Available",
+                "The original file is either deleted or moved.",
+            )
+            return
+
+        original_path = Path(original_location)
+        if not original_path.exists():
+            QMessageBox.information(
+                self,
+                "Original File Not Available",
+                "The original file is either deleted or moved.",
+            )
+            return
+
+        try:
+            subprocess.Popen(f'explorer /select,"{original_path}"')
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to open original file location:\n{str(e)}")
 
     def show_removed_items_popup(self, removed_items):
         removed_names = [item.get("original", "Unknown") for item in removed_items]
