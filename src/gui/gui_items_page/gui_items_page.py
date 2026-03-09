@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 import subprocess
 from pathlib import Path
+from datetime import datetime
 from .gui_items_manager import GuiItemsManager
 
 
@@ -32,6 +33,11 @@ class ItemsPage(QWidget):
         self.table.setSelectionMode(QTableWidget.SingleSelection)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
 
+        # Bold headers
+        header_font = self.table.horizontalHeader().font()
+        header_font.setBold(True)
+        self.table.horizontalHeader().setFont(header_font)
+
         layout.addWidget(self.table, 1)
 
         button_layout = QHBoxLayout()
@@ -44,6 +50,22 @@ class ItemsPage(QWidget):
         button_layout.addWidget(self.visit_btn)
 
         layout.addLayout(button_layout)
+
+    def _format_type(self, raw_type: str) -> str:
+        if raw_type == "pdf_resume":
+            return "Resume"
+        if raw_type == "web_portfolio":
+            return "Portfolio"
+        return raw_type.replace("_", " ").title() if raw_type else ""
+
+    def _format_datetime(self, raw_datetime: str) -> str:
+        if not raw_datetime:
+            return ""
+        try:
+            dt = datetime.fromisoformat(raw_datetime)
+            return dt.strftime("%b %d, %Y %I:%M %p")
+        except ValueError:
+            return raw_datetime
 
     def showEvent(self, event):
         super().showEvent(event)
@@ -72,12 +94,24 @@ class ItemsPage(QWidget):
         self.table.setRowCount(len(items))
 
         for row, item in enumerate(items):
-            self.table.setItem(row, 0, QTableWidgetItem(str(item.get("id", ""))))
-            self.table.setItem(row, 1, QTableWidgetItem(item.get("file_name", "")))
-            self.table.setItem(row, 2, QTableWidgetItem(item.get("original", "")))
-            self.table.setItem(row, 3, QTableWidgetItem(item.get("created_at", "")))
-            self.table.setItem(row, 4, QTableWidgetItem(item.get("type", "")))
-            self.table.setItem(row, 5, QTableWidgetItem(item.get("source_log", "")))
+            id_item = QTableWidgetItem(str(item.get("id", "")))
+            id_item.setTextAlignment(Qt.AlignCenter)
+
+            backup_item = QTableWidgetItem(item.get("file_name", ""))
+            original_item = QTableWidgetItem(item.get("original", ""))
+            created_item = QTableWidgetItem(self._format_datetime(item.get("created_at", "")))
+
+            type_item = QTableWidgetItem(self._format_type(item.get("type", "")))
+            type_item.setTextAlignment(Qt.AlignCenter)
+
+            source_item = QTableWidgetItem(item.get("source_log", ""))
+
+            self.table.setItem(row, 0, id_item)
+            self.table.setItem(row, 1, backup_item)
+            self.table.setItem(row, 2, original_item)
+            self.table.setItem(row, 3, created_item)
+            self.table.setItem(row, 4, type_item)
+            self.table.setItem(row, 5, source_item)
 
         self.resize_columns()
 
