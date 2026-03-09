@@ -1,4 +1,31 @@
-# T2 - Week 8 (2/09/2026 - 2/15/2026) 
+ T2 - Week 9 (3/02/2026 - 3/08/2026) 
+
+![T2 - Week 9 - Task Completed](T2-W9/Done.png)
+
+
+## Features
+
+![T2 - Week 9 - In Progress](T2-W9/Features.png)
+
+
+## Recap
+
+- For term 2 week 9, I worked on making the heatmap for the showcase portfolio:
+  - This heat map can be toggleable
+  - This heat map can show the correct date on visuallization of the entire portfolio
+  
++ Things that went well: I can chill a bit before milestone 3
+- Things that did not went well: Making a web portfolio using python is not fun
+- I will have to plan with my team for week 10. Tho, I plan to continue improving the portfolio next week.
+
+## Additional Context
+## Team Survey:
+
+
+![Term 2 Week 9 - Team Survey](T2-W8/Team_Survey_(1).png)
+![Term 2 Week 9 - Team Survey](T2-W8/Team_Survey_(2).png)
+![Term 2 Week 9 - Team Survey](T2-W8/Team_Survey_(3).png)
+# T2 - Week 8 (2/23/2026 - 3/1/2026) 
 
 ![T2 - Week 8 - Task Completed](T2-W8/Done.png)
 
@@ -30,7 +57,7 @@
 ![Term 2 Week 8 - Team Survey](T2-W8/Team_Survey_(1).png)
 ![Term 2 Week 8 - Team Survey](T2-W8/Team_Survey_(2).png)
 ![Term 2 Week 8 - Team Survey](T2-W8/Team_Survey_(3).png)
-# T2 - Week 7 (1/18/2026 - 1/25/2026) Reading Week
+# T2 - Week 7 (2/16/2026 - 1/22/2026) Reading Week
 
 # T2 - Week 6 (2/09/2026 - 2/15/2026) 
 
