@@ -1,3 +1,17 @@
+# Term 2 Week 9 (03/02/2026 - 03/08/2026)
+
+![Term Two Week Nine Tasks](Term2Week9/Week9Tasks.png)
+
+# Features
+
+![Term Two Week Nine Feature](Term2Week9/Week9Feature.png)
+
+# Recap
+
+This week I worked on adding the ability for a user to create custom projects and groupings of files that were scanned by the system. This ensures that if our scanning system fails to properly identify a project in its scan that the user can create it themselves to properly represent their skills and the projects they have worked on.
+
+Over the next week I intend to fully implement the favourites tab that has been present on the dashboard since its initial creation. This will allow the user to track specific projects across logs and to compile what the user thinks is their best work.
+
 # Term 2 Week 8 (02/23/2026 - 03/01/2026)
 
 ![Term Two Week Eight Tasks](Term2Week8/Week8Tasks.png)
