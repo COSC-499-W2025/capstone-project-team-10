@@ -14,15 +14,17 @@ class LoggingPage(QWidget):
         form_layout.setLabelAlignment(Qt.AlignLeft)
         form_layout.setFieldGrowthPolicy(QFormLayout.AllNonFixedFieldsGrow)
 
-        self.log_max_count = QLineEdit(str(param.get("logging.log_max_count")))
-        self.log_max_count.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        form_layout.addRow("Number of previous sessions to store:", self.log_max_count)
-        self.log_max_count.editingFinished.connect(self.update_log_max_count)
-
+        # Current Log File (moved to top)
         self.current_log_file = QLineEdit(param.get("logging.current_log_file"))
         self.current_log_file.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         form_layout.addRow("Current Log File:", self.current_log_file)
         self.current_log_file.editingFinished.connect(self.update_current_log_file)
+
+        # Number of previous sessions
+        self.log_max_count = QLineEdit(str(param.get("logging.log_max_count")))
+        self.log_max_count.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        form_layout.addRow("Number of previous sessions to store:", self.log_max_count)
+        self.log_max_count.editingFinished.connect(self.update_log_max_count)
 
         form_container = QWidget()
         form_container.setLayout(form_layout)
