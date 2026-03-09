@@ -52,21 +52,32 @@ class SettingsPage(QWidget):
         self.sidebar.addItems(["Scan", "Logging", "Showcase"])
         self.sidebar.currentRowChanged.connect(self.display_page)
         self.sidebar.setMaximumWidth(150)
+        self.sidebar.setFocusPolicy(Qt.NoFocus)  # hide focus rectangle/dashed outline
         self.sidebar.setStyleSheet(f"""
             QListWidget {{
                 padding: 5px;
                 margin: 0px;
                 background-color: {SIDEBAR_BG_COLOR};
                 color: {SIDEBAR_TEXT_COLOR};
+                outline: none;
             }}
-            QListWidget::item:selected {{
-                background-color: {SIDEBAR_ITEM_SELECTED_BG};  
-                color: {SIDEBAR_SELECTED_TEXT_COLOR};
+            QListWidget:focus {{
+                outline: none;
             }}
             QListWidget::item {{
-                    padding: 8px 0;
-                    margin-bottom: 4px;
-                    border-radius: 6px;
+                padding: 8px 0;
+                padding-left: 12px;   /* left margin for tab text */
+                margin-bottom: 4px;
+                border-radius: 6px;
+                outline: none;
+            }}
+            QListWidget::item:selected {{
+                background-color: {SIDEBAR_ITEM_SELECTED_BG};
+                color: {SIDEBAR_SELECTED_TEXT_COLOR};
+                outline: none;
+            }}
+            QListWidget::item:focus {{
+                outline: none;
             }}
         """)
 

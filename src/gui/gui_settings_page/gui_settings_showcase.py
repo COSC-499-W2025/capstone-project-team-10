@@ -24,12 +24,14 @@ class ShowcasePage(QWidget):
         form_layout = QFormLayout()
         form_layout.setAlignment(Qt.AlignLeft)
         form_layout.setLabelAlignment(Qt.AlignLeft)
+        form_layout.setFieldGrowthPolicy(QFormLayout.AllNonFixedFieldsGrow)
 
         form_container = QWidget()
         form_container.setLayout(form_layout)
-        form_container.setMaximumWidth(3000)
+        form_container.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
 
         self.folder_line_edit = QLineEdit(param.get("showcase.showcase_export_path"))
+        self.folder_line_edit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.select_folder_btn = QPushButton("Select Folder")
         self.select_folder_btn.setStyleSheet(styles.BUTTON_STYLE)
         self.select_folder_btn.clicked.connect(self.select_folder)
@@ -42,20 +44,13 @@ class ShowcasePage(QWidget):
         form_layout.addRow("Showcase save location:", folder_layout)
 
         self.max_showcase_length = QLineEdit()
-        form_layout.addRow(
-            "Maximum Showcase Length In Projects", self.max_showcase_length
-        )
-        self.max_showcase_length.setText(
-            str(param.get("showcase.showcase_maximum_exports"))
-        )
-        self.max_showcase_length.editingFinished.connect(
-            self.update_max_showcase_length
-        )
+        self.max_showcase_length.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        form_layout.addRow("Maximum Showcase Length In Projects", self.max_showcase_length)
+        self.max_showcase_length.setText(str(param.get("showcase.showcase_maximum_exports")))
+        self.max_showcase_length.editingFinished.connect(self.update_max_showcase_length)
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(form_container)
-        main_layout.setAlignment(form_container, Qt.AlignLeft | Qt.AlignTop)
-
         self.setLayout(main_layout)
 
     def update_showcase_export_path(self):
