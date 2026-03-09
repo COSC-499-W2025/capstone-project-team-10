@@ -21,6 +21,8 @@ from src.log.log_sorter import LogSorter
 from src.resume.resume_manager import manager
 from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
 
+from src.showcase.showcase_portfolio_heatmap import ActivityHeatmap
+
 
 # Utils
 class ShowcaseProject:
@@ -723,7 +725,12 @@ def generate_portfolio(
         return
 
     project_manager: ShowcaseProjectManager = parse_project_entries()
-
+    
+    # Fix: store projects in a list because get_projects() pops everything
+    projects = list(project_manager.get_projects())
+    
+    heatmap = ActivityHeatmap()
+    
     try:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir_path = Path(tmpdir)
@@ -737,8 +744,70 @@ def generate_portfolio(
             .project-dates { color: #888; margin-bottom: 8px; }
             .project-desc { margin-bottom: 8px; }
             .project-skills { color: #444; font-size: 1em; }
+
+            .heatmap-wrapper { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 30px; }
+            .heatmap-days {
+                display: grid;
+                grid-template-rows: repeat(7, 15px);
+                font-size: 10px;
+                color: #555;
+            }
+
+            .heatmap-days div {
+                display: flex;
+                align-items: center;
+            }
+            .heatmap-months {
+                display: grid;
+                grid-auto-flow: column;
+                grid-auto-columns: 15px;
+                margin-bottom: 4px;
+                font-size: 10px;
+                color: #555;
+                position: relative;
+            }
+
+            .month-label {
+                text-align: left;
+            }
+            .heatmap-container {
+                display: grid;
+                grid-auto-flow: column;
+                grid-template-rows: repeat(7, 12px);
+                grid-auto-columns: 12px;
+                gap: 3px;
+            }
+            .heatmap-day { width: 12px; height: 12px; border-radius: 2px; }
+            .level-0 { background: #ebedf0; }
+            .level-1 { background: #c6e48b; }
+            .level-2 { background: #7bc96f; }
+            .level-3 { background: #239a3b; }
+            .level-4 { background: #196127; }
+            .hidden { display: none !important; }
+
+            .toggle-button { margin-bottom: 10px; padding: 6px 12px; font-size: 0.9em; cursor: pointer; border: none; border-radius: 6px; background: #2a3d66; color: #fff; }
             """
             (tmpdir_path / "style.css").write_text(css_content, encoding="utf-8")
+
+            # Add all project activities to the heatmap BEFORE generating HTML
+            for project in projects:
+                heatmap.add_activity(project.get_start_date())
+                heatmap.add_activity(project.get_end_date())
+
+            # Generate heatmap HTML with labels
+            heatmap_html = f"""
+            <button class="toggle-button" onclick="document.querySelector('.heatmap-wrapper').classList.toggle('hidden')">Toggle Heatmap</button>
+            <div class="heatmap-wrapper">
+                <div class="heatmap-days">
+                    <div></div><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div>
+                    <div>Thu</div><div>Fri</div><div>Sat</div>
+                </div>
+                <div>
+
+                    {heatmap.generate_html()}
+                </div>
+            </div>
+            """
 
             # Write HTML
             html_parts = [
@@ -753,9 +822,11 @@ def generate_portfolio(
                 "<body>",
                 "<div class='container'>",
                 "<h1>My Project Portfolio</h1>",
+                "<h2>Activity Heatmap</h2>",
+                heatmap_html,
             ]
 
-            for project in project_manager.get_projects():
+            for project in projects:
                 html_parts.append("<div class='project'>")
                 html_parts.append(f"<div class='project-title'>{project.title}</div>")
                 html_parts.append(
@@ -771,7 +842,10 @@ def generate_portfolio(
                     )
                 html_parts.append("</div>")
 
-            html_parts.append("</div></body></html>")
+            html_parts.append("</div>")
+            html_parts.append("<script>document.querySelector('.heatmap-wrapper').classList.remove('hidden');</script>")
+            html_parts.append("</body></html>")
+
             html_content = "\n".join(html_parts)
             (tmpdir_path / "index.html").write_text(html_content, encoding="utf-8")
 
