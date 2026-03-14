@@ -1,3 +1,53 @@
+# Term 2 Week 10 (03/08/2026 - 03/15/2026):
+
+## Completed tasks
+
+All in review features will be merged by the end of the week
+
+![Term 2 Week 10 Tasks completed](T2W10/image.png)
+
+## Features
+
+![Term 2 Week 10 Inprogress](T2W10/image-1.png)
+
+## Recap
+
+### PRs:
+
+#### Showcase GUI profile configuration page
+
+This week I introduced a new "Profile" page to the application's GUI, allowing users to view and edit their personal information and highlighted skills. It involves updates to the navigation, the addition of new profile-related components, and integration with the application's parameter storage.
+
+These changes collectively add a new, user-editable profile section to the application, enhancing user customization and data management.
+
+PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/266
+
+#### Summary
+
+This week I focused on allowing user friendly options for configuring their personal information and experience for usage in the Resume and portfolio generation
+
+## Additional Context
+
+N/A
+
+### What went well:
+
+I think everything went well, the new page looks very clean and contains a lot of room for customizable information
+
+### What didnt go well:
+
+No major problems on my end
+
+### For Next Week:
+
+for next week I will be working on the Milestone 3 presentation. 
+
+Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/267
+
+## Team Survey:
+
+Survey Complete
+
 # Term 2 Week 9 (03/01/2026 - 03/08/2026):
 
 ## Completed tasks
