@@ -23,6 +23,8 @@ from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
 
 from src.showcase.showcase_portfolio_heatmap import ActivityHeatmap
 
+from src.showcase.showcase_portfolio_utils import get_top_projects, get_project_duration_days
+
 
 # Utils
 class ShowcaseProject:
@@ -728,6 +730,8 @@ def generate_portfolio(
     
     # Fix: store projects in a list because get_projects() pops everything
     projects = list(project_manager.get_projects())
+
+    top_projects = get_top_projects(projects, 3)
     
     heatmap = ActivityHeatmap()
     
@@ -786,6 +790,22 @@ def generate_portfolio(
             .hidden { display: none !important; }
 
             .toggle-button { margin-bottom: 10px; padding: 6px 12px; font-size: 0.9em; cursor: pointer; border: none; border-radius: 6px; background: #2a3d66; color: #fff; }
+
+            .top-projects { margin-bottom: 30px; }
+            .project-duration { font-size: 0.9em; color: #666; }
+
+            .hidden { display: none !important; }
+
+            .toggle-button {
+                margin-bottom: 10px;
+                padding: 6px 12px;
+                font-size: 0.9em;
+                cursor: pointer;
+                border: none;
+                border-radius: 6px;
+                background: #2a3d66;
+                color: #fff;
+            }
             """
             (tmpdir_path / "style.css").write_text(css_content, encoding="utf-8")
 
@@ -822,9 +842,49 @@ def generate_portfolio(
                 "<body>",
                 "<div class='container'>",
                 "<h1>My Project Portfolio</h1>",
+                
                 "<h2>Activity Heatmap</h2>",
                 heatmap_html,
             ]
+            
+            html_parts.append("""
+                <button class="toggle-button"
+                onclick="toggleTopProjects()">Toggle Top Projects</button>
+                """)
+            html_parts.append("<div class='top-projects hidden' id='top-projects'>")
+            html_parts.append("<h2>Top 3 Highlighted Projects</h2>")
+
+            for project in top_projects:
+
+                duration = get_project_duration_days(project)
+
+                html_parts.append("<div class='project'>")
+                html_parts.append(f"<div class='project-title'>{project.title}</div>")
+
+                html_parts.append(
+                    f"<div class='project-dates'>{project.get_start_date()} to {project.get_end_date()}</div>"
+                )
+
+                html_parts.append(
+                    f"<div class='project-duration'><b>Duration:</b> {duration} days</div>"
+                )
+
+                html_parts.append(
+                    f"<div class='project-desc'>{project.description or ''}</div>"
+                )
+
+                skills = ", ".join(project.get_skills())
+
+                if skills:
+                    html_parts.append(
+                        f"<div class='project-skills'><b>Skills:</b> {skills}</div>"
+                    )
+
+                html_parts.append("</div>")
+
+            html_parts.append("</div>")
+
+            html_parts.append("<div id='all-projects'>")
 
             for project in projects:
                 html_parts.append("<div class='project'>")
@@ -843,7 +903,23 @@ def generate_portfolio(
                 html_parts.append("</div>")
 
             html_parts.append("</div>")
+
+            html_parts.append("</div>")
             html_parts.append("<script>document.querySelector('.heatmap-wrapper').classList.remove('hidden');</script>")
+            html_parts.append("""
+                <script>
+
+                function toggleTopProjects(){
+
+                    const top = document.getElementById("top-projects")
+                    const all = document.getElementById("all-projects")
+
+                    top.classList.toggle("hidden")
+                    all.classList.toggle("hidden")
+                }
+
+                </script>
+                """)
             html_parts.append("</body></html>")
 
             html_content = "\n".join(html_parts)
