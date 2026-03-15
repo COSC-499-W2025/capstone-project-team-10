@@ -124,8 +124,7 @@ class LogDetailsPage(QWidget):
     # Return to previous page
     back_clicked = pyqtSignal()
     project_created = pyqtSignal(str, str)
-    # NEW: emitted whenever a favourite is toggled so the container can
-    # refresh the FavouritesPage without coupling the two pages directly.
+
     favourites_changed = pyqtSignal()
 
     def __init__(self, log_path=None, parent=None):
@@ -186,7 +185,7 @@ class LogDetailsPage(QWidget):
 
         # Favourite button column: fixed width
         self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Fixed)
-        self.table.setColumnWidth(2, 110)
+        self.table.setColumnWidth(2, 130)
 
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
@@ -215,9 +214,24 @@ class LogDetailsPage(QWidget):
             QTableWidget::item:selected { 
                 background-color: #002145; 
                 color: white; }
+            QScrollBar:vertical {
+                margin-right: 4px;
+                width: 8px;
+                background: transparent;
+            }
+            QScrollBar::handle:vertical {
+                background: #c0c0c0;
+                border-radius: 4px;
+                min-height: 20px;
+            }
+            QScrollBar::add-line:vertical,
+            QScrollBar::sub-line:vertical {
+                height: 0px;
+            }
         """)
         self.table.cellDoubleClicked.connect(self.on_double_clicked)
         self.table.itemSelectionChanged.connect(self.on_selection_changed)
+
         layout.addWidget(self.table)
 
         bottom_layout = QHBoxLayout()
@@ -240,8 +254,7 @@ class LogDetailsPage(QWidget):
         self.stack.addWidget(self.projects_widget)
 
         self.project_files_page = ProjectFilesPage()
-        # back_clicked is handled by DashboardContainer for context-aware
-        # routing (returns to favourites tab or project list as appropriate)
+
         self.stack.addWidget(self.project_files_page)
 
     def set_log_path(self, log_path: Path):
@@ -275,27 +288,20 @@ class LogDetailsPage(QWidget):
                 self.table.insertRow(idx)
                 self.table.setRowHeight(idx, thumbnail_size)
 
-                # Col 0 – thumbnail
                 thumb_path = pt.get_thumbnail(pid)
                 pixmap = create_thumbnail(thumb_path, thumbnail_size)
                 thumb_item = QTableWidgetItem()
                 thumb_item.setIcon(QIcon(pixmap))
                 self.table.setItem(idx, 0, thumb_item)
 
-                # Col 1 – Project ID
                 self.table.setItem(idx, 1, QTableWidgetItem(pid))
 
-                # Col 2 – Favourite toggle button
                 self._insert_fav_button(idx, pid)
 
         except Exception as e:
             print(f"Error loading CSV: {e}")
 
         self.thumbnail_btn.setEnabled(False)
-
-    # ------------------------------------------------------------------
-    # Favourite button helpers
-    # ------------------------------------------------------------------
 
     def _fav_button_style(self, is_fav: bool) -> str:
         if is_fav:
@@ -323,7 +329,7 @@ class LogDetailsPage(QWidget):
         """
 
     def _insert_fav_button(self, row: int, project_id: str):
-        """Create (or refresh) the favourite toggle button for a table row."""
+        # Create the favourite toggle button for a table row.
         is_fav = fav_store.is_favourite(project_id, self.log_path)
         btn = QPushButton("Favourited" if is_fav else "Favourite")
         btn.setStyleSheet(self._fav_button_style(is_fav))
@@ -336,22 +342,20 @@ class LogDetailsPage(QWidget):
         self.table.setCellWidget(row, 2, btn)
 
     def _on_toggle_favourite(self, project_id: str, btn: QPushButton):
-        """Toggle the favourite state and update the button appearance."""
+        # Toggle the favourite state and update the button appearance.
         now_fav = fav_store.toggle_favourite(project_id, self.log_path)
         btn.setText("Favourited" if now_fav else "Favourite")
         btn.setStyleSheet(self._fav_button_style(now_fav))
         btn.setToolTip("Remove from favourites" if now_fav else "Add to favourites")
         self.favourites_changed.emit()
 
-    # ------------------------------------------------------------------
-
     def on_selection_changed(self):
-        """Enable the thumbnail button only when a project row is selected."""
+        # Enable the thumbnail button only when a project row is selected.
         has_selection = bool(self.table.selectedItems())
         self.thumbnail_btn.setEnabled(has_selection)
 
     def on_select_thumbnail(self):
-        """Open file dialog to pick a thumbnail for the selected project."""
+        # Open file dialog to pick a thumbnail for the selected project.
         selected_rows = self.table.selectionModel().selectedRows()
         if not selected_rows:
             return
@@ -379,7 +383,6 @@ class LogDetailsPage(QWidget):
             QMessageBox.warning(self, "Error", "Could not save thumbnail. File may not exist.")
             return
 
-        # Update the table cell immediately
         pixmap = create_thumbnail(file_path, thumbnail_size)
         self.table.item(row, 0).setIcon(QIcon(pixmap))
 
@@ -414,7 +417,6 @@ class LogDetailsPage(QWidget):
             styled_msgbox(self, "Error", f"Could not save project to log: {e}", QMessageBox.Warning).exec_()
             return
 
-        # Insert into the table
         row_idx = self.table.rowCount()
         self.table.insertRow(row_idx)
         self.table.setRowHeight(row_idx, thumbnail_size)
@@ -423,7 +425,7 @@ class LogDetailsPage(QWidget):
         thumb_item.setIcon(QIcon(empty_thumbnail(thumbnail_size)))
         self.table.setItem(row_idx, 0, thumb_item)
         self.table.setItem(row_idx, 1, QTableWidgetItem(new_id))
-        self._insert_fav_button(row_idx, new_id)   # ← add fav button for new project
+        self._insert_fav_button(row_idx, new_id)
 
         self._project_ids.append(new_id)
         self.project_created.emit(new_id, description)

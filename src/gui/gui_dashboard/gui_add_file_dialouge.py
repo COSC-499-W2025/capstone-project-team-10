@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 class AddFileDialog(QDialog):
-    """Shows all files not currently in the project but in the same log."""
+    # Shows all files not currently in the project but in the same log.
 
     def __init__(self, current_project_id: str, log_path: Path, parent=None):
         super().__init__(parent)

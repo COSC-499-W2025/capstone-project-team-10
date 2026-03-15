@@ -1,17 +1,3 @@
-"""
-src/gui/gui_dashboard/gui_favourites_page.py
---------------------------------------------
-Shows all favourited projects across every log file.
-
-Each row displays:
-  • Project ID
-  • Log file the project belongs to
-  • A "Remove" button to un-favourite
-
-Double-clicking a row fires  `project_clicked(project_id, log_path)`  so the
-container can navigate straight to that project's LogDetailsPage.
-"""
-
 from pathlib import Path
 
 from PyQt5.QtWidgets import (
@@ -51,14 +37,8 @@ def _make_thumbnail(project_id: str, size: int = _THUMBNAIL_SIZE) -> QPixmap:
 
 
 class FavouritesPage(QWidget):
-    """
-    Signals
-    -------
-    project_clicked(project_id: str, log_path: Path)
-        Emitted when the user double-clicks a row.
-    """
 
-    project_clicked = pyqtSignal(str, object)   # project_id, log_path (Path)
+    project_clicked = pyqtSignal(str, object)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -66,37 +46,33 @@ class FavouritesPage(QWidget):
         self._init_ui()
         self.refresh()
 
-    # ------------------------------------------------------------------
-    # UI construction
-    # ------------------------------------------------------------------
-
     def _init_ui(self):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(20, 20, 20, 20)
         layout.setSpacing(16)
 
-        # ── header ──────────────────────────────────────────────────────
+        # header
         title = QLabel("Favourite Projects")
         title.setStyleSheet("font-size: 18px; font-weight: bold; color: black;")
         layout.addWidget(title)
 
-        # ── empty-state label (hidden when there are rows) ───────────────
+        # empty-state label (hidden when there are rows) 
         self._empty_label = QLabel("No favourites yet.\nOpen a log, then star a project to add it here.")
         self._empty_label.setAlignment(Qt.AlignCenter)
         self._empty_label.setStyleSheet("color: #aaa; font-size: 14px;")
         layout.addWidget(self._empty_label)
 
-        # ── table ────────────────────────────────────────────────────────
+        # table
         self.table = QTableWidget()
         self.table.setColumnCount(4)
         self.table.setHorizontalHeaderLabels(["", "Project ID", "Log File", ""])
 
         hdr = self.table.horizontalHeader()
-        hdr.setSectionResizeMode(0, QHeaderView.Fixed)          # thumbnail
+        hdr.setSectionResizeMode(0, QHeaderView.Fixed)
         self.table.setColumnWidth(0, _THUMBNAIL_SIZE + 8)
-        hdr.setSectionResizeMode(1, QHeaderView.Stretch)        # project id
-        hdr.setSectionResizeMode(2, QHeaderView.ResizeToContents)  # log name
-        hdr.setSectionResizeMode(3, QHeaderView.Fixed)          # remove btn
+        hdr.setSectionResizeMode(1, QHeaderView.Stretch)
+        hdr.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        hdr.setSectionResizeMode(3, QHeaderView.Fixed)
         self.table.setColumnWidth(3, 100)
 
         self.table.verticalHeader().setVisible(False)
@@ -129,17 +105,12 @@ class FavouritesPage(QWidget):
             }
         """)
 
-        # Double-click anywhere on a row → open that project
         self.table.cellDoubleClicked.connect(self._on_row_double_clicked)
 
         layout.addWidget(self.table)
 
-    # ------------------------------------------------------------------
-    # Public helpers
-    # ------------------------------------------------------------------
-
     def refresh(self):
-        """Re-read the favourites store and repopulate the table."""
+        # Re-read the favourites store and repopulate the table.
         self.table.setRowCount(0)
         favourites = fav_store.get_favourites()
 
@@ -171,15 +142,11 @@ class FavouritesPage(QWidget):
             # Col 3 – remove button (inline widget)
             remove_btn = QPushButton("Remove")
             remove_btn.setStyleSheet(_DANGER_BTN_STYLE)
-            # Capture current values in the lambda default args
+
             remove_btn.clicked.connect(
                 lambda checked, pid=project_id, lp=log_path: self._on_remove(pid, lp)
             )
             self.table.setCellWidget(idx, 3, remove_btn)
-
-    # ------------------------------------------------------------------
-    # Slots
-    # ------------------------------------------------------------------
 
     def _on_row_double_clicked(self, row: int, _col: int):
         pid_item = self.table.item(row, 1)
@@ -197,7 +164,7 @@ class FavouritesPage(QWidget):
             )
 
     def _on_remove(self, project_id: str, log_path: Path):
-        """Un-favourite a project after confirmation."""
+        # Un-favourite a project after confirmation.
         msg = QMessageBox(self)
         msg.setWindowTitle("Remove Favourite")
         msg.setText(f"Remove <b>{project_id}</b> from favourites?")

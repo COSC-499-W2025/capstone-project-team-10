@@ -17,7 +17,7 @@ class DashboardPage(QWidget):
         self.log_files = {}
         self.table = None
         self._tab_widget = None
-        self._favourites_placeholder = None   # replaced by set_favourites_widget()
+        self._favourites_placeholder = None
         self.init_ui()
         self.load_log_files()
         self.update_table()
@@ -49,10 +49,7 @@ class DashboardPage(QWidget):
         """)
         
         recent_widget = self.create_recent_tab()
-
-        # Favourites tab: initially a plain placeholder widget.
-        # DashboardContainer will call set_favourites_widget() to replace it
-        # with the real FavouritesPage once both are constructed.
+        
         self._favourites_placeholder = QWidget()
         self._favourites_placeholder.setStyleSheet("background-color: white;")
         placeholder_layout = QVBoxLayout(self._favourites_placeholder)
@@ -60,22 +57,14 @@ class DashboardPage(QWidget):
             QLabel("Loading favourites…", alignment=Qt.AlignCenter)
         )
 
-        self._tab_widget.addTab(recent_widget, "Recent")                  # index 0
-        self._tab_widget.addTab(self._favourites_placeholder, "Favourite")  # index 1
+        self._tab_widget.addTab(recent_widget, "Recent") # index 0
+        self._tab_widget.addTab(self._favourites_placeholder, "Favourite") # index 1
         
         layout.addWidget(self._tab_widget)
 
-    # ------------------------------------------------------------------
-
     def set_favourites_widget(self, favourites_widget: QWidget):
-        """
-        Replace the placeholder Favourites tab with the real FavouritesPage.
-        Call this from DashboardContainer after constructing both widgets.
-        """
         self._tab_widget.removeTab(1)
         self._tab_widget.addTab(favourites_widget, "Favourite")
-
-    # ------------------------------------------------------------------
 
     def create_recent_tab(self):
         recent_widget = QWidget()
@@ -132,8 +121,6 @@ class DashboardPage(QWidget):
         recent_layout.addWidget(bottom_label)
         
         return recent_widget
-
-    # ------------------------------------------------------------------
 
     def on_cell_clicked(self, row, column):
         file_name_item = self.table.item(row, 0)

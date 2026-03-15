@@ -1,21 +1,3 @@
-"""
-utils/favourites.py
--------------------
-Persist favourite projects as a JSON file stored in the same location
-as other app storage (param.program_file_path / "storage").
-
-Schema:
-{
-    "favourites": [
-        {
-            "project_id": "my_project",
-            "log_path": "/absolute/path/to/file.log"
-        },
-        ...
-    ]
-}
-"""
-
 import json
 import os
 from pathlib import Path
@@ -50,11 +32,6 @@ def _save_raw(favourites: list[dict]) -> None:
             json.dump({"favourites": favourites}, f, indent=2, ensure_ascii=False)
     except OSError as e:
         print(f"Warning: Could not save favourites: {e}")
-
-
-# ---------------------------------------------------------------------------
-# Public API
-# ---------------------------------------------------------------------------
 
 def get_favourites() -> list[dict]:
     """Return all favourites as a list of {"project_id": ..., "log_path": ...} dicts."""
