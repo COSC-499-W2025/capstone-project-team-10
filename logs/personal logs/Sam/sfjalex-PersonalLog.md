@@ -1,3 +1,17 @@
+# Term 2 Week 10 (03/09/2026 - 03/15/2026)
+
+![Term Two Week Ten Tasks](Term2Week10/Week10Tasks.png)
+
+# Features
+
+![Term Two Week Ten Feature](Term2Week10/Week10Feature.png)
+
+# Recap
+
+This week I implimented the favourites page on the dashboard of our project. This allows users to track specific projects and have quick access to them at all times without having to find them in each log every time they want to check or modify it.
+
+Over the next week I intend to contribute to the requirements needed for milestone 3, likely the documentation such as the updated DFD levels 0 and 1 or the test reports to ensure we are prepared for the submission that is encroaching within the next few weeks.
+
 # Term 2 Week 9 (03/02/2026 - 03/08/2026)
 
 ![Term Two Week Nine Tasks](Term2Week9/Week9Tasks.png)
