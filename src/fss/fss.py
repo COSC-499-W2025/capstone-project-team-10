@@ -96,7 +96,7 @@ def search(search_params: FSS_Search):
             if file.exists():
                 if file_analysis.file_path in search_params.excluded_path:
                     continue
-                if datetime.fromtimestamp(
+                if file_analysis.last_modified and datetime.fromtimestamp(
                     file.stat().st_mtime
                 ) <= datetime.fromisoformat(file_analysis.last_modified):
                     exclude_flag = True
