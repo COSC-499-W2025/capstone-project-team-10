@@ -10,7 +10,6 @@ from PyQt5.QtWidgets import (
 
 from src.gui.gui_dashboard.gui_dashboard_container import DashboardContainer
 from src.gui.gui_items_page.gui_items_page import ItemsPage
-from src.gui.gui_portfolio_page import PortfolioPage
 from src.gui.gui_resume_page import ResumePage
 from src.gui.gui_scan_page import ScanPage
 from src.gui.gui_scan_results import ScanResultsPage
@@ -120,7 +119,6 @@ class AppShell(QWidget):
         self.page_dashboard = DashboardContainer()
 
         self.page_resume = ResumePage()
-        # self.page_portfolio = PortfolioPage()
 
         self.page_scan = ScanPage()
         self.page_scan_results = ScanResultsPage()
@@ -169,9 +167,6 @@ class AppShell(QWidget):
 
         elif page_name == "Resume/Portfolio":
             self.content_stack.setCurrentWidget(self.page_resume)
-
-        # elif page_name == "Portfolio":
-        #     self.content_stack.setCurrentWidget(self.page_portfolio)
 
         elif page_name == "Settings":
             self.content_stack.setCurrentWidget(self.page_settings)

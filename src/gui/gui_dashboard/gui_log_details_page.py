@@ -553,8 +553,7 @@ class LogDetailsPage(QWidget):
         bottom_layout.addWidget(self.new_project_btn)
 
         layout.addLayout(bottom_layout)
-
-        layout.addLayout(bottom_layout)
+        
         self.stack.addWidget(self.projects_widget)
 
         self.project_files_page = ProjectFilesPage()
