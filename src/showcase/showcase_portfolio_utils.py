@@ -1,7 +1,6 @@
 from datetime import datetime
 
 
-from datetime import datetime
 
 
 def get_project_duration_days(project):
@@ -21,26 +20,47 @@ def get_project_duration_days(project):
         else:
             end_date = datetime.fromisoformat(end).date()
 
-        return (end_date - start_date).days
+        return (end_date - start_date).days + 1
 
-    except Exception as e:
-        print("Duration parse error:", start, end)
+    except Exception:
         return 0
 
 
-def score_project(project):
+def sort_projects(projects, method="duration"):
     """
-    Score project based on:
-    - duration
-    - number of skills
+    Sort projects using different strategies.
+
+    method options:
+    - "duration"
+    - "skills"
+    - "combined"
     """
-    duration = get_project_duration_days(project)
-    skill_count = len(project.get_skills())
 
-    return duration + (skill_count * 10)
+    if method == "duration":
+        return sorted(
+            projects,
+            key=lambda p: get_project_duration_days(p),
+            reverse=True
+        )
+
+    elif method == "skills":
+        return sorted(
+            projects,
+            key=lambda p: len(p.get_skills()),
+            reverse=True
+        )
+
+    elif method == "combined":
+        return sorted(
+            projects,
+            key=lambda p: get_project_duration_days(p) + len(p.get_skills()) * 10,
+            reverse=True
+        )
+
+    return projects
 
 
-def get_top_projects(projects, limit=3):
-    """Return top N ranked projects."""
-    ranked = sorted(projects, key=score_project, reverse=True)
-    return ranked[:limit]
+def get_top_projects(projects, limit=3, method="combined"):
+    """Return top N projects based on sorting method."""
+    sorted_projects = sort_projects(projects, method)
+    return sorted_projects[:limit]

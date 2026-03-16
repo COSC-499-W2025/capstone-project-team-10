@@ -731,7 +731,9 @@ def generate_portfolio(
     # Fix: store projects in a list because get_projects() pops everything
     projects = list(project_manager.get_projects())
 
-    top_projects = get_top_projects(projects, 3)
+    top_projects_duration = get_top_projects(projects, 3, method="duration")
+    top_projects_skills = get_top_projects(projects, 3, method="skills")
+    top_projects_combined = get_top_projects(projects, 3, method="combined")
     
     heatmap = ActivityHeatmap()
     
@@ -806,6 +808,17 @@ def generate_portfolio(
                 background: #2a3d66;
                 color: #fff;
             }
+
+            .cycle-button {
+            margin-bottom: 10px;
+            padding: 6px 12px;
+            font-size: 0.9em;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            background: #2a3d66;
+            color: #fff;
+        }
             """
             (tmpdir_path / "style.css").write_text(css_content, encoding="utf-8")
 
@@ -846,41 +859,39 @@ def generate_portfolio(
                 "<h2>Activity Heatmap</h2>",
                 heatmap_html,
             ]
-            
+
             html_parts.append("""
-                <button class="toggle-button"
-                onclick="toggleTopProjects()">Toggle Top Projects</button>
+                <button class="cycle-button" onclick="cycleTopProjects()">
+                Cycle Top Projects Ranking
+                </button>
                 """)
-            html_parts.append("<div class='top-projects hidden' id='top-projects'>")
-            html_parts.append("<h2>Top 3 Highlighted Projects</h2>")
+            
+            # Duration ranking
+            html_parts.append("<div id='top-duration' class='top-projects hidden'>")
+            html_parts.append("<h2>Top 3 Projects (Longest Duration)</h2>")
 
-            for project in top_projects:
+            for project in top_projects_duration:
+                html_parts.extend(render_project_html(project))
 
-                duration = get_project_duration_days(project)
+            html_parts.append("</div>")
 
-                html_parts.append("<div class='project'>")
-                html_parts.append(f"<div class='project-title'>{project.title}</div>")
 
-                html_parts.append(
-                    f"<div class='project-dates'>{project.get_start_date()} to {project.get_end_date()}</div>"
-                )
+            # Skills ranking
+            html_parts.append("<div id='top-skills' class='top-projects hidden'>")
+            html_parts.append("<h2>Top 3 Projects (Most Skills)</h2>")
 
-                html_parts.append(
-                    f"<div class='project-duration'><b>Duration:</b> {duration} days</div>"
-                )
+            for project in top_projects_skills:
+                html_parts.extend(render_project_html(project))
 
-                html_parts.append(
-                    f"<div class='project-desc'>{project.description or ''}</div>"
-                )
+            html_parts.append("</div>")
 
-                skills = ", ".join(project.get_skills())
 
-                if skills:
-                    html_parts.append(
-                        f"<div class='project-skills'><b>Skills:</b> {skills}</div>"
-                    )
+            # Combined ranking
+            html_parts.append("<div id='top-combined' class='top-projects hidden'>")
+            html_parts.append("<h2>Top 3 Projects (Combined Ranking)</h2>")
 
-                html_parts.append("</div>")
+            for project in top_projects_combined:
+                html_parts.extend(render_project_html(project))
 
             html_parts.append("</div>")
 
@@ -904,18 +915,29 @@ def generate_portfolio(
 
             html_parts.append("</div>")
 
-            html_parts.append("</div>")
             html_parts.append("<script>document.querySelector('.heatmap-wrapper').classList.remove('hidden');</script>")
             html_parts.append("""
                 <script>
 
-                function toggleTopProjects(){
+                let mode = 0
 
-                    const top = document.getElementById("top-projects")
+                function cycleTopProjects(){
+
+                    const duration = document.getElementById("top-duration")
+                    const skills = document.getElementById("top-skills")
+                    const combined = document.getElementById("top-combined")
                     const all = document.getElementById("all-projects")
 
-                    top.classList.toggle("hidden")
-                    all.classList.toggle("hidden")
+                    const sections = [all, duration, skills, combined]
+
+                    // hide everything
+                    sections.forEach(s => s.classList.add("hidden"))
+
+                    // move to next mode
+                    mode = (mode + 1) % sections.length
+
+                    // show selected
+                    sections[mode].classList.remove("hidden")
                 }
 
                 </script>
@@ -1084,3 +1106,33 @@ def generate_skill_timeline() -> Path | None:
     except Exception as e:
         print(f"Failed to generate skills timeline: {e}")
         return None
+
+def render_project_html(project):
+    duration = get_project_duration_days(project)
+
+    parts = []
+    parts.append("<div class='project'>")
+    parts.append(f"<div class='project-title'>{project.title}</div>")
+
+    parts.append(
+        f"<div class='project-dates'>{project.get_start_date()} to {project.get_end_date()}</div>"
+    )
+
+    parts.append(
+        f"<div class='project-duration'><b>Duration:</b> {duration} days</div>"
+    )
+
+    parts.append(
+        f"<div class='project-desc'>{project.description or ''}</div>"
+    )
+
+    skills = ", ".join(project.get_skills())
+
+    if skills:
+        parts.append(
+            f"<div class='project-skills'><b>Skills:</b> {skills}</div>"
+        )
+
+    parts.append("</div>")
+
+    return parts
