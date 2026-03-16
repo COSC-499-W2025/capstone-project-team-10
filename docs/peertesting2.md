@@ -26,7 +26,13 @@ Hello, today you will be testing the gui of our artifact mining application. Ple
 
 **Task 11:** View the modified resume or portfolio
 
-**Task 12:** Complete the google form questionnaire
+**Task 12:** Add education experience to profile
+
+**Task 13:** Edit personal profile info (can put whatever)
+
+**Task 14:** Add work experience and skills
+
+**Task 15:** Complete the google form questionnaire
 
 # Things to note during the test
 
