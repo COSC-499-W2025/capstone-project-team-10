@@ -8,23 +8,25 @@ Hello, today you will be testing the gui of our artifact mining application. Ple
 
 **Task 2:** Scan the folder located at `"tests\testdata\test_peer_testing\testScanFolder.zip"`
 
-**Task 3:** Find and explore the projects in the log generated from your scan.
+**Task 3:** Apply a filter to exclude the folder at "testdata\test_image"
 
-**Task 4:** Apply a thumbnail to a project in the log
+**Task 4:** Find and explore the projects in the log generated from your scan.
 
-**Task 5:** Add or remove a file from a project in the log
+**Task 5:** Apply a thumbnail to a project in the log
 
-**Task 6:** Create a new project and add a file to that project
+**Task 6:** Add or remove a file from a project in the log
 
-**Task 7:** Navigate to the Resume/Portfolio page and generate a resume and portfolio
+**Task 7:** Create a new project and add a file to that project
 
-**Task 8:** Navigate to the items page and view the resume and portfolio you generated
+**Task 8:** Navigate to the Resume/Portfolio page and generate a resume and portfolio
 
-**Task 9:** Modify a project in the Resume/Portfolio page, save changes, and regenerate a resume or portfolio
+**Task 9:** Navigate to the items page and view the resume and portfolio you generated
 
-**Task 10:** View the modified resume or portfolio
+**Task 10:** Modify a project in the Resume/Portfolio page, save changes, and regenerate a resume or portfolio
 
-**Task 11:** Complete the google form questionnaire
+**Task 11:** View the modified resume or portfolio
+
+**Task 12:** Complete the google form questionnaire
 
 # Things to note during the test
 
@@ -40,3 +42,4 @@ Accept any feedback given from the tester. All information is useful and should 
 
 # Questionnaire
 
+https://docs.google.com/forms/d/e/1FAIpQLSd3OKqRLDqR3XS3DDkSPOCJCFD30xSD1hzm-OzvT-PRrJTg3w/viewform?usp=publish-editor
