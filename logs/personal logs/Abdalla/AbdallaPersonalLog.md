@@ -5,6 +5,7 @@
 [Week 2](#week-2-1112026---1182026)  
 [Week 3](#week-3-1182026---1252026)  
 [Week 4+5](#week-45-1262026---2082026)
+[Week 10](#week-10-382026---3152026)
 
 # Term 1
 # Week 3 (9/14/2025 -  9/21/2025)
@@ -133,7 +134,7 @@ https://github.com/COSC-499-W2025/capstone-project-team-10/pull/216
 We have implemented a good amount to our GUI and it's coming along nicely, in these weeks I worked on making a resume manager API which sotres generated resumes into the application storage and indexes them in a json database that is easy for the GUI to read. Progress is going really well and next week I'll be working on getting project IDs from the log files.
 
 # Week 10 (3/8/2026 - 3/15/2026)
-
+[](week10/image.png)
 
 ### Tasks
 https://github.com/COSC-499-W2025/capstone-project-team-10/pull/271
