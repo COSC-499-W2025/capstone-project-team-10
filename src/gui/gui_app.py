@@ -66,6 +66,9 @@ class MainWindow(QMainWindow):
         elif page_name == "Portfolio":
             pass
 
+        elif page_name == "Profile":
+            pass
+
         elif page_name == "Settings":
             pass
 
