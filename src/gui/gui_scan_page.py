@@ -179,7 +179,10 @@ class ScanPage(QtWidgets.QWidget):
             )
             summary += f"Time Bounds: {lower} to {upper}"
         else:
-            summary += "Time Bounds: None"
+            summary += "Time Bounds: None\n"
+
+        if filters.get('clean', False):
+            summary += "New Log: Yes"
 
         self.filter_summary.setText(summary)
         self.filter_summary.setVisible(True)
