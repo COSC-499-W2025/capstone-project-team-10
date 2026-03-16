@@ -16,18 +16,19 @@ class DashboardPage(QWidget):
         self.log_dir = self.log_file.parent
         self.log_files = {}
         self.table = None
+        self._tab_widget = None
+        self._favourites_placeholder = None
         self.init_ui()
         self.load_log_files()
         self.update_table()
-    
+
     def init_ui(self):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         
-        # Tab widget
-        tab_widget = QTabWidget()
-        tab_widget.setStyleSheet("""
+        self._tab_widget = QTabWidget()
+        self._tab_widget.setStyleSheet("""
             QTabWidget::pane {
                 border: none;
                 background-color: white;
@@ -48,13 +49,23 @@ class DashboardPage(QWidget):
         """)
         
         recent_widget = self.create_recent_tab()
-        favourite_widget = self.create_favourite_tab()
         
-        tab_widget.addTab(recent_widget, "Recent")
-        tab_widget.addTab(favourite_widget, "Favourite")
+        self._favourites_placeholder = QWidget()
+        self._favourites_placeholder.setStyleSheet("background-color: white;")
+        placeholder_layout = QVBoxLayout(self._favourites_placeholder)
+        placeholder_layout.addWidget(
+            QLabel("Loading favourites…", alignment=Qt.AlignCenter)
+        )
+
+        self._tab_widget.addTab(recent_widget, "Recent") # index 0
+        self._tab_widget.addTab(self._favourites_placeholder, "Favourite") # index 1
         
-        layout.addWidget(tab_widget)
-    
+        layout.addWidget(self._tab_widget)
+
+    def set_favourites_widget(self, favourites_widget: QWidget):
+        self._tab_widget.removeTab(1)
+        self._tab_widget.addTab(favourites_widget, "Favourite")
+
     def create_recent_tab(self):
         recent_widget = QWidget()
         recent_layout = QVBoxLayout(recent_widget)
@@ -110,69 +121,14 @@ class DashboardPage(QWidget):
         recent_layout.addWidget(bottom_label)
         
         return recent_widget
-    
-    def create_favourite_tab(self):
-        favourite_widget = QWidget()
-        favourite_layout = QVBoxLayout(favourite_widget)
-        favourite_layout.setContentsMargins(20, 20, 20, 20)
-        
-        self.favourites_table = QTableWidget()
-        self.favourites_table.setColumnCount(3)
-        self.favourites_table.setHorizontalHeaderLabels(["ID", "Size", "Date Created"])
-        
-        self.favourites_table.setStyleSheet("""
-            QTableWidget {
-                background-color: white;
-                gridline-color: #e0e0e0;
-                border: none;
-                color: black; 
-            }
-            QHeaderView::section {
-                background-color: white;
-                padding: 8px;
-                border: none;
-                border-bottom: 1px solid #e0e0e0;
-                font-weight: normal;
-                color: #666;
-            }
-            QTableWidget::item {
-                padding: 8px;
-                border-bottom: 1px solid #e0e0e0;
-                color: black; 
-            }
-            QTableWidget::item:selected {
-                background-color: #002145;
-                color: white;
-            }
-        """)
-        
-        self.favourites_table.viewport().setCursor(Qt.PointingHandCursor)
-        
-        header = self.favourites_table.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.Stretch)
-        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
-        header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
-        
-        self.favourites_table.verticalHeader().setVisible(False)
-        self.favourites_table.setSelectionBehavior(QTableWidget.SelectRows)
-        
-        favourite_layout.addWidget(self.favourites_table)
 
-        bottom_label = QLabel(f"All logs are located at {self.log_dir}")
-        bottom_label.setStyleSheet("color: #999; font-size: 12px;")
-        bottom_label.setAlignment(Qt.AlignCenter)
-        favourite_layout.addWidget(bottom_label)
-        
-        return favourite_widget
-    
     def on_cell_clicked(self, row, column):
-        if column == 0:  # First column clicked
-            file_name_item = self.table.item(row, 0)
-            if file_name_item:
-                file_name = file_name_item.text()
-                if file_name in self.log_files:
-                    log_path = self.log_files[file_name]['path']
-                    self.log_clicked.emit(log_path)
+        file_name_item = self.table.item(row, 0)
+        if file_name_item:
+            file_name = file_name_item.text()
+            if file_name in self.log_files:
+                log_path = self.log_files[file_name]['path']
+                self.log_clicked.emit(log_path)
     
     def load_log_files(self):
         self.log_files.clear()
@@ -181,7 +137,6 @@ class DashboardPage(QWidget):
         
         for log_path in self.log_dir.glob("*.log"):
             file_stat = log_path.stat()
-            
             self.log_files[log_path.name] = {
                 'path': log_path,
                 'name': log_path.name,
@@ -210,7 +165,6 @@ class DashboardPage(QWidget):
         
         for idx, (file_name, log_info) in enumerate(sorted_logs):
             self.table.insertRow(idx)
-            
             self.table.setItem(idx, 0, QTableWidgetItem(log_info['name']))
             self.table.setItem(idx, 1, QTableWidgetItem(log_info['size']))
             self.table.setItem(idx, 2, QTableWidgetItem(log_info['created']))
