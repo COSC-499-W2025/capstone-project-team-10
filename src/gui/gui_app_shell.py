@@ -10,6 +10,8 @@ from PyQt5.QtWidgets import (
 
 from src.gui.gui_dashboard.gui_dashboard_container import DashboardContainer
 from src.gui.gui_items_page.gui_items_page import ItemsPage
+from src.gui.gui_portfolio_page import PortfolioPage
+from src.gui.gui_profile.gui_profile_page import ProfilePage
 from src.gui.gui_resume_page import ResumePage
 from src.gui.gui_scan_page import ScanPage
 from src.gui.gui_scan_results import ScanResultsPage
@@ -93,6 +95,7 @@ class AppShell(QWidget):
             "Scan",
             "Items",
             "Resume/Portfolio",
+            "Profile",
             "Settings",
         ]
         self.sidebar.addItems(self.sidebar_items)
@@ -125,6 +128,8 @@ class AppShell(QWidget):
 
         self.page_items = ItemsPage()
 
+        self.profile_page = ProfilePage()
+
         self.page_settings = SettingsPage()
 
         # Add pages to stack (order matters)
@@ -133,6 +138,7 @@ class AppShell(QWidget):
         self.content_stack.addWidget(self.page_items)  # index 2
         self.content_stack.addWidget(self.page_resume)  # index 3
         # self.content_stack.addWidget(self.page_portfolio)  # index 4
+        self.content_stack.addWidget(self.profile_page)  # index 4
         self.content_stack.addWidget(self.page_settings)  # index 5
         self.content_stack.addWidget(self.page_scan_results)  # index 6
 
@@ -168,6 +174,11 @@ class AppShell(QWidget):
         elif page_name == "Resume/Portfolio":
             self.content_stack.setCurrentWidget(self.page_resume)
 
+        # elif page_name == "Portfolio":
+        #     self.content_stack.setCurrentWidget(self.page_portfolio)
+        elif page_name == "Profile":
+            self.content_stack.setCurrentWidget(self.profile_page)
+
         elif page_name == "Settings":
             self.content_stack.setCurrentWidget(self.page_settings)
 
@@ -190,6 +201,7 @@ class AppShell(QWidget):
         self.sidebar.setCurrentRow(1)  # Set to "Scan" item
         self.change_page("Scan")
 
-    def closeEvent(self, event):
+    def closeEvent(self, a0):
         self.page_scan.scan_manager.cleanup()
-        event.accept()
+        if a0:
+            a0.accept()

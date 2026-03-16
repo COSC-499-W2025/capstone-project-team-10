@@ -9,6 +9,7 @@ from typing import Dict, List, Optional
 
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
+from numpy.strings import title
 from pandas.core.arrays.period import com
 from typing_extensions import Any
 
@@ -20,6 +21,8 @@ from src.resume.resume_manager import manager
 from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
 
 from src.showcase.showcase_portfolio_heatmap import ActivityHeatmap
+
+from src.showcase.showcase_portfolio_utils import get_top_projects, get_project_duration_days
 
 
 # Utils
@@ -726,6 +729,10 @@ def generate_portfolio(
     
     # Fix: store projects in a list because get_projects() pops everything
     projects = list(project_manager.get_projects())
+
+    top_projects_duration = get_top_projects(projects, 3, method="duration")
+    top_projects_skills = get_top_projects(projects, 3, method="skills")
+    top_projects_combined = get_top_projects(projects, 3, method="combined")
     
     heatmap = ActivityHeatmap()
     
@@ -784,6 +791,33 @@ def generate_portfolio(
             .hidden { display: none !important; }
 
             .toggle-button { margin-bottom: 10px; padding: 6px 12px; font-size: 0.9em; cursor: pointer; border: none; border-radius: 6px; background: #2a3d66; color: #fff; }
+
+            .top-projects { margin-bottom: 30px; }
+            .project-duration { font-size: 0.9em; color: #666; }
+
+            .hidden { display: none !important; }
+
+            .toggle-button {
+                margin-bottom: 10px;
+                padding: 6px 12px;
+                font-size: 0.9em;
+                cursor: pointer;
+                border: none;
+                border-radius: 6px;
+                background: #2a3d66;
+                color: #fff;
+            }
+
+            .cycle-button {
+            margin-bottom: 10px;
+            padding: 6px 12px;
+            font-size: 0.9em;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            background: #2a3d66;
+            color: #fff;
+        }
             """
             (tmpdir_path / "style.css").write_text(css_content, encoding="utf-8")
 
@@ -820,13 +854,52 @@ def generate_portfolio(
                 "<body>",
                 "<div class='container'>",
                 "<h1>My Project Portfolio</h1>",
+                
                 "<h2>Activity Heatmap</h2>",
                 heatmap_html,
             ]
 
+            html_parts.append("""
+                <button class="cycle-button" onclick="cycleTopProjects()">
+                Cycle Top Projects Ranking
+                </button>
+                """)
+            
+            # Duration ranking
+            html_parts.append("<div id='top-duration' class='top-projects hidden'>")
+            html_parts.append("<h2>Top 3 Projects (Longest Duration)</h2>")
+
+            for project in top_projects_duration:
+                html_parts.extend(render_project_html(project))
+
+            html_parts.append("</div>")
+
+
+            # Skills ranking
+            html_parts.append("<div id='top-skills' class='top-projects hidden'>")
+            html_parts.append("<h2>Top 3 Projects (Most Skills)</h2>")
+
+            for project in top_projects_skills:
+                html_parts.extend(render_project_html(project))
+
+            html_parts.append("</div>")
+
+
+            # Combined ranking
+            html_parts.append("<div id='top-combined' class='top-projects hidden'>")
+            html_parts.append("<h2>Top 3 Projects (Combined Ranking)</h2>")
+
+            for project in top_projects_combined:
+                html_parts.extend(render_project_html(project))
+
+            html_parts.append("</div>")
+
+            html_parts.append("<div id='all-projects'>")
+
             for project in projects:
                 html_parts.append("<div class='project'>")
-                html_parts.append(f"<div class='project-title'>{project.title}</div>")
+                title = project.title.strip() if project.title and project.title.strip() else "Untitled Project"
+                html_parts.append(f"<div class='project-title'>{title}</div>")
                 html_parts.append(
                     f"<div class='project-dates'>{project.get_start_date()} to {project.get_end_date()}</div>"
                 )
@@ -841,7 +914,34 @@ def generate_portfolio(
                 html_parts.append("</div>")
 
             html_parts.append("</div>")
+
             html_parts.append("<script>document.querySelector('.heatmap-wrapper').classList.remove('hidden');</script>")
+            html_parts.append("""
+                <script>
+
+                let mode = 0
+
+                function cycleTopProjects(){
+
+                    const duration = document.getElementById("top-duration")
+                    const skills = document.getElementById("top-skills")
+                    const combined = document.getElementById("top-combined")
+                    const all = document.getElementById("all-projects")
+
+                    const sections = [all, duration, skills, combined]
+
+                    // hide everything
+                    sections.forEach(s => s.classList.add("hidden"))
+
+                    // move to next mode
+                    mode = (mode + 1) % sections.length
+
+                    // show selected
+                    sections[mode].classList.remove("hidden")
+                }
+
+                </script>
+                """)
             html_parts.append("</body></html>")
 
             html_content = "\n".join(html_parts)
@@ -1006,3 +1106,34 @@ def generate_skill_timeline() -> Path | None:
     except Exception as e:
         print(f"Failed to generate skills timeline: {e}")
         return None
+
+def render_project_html(project):
+    duration = get_project_duration_days(project)
+
+    parts = []
+    parts.append("<div class='project'>")
+    title = project.title.strip() if project.title and project.title.strip() else "Untitled Project"
+    parts.append(f"<div class='project-title'>{title}</div>")
+
+    parts.append(
+        f"<div class='project-dates'>{project.get_start_date()} to {project.get_end_date()}</div>"
+    )
+
+    parts.append(
+        f"<div class='project-duration'><b>Duration:</b> {duration} days</div>"
+    )
+
+    parts.append(
+        f"<div class='project-desc'>{project.description or ''}</div>"
+    )
+
+    skills = ", ".join(project.get_skills())
+
+    if skills:
+        parts.append(
+            f"<div class='project-skills'><b>Skills:</b> {skills}</div>"
+        )
+
+    parts.append("</div>")
+
+    return parts
