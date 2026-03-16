@@ -1,3 +1,25 @@
+# Week 22 (3/9/2026 = 3/15/2026) ** TERM 2 Week 10 **
+
+![Week 18/19 Tasks](Week21/Week21Tasks.png)
+
+## Features
+
+![Week 20 Tasks](Week21/Week21KanBan.png)
+
+## Recap
+Collaborated with Abdalla on the peer testing document. Fixed many of the bugs found in the code included bugs causing the app to crash. Added a filter to scans to use a new log instead of the same log everytime. Added a delete button to logs so users can remove logs. Next week I want to continue bug fixing and adding new features. Specifically finding bugs that are not errors but are incorrect behaviours.
+
+# Week 20 (1/26/2026 = 2/8/2026) ** TERM 2 Week 6 **
+
+## Features
+
+![Week 20 Tasks](Week20/Week20KanBan1.png)
+![Week 20 Tasks](Week20/Week20KanBan2.png)
+
+## Recap
+Fixed a simple bug in fss that miscounted the number of files scanned during a search. Added thumbnail setting functionality to the gui for projects.
+
+
 # Week 21 (3/2/2026 = 3/8/2026) ** TERM 2 Week 9 **
 
 ## Features
