@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
 from PyQt5.QtGui import QIcon, QPixmap
 
-import utils.favourites as fav_store
+import src.gui.gui_dashboard.gui_favourites_helper as fav_store
 import utils.project_thumbnails as pt
 
 _THUMBNAIL_SIZE = 48          # smaller than the LogDetailsPage thumbnails

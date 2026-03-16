@@ -10,7 +10,7 @@ from pathlib import Path
 from src.fas.fas import FileAnalysis
 import src.log.log as log
 import utils.project_thumbnails as pt
-import utils.favourites as fav_store
+import src.gui.gui_dashboard.gui_favourites_helper as fav_store
 from src.gui.gui_dashboard.gui_project_files_page import ProjectFilesPage
 
 thumbnail_size = 128
