@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QListWidget,
     QListWidgetItem,
+    QMessageBox,
     QPushButton,
     QScrollArea,
     QSizePolicy,
@@ -64,63 +65,13 @@ edit_style = f"""
     }}
 """
 
-# Checkbox style (native indicator, just text and spacing)
-checkbox_style = f"""
-    QCheckBox {{
-        font-size: 13px;
-        color: #222;
-        padding: 6px 0 6px 4px;
-        spacing: 12px;
-        background-color: {styles.SIDEBAR_BG_COLOR};
-    }}
-    QCheckBox::indicator {{
-        width: 18px;
-        height: 18px;
-        border: 2px solid {styles.HEADER_BG_COLOR};
-        border-radius: 4px;
-        background: white;
-    }}
-    QCheckBox::indicator:unchecked {{
-        background: white;
-        border: 2px solid {styles.HEADER_BG_COLOR};
-    }}
-    QCheckBox::indicator:checked {{
-        background: {styles.HEADER_BG_COLOR};
-        border: 2px solid {styles.HEADER_BG_COLOR};
-    }}
-"""
+# Checkbox style
+checkbox_style = styles.CHECK_BOX_STYLES
 
 # Remove button style
-remove_btn_style = """
-    QPushButton {
-        background: #fff0f0;
-        color: #a00;
-        border: 1px solid #a00;
-        border-radius: 4px;
-        padding: 2px 10px;
-        font-weight: bold;
-    }
-    QPushButton:hover {
-        background: #ffeaea;
-        color: #fff;
-        border: 1.5px solid #d00;
-    }
-"""
+remove_btn_style = styles.BUTTON_STYLE
 # Button style
-btn_style = f"""
-    QPushButton {{
-        background-color: {styles.SIDEBAR_BG_COLOR};
-        color: {styles.SIDEBAR_TEXT_COLOR};
-        border: 1px solid {styles.HEADER_BG_COLOR};
-        border-radius: 4px;
-        padding: 4px 12px;
-        font-size: 13px;
-    }}
-    QPushButton:hover {{
-        background-color: {styles.SIDEBAR_ITEM_HOVER_BG};
-        color: {styles.SIDEBAR_SELECTED_TEXT_COLOR};
-    }}
-"""
+btn_style = styles.BUTTON_STYLE
 
 
 class WorkExperienceItem(QWidget):
@@ -400,6 +351,16 @@ class WorkProfile(QWidget):
             )
             self.experience_layout.addWidget(item, idx, 0, 1, 2)
 
+    def show_save_confirmation(self):
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Success")
+        msg.setText("Item Saved successfully!")
+        msg.setIcon(QMessageBox.Icon.Information)
+
+        msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+
+        msg.exec()
+
     def update_work_experience(self):
         work_experiences = []
         for i in range(self.experience_layout.count()):
@@ -411,6 +372,7 @@ class WorkProfile(QWidget):
                 work_experiences.append(item_widget.get_data())
         param.set("profile.work_experience", work_experiences)
         self.refresh_experiences()
+        self.show_save_confirmation()
 
     def add_work_experience(self):
         new_exp = {

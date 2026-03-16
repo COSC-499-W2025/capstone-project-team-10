@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QMessageBox,
     QPushButton,
     QScrollArea,
     QSizePolicy,
@@ -41,44 +42,9 @@ edit_style = f"""
         background: #f5faff;
     }}
 """
-checkbox_style = f"""
-    QCheckBox {{
-        font-size: 13px;
-        color: #222;
-        padding: 6px 0 6px 4px;
-        spacing: 12px;
-        background-color: {styles.SIDEBAR_BG_COLOR};
-    }}
-    QCheckBox::indicator {{
-        width: 18px;
-        height: 18px;
-        border: 2px solid {styles.HEADER_BG_COLOR};
-        border-radius: 4px;
-        background: white;
-    }}
-    QCheckBox::indicator:unchecked {{
-        background: white;
-        border: 2px solid {styles.HEADER_BG_COLOR};
-    }}
-    QCheckBox::indicator:checked {{
-        background: {styles.HEADER_BG_COLOR};
-        border: 2px solid {styles.HEADER_BG_COLOR};
-    }}
-"""
-btn_style = f"""
-    QPushButton {{
-        background-color: {styles.SIDEBAR_BG_COLOR};
-        color: {styles.SIDEBAR_TEXT_COLOR};
-        border: 1px solid {styles.HEADER_BG_COLOR};
-        border-radius: 4px;
-        padding: 4px 12px;
-        font-size: 13px;
-    }}
-    QPushButton:hover {{
-        background-color: {styles.SIDEBAR_ITEM_HOVER_BG};
-        color: {styles.SIDEBAR_SELECTED_TEXT_COLOR};
-    }}
-"""
+checkbox_style = styles.CHECK_BOX_STYLES
+
+btn_style = styles.BUTTON_STYLE
 
 
 class AwardEntry(QWidget):
@@ -298,6 +264,16 @@ class AwardsProfile(QWidget):
             )
             self.awards_layout.addWidget(item, idx, 0, 1, 2)
 
+    def show_save_confirmation(self):
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Success")
+        msg.setText("Item Saved successfully!")
+        msg.setIcon(QMessageBox.Icon.Information)
+
+        msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+
+        msg.exec()
+
     def update_awards(self):
         awards_entries = []
         for i in range(self.awards_layout.count()):
@@ -308,6 +284,7 @@ class AwardsProfile(QWidget):
             if isinstance(item_widget, AwardEntry):
                 awards_entries.append(item_widget.get_data())
         param.set("profile.awards", awards_entries)
+        self.show_save_confirmation()
         # Do not call refresh_awards here to avoid recursion
 
     def add_award(self):
@@ -319,7 +296,7 @@ class AwardsProfile(QWidget):
             "include": False,
         }
         awards_entries = param.get("profile.awards") or []
-        awards_entries.insert(0, new_entry)  # Add new at the top
+        awards_entries.insert(0, new_entry)
         param.set("profile.awards", awards_entries)
         self.refresh_awards()
 
