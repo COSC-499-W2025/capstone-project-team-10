@@ -1,3 +1,32 @@
+# T2 - Week 10 (3/09/2026 - 3/15/2026)
+
+![T2 - Week 10 - Task Completed](T2-W10/Done.png)
+
+## Features
+
+![T2 - Week 10 - In Progress](T2-W10/Features.png)
+
+## Recap
+
+- For term 2 week 10, I worked on polishing the GUI and adding new features:
+  - Implemented the screen for adding work experience and modifying personal info
+  - Added a Favourites tab for easier tracking of projects
+  - Continued work on the Top 3 Project Showcase from last week
+  - Prepared materials and content for Milestone 3 presentation
+  - Participated in Peer Testing 2 to gather feedback on current build
+
++ **Things that went well:** Finished several UI improvements and presentation prep; project is more user-friendly  
+- **Things that did not go well:** Still refining some GUI elements; polishing the portfolio features can be tedious  
+- **Plans for next week:** Continue improving the resume and web portfolio features, add more customization settings, and optimize current functionality
+
+## Additional Context
+
+## Team Survey:
+
+![Term 2 Week 10 - Team Survey](T2-W10/Team_Survey_1.png)  
+![Term 2 Week 10 - Team Survey](T2-W10/Team_Survey_2.png)  
+![Term 2 Week 10 - Team Survey](T2-W10/Team_Survey_3.png)
+ 
  T2 - Week 9 (3/02/2026 - 3/08/2026) 
 
 ![T2 - Week 9 - Task Completed](T2-W9/Done.png)
