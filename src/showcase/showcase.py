@@ -11,6 +11,7 @@ from typing import Callable, Dict, List, Optional
 
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
+from numpy.strings import title
 from pandas.core.arrays.period import com
 from typing_extensions import Any
 
@@ -899,7 +900,8 @@ def generate_portfolio(
 
             for project in projects:
                 html_parts.append("<div class='project'>")
-                html_parts.append(f"<div class='project-title'>{project.title}</div>")
+                title = project.title.strip() if project.title and project.title.strip() else "Untitled Project"
+                html_parts.append(f"<div class='project-title'>{title}</div>")
                 html_parts.append(
                     f"<div class='project-dates'>{project.get_start_date()} to {project.get_end_date()}</div>"
                 )
@@ -1112,7 +1114,8 @@ def render_project_html(project):
 
     parts = []
     parts.append("<div class='project'>")
-    parts.append(f"<div class='project-title'>{project.title}</div>")
+    title = project.title.strip() if project.title and project.title.strip() else "Untitled Project"
+    parts.append(f"<div class='project-title'>{title}</div>")
 
     parts.append(
         f"<div class='project-dates'>{project.get_start_date()} to {project.get_end_date()}</div>"
