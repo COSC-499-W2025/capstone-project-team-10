@@ -9,7 +9,8 @@ class GuiItemsManager:
     """Manager for reading and managing generated items from items.json"""
 
     def __init__(self):
-        self.items_file = Path(param.program_file_path) / "storage" / "items.json"
+        self.items_file = Path(param.program_file_path) / "storage" / "resumes" / "index.json"
+        print(f"Items index path: {self.items_file}")
 
     def load_items(self) -> List[Dict[str, Any]]:
         """Load all items from items.json"""
