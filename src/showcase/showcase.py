@@ -41,25 +41,73 @@ class ShowcaseProject:
         self.project_skills = []
         self.project_rank = 0
         self.include = True
+        self.has_git_commit_dates = False
+        self.commit_dates = []  # Store individual commit dates for heatmap
+
+    def _parse_iso_datetime(self, value: Any) -> Optional[datetime]:
+        if not isinstance(value, str):
+            return None
+        date_str = value.strip()
+        if not date_str:
+            return None
+        try:
+            return datetime.fromisoformat(date_str)
+        except ValueError:
+            return None
 
     def add_file(self, file_analysis: FileAnalysis):
+        if file_analysis.file_type == "git" and isinstance(file_analysis.extra_data, dict):
+            commits = file_analysis.extra_data.get("commits", {})
+            commit_start_raw = None
+            commit_end_raw = None
+            commit_dates_list = []
+            
+            if isinstance(commits, dict):
+                commit_start_raw = commits.get("commit_start_date")
+                commit_end_raw = commits.get("commit_end_date")
+                # Extract individual commit dates for heatmap
+                commit_dates_list = commits.get("commit_dates", [])
+                if isinstance(commit_dates_list, list):
+                    self.commit_dates = commit_dates_list
+
+            commit_start = self._parse_iso_datetime(commit_start_raw)
+            commit_end = self._parse_iso_datetime(commit_end_raw)
+
+            if commit_start is None:
+                commit_start = self._parse_iso_datetime(file_analysis.extra_data.get("created"))
+            if commit_end is None:
+                commit_end = self._parse_iso_datetime(file_analysis.extra_data.get("modified"))
+
+            if commit_start is not None and commit_end is not None:
+                if commit_end < commit_start:
+                    commit_start, commit_end = commit_end, commit_start
+                self.date_start = commit_start
+                self.date_end = commit_end
+                self.has_git_commit_dates = True
+
         if file_analysis.file_type == "Project":
             print(f"Processing project entry: {file_analysis.file_name}")
             self.valid_project_entry = True
             # Get valid dates for project duration
             if (
+                not self.has_git_commit_dates
+                and (
                 isinstance(file_analysis.created_time, str)
                 and file_analysis.created_time != "N/A"
                 and file_analysis.created_time != ""
+                )
             ):
                 try:
                     self.date_start = datetime.fromisoformat(file_analysis.created_time)
                 except Exception as e:
                     pass
             if (
+                not self.has_git_commit_dates
+                and (
                 isinstance(file_analysis.last_modified, str)
                 and file_analysis.last_modified != "N/A"
                 and file_analysis.last_modified != ""
+                )
             ):
                 try:
                     self.date_end = datetime.fromisoformat(file_analysis.last_modified)
@@ -92,7 +140,7 @@ class ShowcaseProject:
                 # check if it should be included in the resume at all
                 self.include = file_analysis.extra_data.get("include", True)
         else:
-            if not self.valid_project_entry:
+            if not self.valid_project_entry and not self.has_git_commit_dates:
                 if self.date_start > datetime.fromisoformat(file_analysis.created_time):
                     self.date_start = datetime.fromisoformat(file_analysis.created_time)
                 if self.date_end < datetime.fromisoformat(file_analysis.last_modified):
@@ -130,6 +178,8 @@ class ShowcaseProject:
         return self.date_start.strftime("%Y-%m-%d")
 
     def get_end_date(self):
+        if self.has_git_commit_dates:
+            return self.date_end.strftime("%Y-%m-%d")
         if self.date_end == "N/A":
             return "Current"
         now = datetime.now()
@@ -825,8 +875,13 @@ def generate_portfolio(
 
             # Add all project activities to the heatmap BEFORE generating HTML
             for project in projects:
-                heatmap.add_activity(project.get_start_date())
-                heatmap.add_activity(project.get_end_date())
+                # If we have individual commit dates, use those; otherwise use start/end
+                if project.commit_dates:
+                    for commit_date in project.commit_dates:
+                        heatmap.add_activity(commit_date)
+                else:
+                    heatmap.add_activity(project.get_start_date())
+                    heatmap.add_activity(project.get_end_date())
 
             # Generate heatmap HTML with labels
             heatmap_html = f"""

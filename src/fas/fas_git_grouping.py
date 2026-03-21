@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -19,10 +20,10 @@ class GitGrouping:
     def add_repository(self, repo_path: str | Path, repo_id: Optional[str] = None):
         repo_path = Path(repo_path).resolve()
 
-        # Once a repo has been added, if it does not currently have a repo id,
-        # it will use the path of the repo as its identifier
+        # Use repo folder name as the default identifier so it matches the
+        # project_id format used by regular file scans.
         if repo_id is None:
-            repo_id = str(repo_path)
+            repo_id = repo_path.name
 
         # Use repo_reader to create a repo object
         repo = Repository(
@@ -42,14 +43,19 @@ class GitGrouping:
 
         commit_analyzed = self.commit_analysis(commit_data)
 
-        # Extract created and modified dates from Git history
-        created_date, modified_date = self.get_repo_dates(str(repo_path))
+        # Extract created and modified dates from commit history.
+        created_date = commit_analyzed.get("commit_start_date")
+        modified_date = commit_analyzed.get("commit_end_date")
+
+        # Fallback for edge cases where commit_data is empty.
+        if not created_date or not modified_date:
+            created_date, modified_date = self.get_repo_dates(str(repo_path))
 
         # Build the git_output object with all required fields
         git_output = {
             "repo_id": repo_id,
             "author": repo.get_authors(),
-            "title": repo_id,  # Repo ID becomes the title of the project
+            "title": repo_id,
             "created": created_date,
             "modified": modified_date,
             "extra data": extra_data,
@@ -109,9 +115,12 @@ class GitGrouping:
             if not commits:
                 return None, None
 
-            # Commits are in reverse chronological order by default, Most recent commit is first, oldest is last
-            modified_date = commits[0].committer_date
-            created_date = commits[-1].committer_date
+            commit_dates = [c.committer_date for c in commits if c.committer_date]
+            if not commit_dates:
+                return None, None
+
+            created_date = min(commit_dates)
+            modified_date = max(commit_dates)
 
             return created_date, modified_date
 
@@ -133,6 +142,7 @@ class GitGrouping:
         total_insertions = 0
         total_deletions = 0
         messages = []
+        commit_dates = []
 
         # Process each commit
         for commit in commit_data:
@@ -145,12 +155,26 @@ class GitGrouping:
             if msg:
                 messages.append(msg)
 
+            commit_date = commit.get("date")
+            normalized_date = self._normalize_commit_date(commit_date)
+            if normalized_date is not None:
+                commit_dates.append(normalized_date)
+
+        commit_start_date = min(commit_dates).isoformat() if commit_dates else None
+        commit_end_date = max(commit_dates).isoformat() if commit_dates else None
+
+        # Include individual commit dates (as ISO strings) for heatmap generation
+        commit_dates_iso = [d.isoformat() for d in commit_dates]
+
         output = {
             "total_insertions": total_insertions,
             "total_deletions": total_deletions,
             "total_commits": len(commit_data),
             "net_change": total_insertions - total_deletions,
+            "commit_start_date": commit_start_date,
+            "commit_end_date": commit_end_date,
             "message_analysis": self._categorize_messages(messages),
+            "commit_dates": commit_dates_iso,
         }
 
         return output
@@ -183,3 +207,19 @@ class GitGrouping:
                 output.add("other")
 
         return output
+
+    def _normalize_commit_date(self, commit_date):
+        if commit_date is None:
+            return None
+
+        if isinstance(commit_date, datetime):
+            return commit_date
+
+        if isinstance(commit_date, str):
+            normalized = commit_date.strip().replace("Z", "+00:00")
+            try:
+                return datetime.fromisoformat(normalized)
+            except ValueError:
+                return None
+
+        return None

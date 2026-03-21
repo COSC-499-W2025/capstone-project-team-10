@@ -13,6 +13,12 @@ from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
 from utils.libraries_mappings import LIBRARY_SKILL_MAP as lsm
 
 
+# Track git repositories emitted during this process and prevent re-entry
+# while repository analysis is in progress.
+_logged_git_repos: set[str] = set()
+_git_repos_in_progress: set[str] = set()
+
+
 class FileAnalysis:
     def __init__(
         self,
@@ -63,6 +69,76 @@ def _make_json_safe(value):
     return str(value)
 
 
+def find_git_repo_id(file_path: str) -> Optional[str]:
+    current_path = Path(file_path).resolve()
+
+    # Serach directory tree for git file association for project id.
+    for parent in current_path.parents:
+        git_dir = parent / ".git"
+        if git_dir.exists():
+            return parent.name
+
+    return None
+
+
+def find_git_repo_root(file_path: str) -> Optional[Path]:
+    current_path = Path(file_path).resolve()
+
+    candidate_dirs = (
+        [current_path] + list(current_path.parents)
+        if current_path.is_dir()
+        else list(current_path.parents)
+    )
+
+    for candidate in candidate_dirs:
+        if (candidate / ".git").exists():
+            return candidate
+
+    return None
+
+
+def _is_git_metadata_path(file_path: str) -> bool:
+    normalized = os.path.normpath(file_path)
+    parts = normalized.split(os.sep)
+    return ".git" in parts
+
+
+def _analyze_git_repository(
+    repo_root: Path, project_id: Optional[str] = None
+) -> Optional[FileAnalysis]:
+    repo_path = str(repo_root)
+    file_type = "git"
+
+    extra_data = get_file_extra_data(repo_path, file_type)
+    importance = compute_importance(file_type, extra_data)
+    file_hash = compute_file_hash(repo_path)
+
+    git_created_time = ""
+    git_last_modified = ""
+    if isinstance(extra_data, dict):
+        created_value = extra_data.get("created")
+        modified_value = extra_data.get("modified")
+        if isinstance(created_value, str):
+            git_created_time = created_value
+        if isinstance(modified_value, str):
+            git_last_modified = modified_value
+
+    if project_id is None:
+        project_id = determine_project_id(repo_path, file_type, extra_data)
+
+    return FileAnalysis(
+        file_path=repo_path,
+        file_name=repo_root.name,
+        file_type=file_type,
+        last_modified=git_last_modified or get_last_modified_time(repo_path),
+        created_time=git_created_time or get_created_time(repo_path),
+        extra_data=extra_data,
+        importance=importance,
+        project_id=project_id,
+        file_hash=file_hash,
+    )
+
+
 # def get_file_type(file_path: str) -> str:
 #     # First, try to get the file extension
 #     # file_path should be a string
@@ -80,9 +156,15 @@ def _make_json_safe(value):
 
 
 def get_file_type(file_path: str) -> str:
-    # Special-case: git repository folder
-    if os.path.isdir(file_path) and os.path.basename(file_path) == ".git":
-        return "git"
+    # Skip .git internal files - they shouldn't be analyzed individually
+    if ".git" + os.sep in file_path:
+        return "unknown"
+    
+    # Check if this path is a git repository root (has .git directory)
+    if os.path.isdir(file_path):
+        git_dir = os.path.join(file_path, ".git")
+        if os.path.exists(git_dir):
+            return "git"
 
     file_name = os.path.basename(file_path)
 
@@ -211,6 +293,25 @@ def compute_importance(file_type: str, extra_data: Optional[Any]) -> float:
 def analyze_file(
     file_path: str, project_id: Optional[str] = None
 ) -> Optional[FileAnalysis]:
+    # Trigger one repo-level git analysis during normal file scans.
+    # Guarded to avoid recursion while git grouping scans repo files.
+    if not _is_git_metadata_path(file_path):
+        repo_root = find_git_repo_root(file_path)
+        if repo_root is not None:
+            repo_key = str(repo_root)
+            if (
+                repo_key not in _logged_git_repos
+                and repo_key not in _git_repos_in_progress
+            ):
+                _git_repos_in_progress.add(repo_key)
+                try:
+                    git_result = _analyze_git_repository(repo_root, project_id)
+                    if git_result is not None:
+                        _logged_git_repos.add(repo_key)
+                        return git_result
+                finally:
+                    _git_repos_in_progress.discard(repo_key)
+
     file_name = get_file_name(file_path)
     file_type = get_file_type(file_path)
     last_modified = get_last_modified_time(file_path)
@@ -312,18 +413,6 @@ def determine_project_id(
         return repo_id
 
     return Path(file_path).parent.name
-
-
-def find_git_repo_id(file_path: str) -> Optional[str]:
-    current_path = Path(file_path).resolve()
-
-    # Serach directory tree for git file association for project id.
-    for parent in current_path.parents:
-        git_dir = parent / ".git"
-        if git_dir.exists():
-            return parent.name
-
-    return None
 
 
 # This is just to run code directly for testing purposes
