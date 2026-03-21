@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QMessageBox,
     QPushButton,
     QScrollArea,
     QSizePolicy,
@@ -41,44 +42,9 @@ edit_style = f"""
         background: #f5faff;
     }}
 """
-checkbox_style = f"""
-    QCheckBox {{
-        font-size: 13px;
-        color: #222;
-        padding: 6px 0 6px 4px;
-        spacing: 12px;
-        background-color: {styles.SIDEBAR_BG_COLOR};
-    }}
-    QCheckBox::indicator {{
-        width: 18px;
-        height: 18px;
-        border: 2px solid {styles.HEADER_BG_COLOR};
-        border-radius: 4px;
-        background: white;
-    }}
-    QCheckBox::indicator:unchecked {{
-        background: white;
-        border: 2px solid {styles.HEADER_BG_COLOR};
-    }}
-    QCheckBox::indicator:checked {{
-        background: {styles.HEADER_BG_COLOR};
-        border: 2px solid {styles.HEADER_BG_COLOR};
-    }}
-"""
-btn_style = f"""
-    QPushButton {{
-        background-color: {styles.SIDEBAR_BG_COLOR};
-        color: {styles.SIDEBAR_TEXT_COLOR};
-        border: 1px solid {styles.HEADER_BG_COLOR};
-        border-radius: 4px;
-        padding: 4px 12px;
-        font-size: 13px;
-    }}
-    QPushButton:hover {{
-        background-color: {styles.SIDEBAR_ITEM_HOVER_BG};
-        color: {styles.SIDEBAR_SELECTED_TEXT_COLOR};
-    }}
-"""
+checkbox_style = styles.CHECK_BOX_STYLES
+
+btn_style = styles.BUTTON_STYLE
 
 
 class AwardEntry(QWidget):
@@ -106,19 +72,15 @@ class AwardEntry(QWidget):
 
         self.title_edit = QLineEdit(title)
         self.title_edit.setStyleSheet(edit_style)
-        self.title_edit.textChanged.connect(self.update_self)
 
         self.issuer_edit = QLineEdit(issuer)
         self.issuer_edit.setStyleSheet(edit_style)
-        self.issuer_edit.textChanged.connect(self.update_self)
 
         self.date_edit = QLineEdit(date)
         self.date_edit.setStyleSheet(edit_style)
-        self.date_edit.textChanged.connect(self.update_self)
 
         self.description_edit = QTextEdit(description)
         self.description_edit.setStyleSheet(edit_style)
-        self.description_edit.textChanged.connect(self.update_self)
 
         self.include_checkbox = QCheckBox("Include this award")
         self.include_checkbox.setChecked(include)
@@ -204,9 +166,20 @@ class AwardEntry(QWidget):
         main_layout.addWidget(group)
         self.setLayout(main_layout)
 
+    def show_save_confirmation(self):
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Success")
+        msg.setText("Item Saved successfully!")
+        msg.setIcon(QMessageBox.Icon.Information)
+
+        msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+
+        msg.exec()
+
     def update_self(self):
         if self.on_update_callback:
             self.on_update_callback()
+            self.show_save_confirmation()
 
     def delete_self(self):
         if self.on_remove_callback:
@@ -319,7 +292,7 @@ class AwardsProfile(QWidget):
             "include": False,
         }
         awards_entries = param.get("profile.awards") or []
-        awards_entries.insert(0, new_entry)  # Add new at the top
+        awards_entries.insert(0, new_entry)
         param.set("profile.awards", awards_entries)
         self.refresh_awards()
 

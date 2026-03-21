@@ -25,33 +25,10 @@ class SkillListItem(QWidget):
         layout = QHBoxLayout()
         layout.setContentsMargins(8, 4, 8, 4)  # More padding for clarity
         layout.setSpacing(12)
-
-        self.checkbox = QCheckBox("Include: " + skill_name)
+        self.label = "Include?"
+        self.checkbox = QCheckBox(skill_name)
         self.checkbox.setChecked(checked)
-        self.checkbox.setStyleSheet(f"""
-            QCheckBox {{
-                font-size: 13px;
-                color: #222;
-                padding: 6px 0 6px 4px;
-                spacing: 12px;
-                background-color: {styles.SIDEBAR_BG_COLOR};
-            }}
-            QCheckBox::indicator {{
-                width: 18px;
-                height: 18px;
-                border: 2px solid {styles.HEADER_BG_COLOR};
-                border-radius: 4px;
-                background: white;
-            }}
-            QCheckBox::indicator:unchecked {{
-                background: white;
-                border: 2px solid {styles.HEADER_BG_COLOR};
-            }}
-            QCheckBox::indicator:checked {{
-                background: {styles.HEADER_BG_COLOR};
-                border: 2px solid {styles.HEADER_BG_COLOR};
-            }}
-        """)  # No indicator styling, keeps native look
+        self.checkbox.setStyleSheet(styles.CHECK_BOX_STYLES)
 
         layout.addWidget(self.checkbox)
 
@@ -59,26 +36,15 @@ class SkillListItem(QWidget):
         self.remove_button.setMinimumWidth(60)
         self.remove_button.setMaximumWidth(80)
         self.remove_button.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        self.remove_button.setStyleSheet(f"""
-            QPushButton {{
-                background-color: {styles.SIDEBAR_BG_COLOR};
-                color: {styles.SIDEBAR_TEXT_COLOR};
-                border: 1px solid {styles.HEADER_BG_COLOR};
-                border-radius: 4px;
-                padding: 4px 12px;
-                font-size: 13px;
-            }}
-            QPushButton:hover {{
-                background-color: {styles.SIDEBAR_ITEM_HOVER_BG};
-                color: {styles.SIDEBAR_SELECTED_TEXT_COLOR};
-            }}
-        """)
+        self.remove_button.setStyleSheet(styles.BUTTON_STYLE)
         layout.addWidget(self.remove_button)
 
         self.setLayout(layout)
         self.setStyleSheet(f"""
-            background-color: {styles.SIDEBAR_BG_COLOR};
-            border-bottom: 1px solid {styles.HEADER_BG_COLOR};
+            background-color: {styles.BG_COLOR};
+            border: 2px solid {styles.HEADER_BG_COLOR};
+            border-radius: 8px;
+            padding: 6px;
         """)
 
         if remove_callback:
@@ -162,19 +128,7 @@ class HighlightedSkills(QWidget):
         self.add_skill_button = QPushButton("Add")
         self.add_skill_button.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         self.add_skill_button.setMinimumWidth(60)
-        self.add_skill_button.setStyleSheet(f"""
-            QPushButton {{
-                background-color: {styles.SIDEBAR_BG_COLOR};
-                color: {styles.SIDEBAR_TEXT_COLOR};
-                border: 1px solid {styles.HEADER_BG_COLOR};
-                border-radius: 4px;
-                padding: 4px 12px;
-            }}
-            QPushButton:hover {{
-                background-color: {styles.SIDEBAR_ITEM_HOVER_BG};
-                color: {styles.SIDEBAR_SELECTED_TEXT_COLOR};
-            }}
-        """)
+        self.add_skill_button.setStyleSheet(styles.BUTTON_STYLE)
         self.add_skill_button.clicked.connect(self.add_skill_to_list)
         add_skill_layout.addWidget(self.add_skill_input, stretch=1)
         add_skill_layout.addWidget(self.add_skill_button)
