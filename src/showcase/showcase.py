@@ -20,11 +20,12 @@ import src.param.param as param
 from src.fas.fas import FileAnalysis
 from src.log.log_sorter import LogSorter
 from src.resume.resume_manager import manager
-from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
-
 from src.showcase.showcase_portfolio_heatmap import ActivityHeatmap
-
-from src.showcase.showcase_portfolio_utils import get_top_projects, get_project_duration_days
+from src.showcase.showcase_portfolio_utils import (
+    get_project_duration_days,
+    get_top_projects,
+)
+from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
 
 
 # Utils
@@ -158,8 +159,8 @@ class ShowcaseProjectManager:
         for key, project in sorted_projects:
             if self.project_counter >= self.project_limit:
                 break
-            self.project_counter += 1
             if project.include:
+                self.project_counter += 1
                 yield self.projects.pop(key)
             else:
                 self.projects.pop(key)
@@ -470,7 +471,6 @@ def create_project_section(pdf_output: FPDF):
     pdf_output.set_font("Noto", "B", size=18)
     pdf_output.multi_cell(0, 8, "Projects", new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     start_section(pdf_output)
-
     for project in project_manager.get_projects():
         entry = resume_entry_template.format(
             project_name=project.title,
@@ -479,7 +479,6 @@ def create_project_section(pdf_output: FPDF):
             project_description=project.description,
             project_skills="\n- ".join(project.get_skills()),
         )
-
         if project.title and isinstance(project.title, str):
             pdf_output.set_font("Noto", size=14, style="B")
             pdf_output.multi_cell(
@@ -728,16 +727,16 @@ def generate_portfolio(
         return
 
     project_manager: ShowcaseProjectManager = parse_project_entries()
-    
+
     # Fix: store projects in a list because get_projects() pops everything
     projects = list(project_manager.get_projects())
 
     top_projects_duration = get_top_projects(projects, 3, method="duration")
     top_projects_skills = get_top_projects(projects, 3, method="skills")
     top_projects_combined = get_top_projects(projects, 3, method="combined")
-    
+
     heatmap = ActivityHeatmap()
-    
+
     try:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmpdir_path = Path(tmpdir)
@@ -856,7 +855,6 @@ def generate_portfolio(
                 "<body>",
                 "<div class='container'>",
                 "<h1>My Project Portfolio</h1>",
-                
                 "<h2>Activity Heatmap</h2>",
                 heatmap_html,
             ]
@@ -866,7 +864,7 @@ def generate_portfolio(
                 Cycle Top Projects Ranking
                 </button>
                 """)
-            
+
             # Duration ranking
             html_parts.append("<div id='top-duration' class='top-projects hidden'>")
             html_parts.append("<h2>Top 3 Projects (Longest Duration)</h2>")
@@ -876,7 +874,6 @@ def generate_portfolio(
 
             html_parts.append("</div>")
 
-
             # Skills ranking
             html_parts.append("<div id='top-skills' class='top-projects hidden'>")
             html_parts.append("<h2>Top 3 Projects (Most Skills)</h2>")
@@ -885,7 +882,6 @@ def generate_portfolio(
                 html_parts.extend(render_project_html(project))
 
             html_parts.append("</div>")
-
 
             # Combined ranking
             html_parts.append("<div id='top-combined' class='top-projects hidden'>")
@@ -900,7 +896,11 @@ def generate_portfolio(
 
             for project in projects:
                 html_parts.append("<div class='project'>")
-                title = project.title.strip() if project.title and project.title.strip() else "Untitled Project"
+                title = (
+                    project.title.strip()
+                    if project.title and project.title.strip()
+                    else "Untitled Project"
+                )
                 html_parts.append(f"<div class='project-title'>{title}</div>")
                 html_parts.append(
                     f"<div class='project-dates'>{project.get_start_date()} to {project.get_end_date()}</div>"
@@ -917,7 +917,9 @@ def generate_portfolio(
 
             html_parts.append("</div>")
 
-            html_parts.append("<script>document.querySelector('.heatmap-wrapper').classList.remove('hidden');</script>")
+            html_parts.append(
+                "<script>document.querySelector('.heatmap-wrapper').classList.remove('hidden');</script>"
+            )
             html_parts.append("""
                 <script>
 
@@ -1109,12 +1111,17 @@ def generate_skill_timeline() -> Path | None:
         print(f"Failed to generate skills timeline: {e}")
         return None
 
+
 def render_project_html(project):
     duration = get_project_duration_days(project)
 
     parts = []
     parts.append("<div class='project'>")
-    title = project.title.strip() if project.title and project.title.strip() else "Untitled Project"
+    title = (
+        project.title.strip()
+        if project.title and project.title.strip()
+        else "Untitled Project"
+    )
     parts.append(f"<div class='project-title'>{title}</div>")
 
     parts.append(
@@ -1125,16 +1132,12 @@ def render_project_html(project):
         f"<div class='project-duration'><b>Duration:</b> {duration} days</div>"
     )
 
-    parts.append(
-        f"<div class='project-desc'>{project.description or ''}</div>"
-    )
+    parts.append(f"<div class='project-desc'>{project.description or ''}</div>")
 
     skills = ", ".join(project.get_skills())
 
     if skills:
-        parts.append(
-            f"<div class='project-skills'><b>Skills:</b> {skills}</div>"
-        )
+        parts.append(f"<div class='project-skills'><b>Skills:</b> {skills}</div>")
 
     parts.append("</div>")
 
