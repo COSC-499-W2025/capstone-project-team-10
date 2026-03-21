@@ -1,12 +1,13 @@
 import csv
 import os
+import zipfile
 from datetime import date, datetime
 from pathlib import Path
 from typing import Optional
 
-import zipfile
 import src.fas.fas as fas
 import src.log.log as log
+import src.param.param as param
 from src.fss.fss_helper import file_type_check, time_check
 
 
@@ -41,6 +42,7 @@ def search(search_params: FSS_Search):
     # Checks if file path is a zip folder and recursively calls search with the extracted folder
     if zipfile.is_zipfile(search_params.input_path):
         from src.zip.zip_app import extract_zip
+
         extracted_path = extract_zip(search_params.input_path)
         if not extracted_path:
             return -1
@@ -80,7 +82,7 @@ def search(search_params: FSS_Search):
             next(reader)  # Skip header
             for file_details in reader:
                 log_entries.append(file_details)
-                
+
         # Update log details after closing file
         for file_details in log_entries:
             file_analysis: fas.FileAnalysis = fas.FileAnalysis(
@@ -121,19 +123,41 @@ def search(search_params: FSS_Search):
             return 1
         else:
             return 0
-
+    scan_hidden = param.get("scan.scan_hidden_files")
     for root, dirs, files in os.walk(search_params.input_path, topdown=True):
         root_abs = os.path.abspath(root)
 
         # Skip this directory entirely if it is under an excluded path
         if any(root_abs.startswith(excluded) for excluded in excluded_set):
             continue
+        # skip hidden folders
+        # Remove hidden dirs if scan_hidden is False
+        if not scan_hidden:
+            dirs[:] = [
+                d
+                for d in dirs
+                if not ((d.startswith(".") or d.startswith("_")) and d != ".git")
+            ] + [d for d in dirs if d == ".git"]
 
         # Remove dirs that are under excluded paths
-        dirs[:] = [d for d in dirs if not any(os.path.abspath(os.path.join(root_abs, d)).startswith(excluded) for excluded in excluded_set)]
+        dirs[:] = [
+            d
+            for d in dirs
+            if not any(
+                os.path.abspath(os.path.join(root_abs, d)).startswith(excluded)
+                for excluded in excluded_set
+            )
+        ]
 
         # Remove files under excluded paths
-        files[:] = [f for f in files if not any(os.path.abspath(os.path.join(root_abs, f)).startswith(excluded) for excluded in excluded_set)]
+        files[:] = [
+            f
+            for f in files
+            if not any(
+                os.path.abspath(os.path.join(root_abs, f)).startswith(excluded)
+                for excluded in excluded_set
+            )
+        ]
 
         # Now process remaining files
         for file in files:
@@ -141,10 +165,14 @@ def search(search_params: FSS_Search):
                 continue
             file_path = os.path.join(root_abs, file)
 
-            if search_params.file_types and not file_type_check(file_path, search_params.file_types):
+            if search_params.file_types and not file_type_check(
+                file_path, search_params.file_types
+            ):
                 continue
 
-            if (search_params.time_lower_bound or search_params.time_upper_bound) and not time_check(
+            if (
+                search_params.time_lower_bound or search_params.time_upper_bound
+            ) and not time_check(
                 [search_params.time_lower_bound, search_params.time_upper_bound],
                 Path(file_path),
                 "create",
@@ -167,10 +195,13 @@ def search(search_params: FSS_Search):
                     log.write(file_result)
                     # Pass file result to GUI/CLI if necessary
                 num_of_files_scanned += 1
-            
+
     return num_of_files_scanned
 
-def get_duplicate_from_log(file_path: str, project_id: Optional[str] = None) -> fas.FileAnalysis | None:
+
+def get_duplicate_from_log(
+    file_path: str, project_id: Optional[str] = None
+) -> fas.FileAnalysis | None:
     """
     Checks if file is already analyzed and returns the analysis instead of running new scan.
     Computes the file hash, searches all logs for a match, and returns the cached
