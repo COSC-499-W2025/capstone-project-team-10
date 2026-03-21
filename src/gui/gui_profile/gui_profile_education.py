@@ -75,23 +75,18 @@ class EducationEntry(QWidget):
 
         self.title_edit = QLineEdit(title)
         self.title_edit.setStyleSheet(edit_style)
-        self.title_edit.textChanged.connect(self.update_self)
 
         self.institution_edit = QLineEdit(institution)
         self.institution_edit.setStyleSheet(edit_style)
-        self.institution_edit.textChanged.connect(self.update_self)
 
         self.location_edit = QLineEdit(location)
         self.location_edit.setStyleSheet(edit_style)
-        self.location_edit.textChanged.connect(self.update_self)
 
         self.completion_date_edit = QLineEdit(completion_date)
         self.completion_date_edit.setStyleSheet(edit_style)
-        self.completion_date_edit.textChanged.connect(self.update_self)
 
         self.description_edit = QTextEdit(description)
         self.description_edit.setStyleSheet(edit_style)
-        self.description_edit.textChanged.connect(self.update_self)
 
         self.include_checkbox = QCheckBox("Include this education entry")
         self.include_checkbox.setChecked(include)
@@ -179,9 +174,20 @@ class EducationEntry(QWidget):
         main_layout.addWidget(group)
         self.setLayout(main_layout)
 
+    def show_save_confirmation(self):
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Success")
+        msg.setText("Item Saved successfully!")
+        msg.setIcon(QMessageBox.Icon.Information)
+
+        msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+
+        msg.exec()
+
     def update_self(self):
         if self.on_update_callback:
             self.on_update_callback()
+            self.show_save_confirmation()
 
     def delete_self(self):
         if self.on_remove_callback:
@@ -276,16 +282,6 @@ class EducationProfile(QWidget):
             )
             self.education_layout.addWidget(item, idx, 0, 1, 2)
 
-    def show_save_confirmation(self):
-        msg = QMessageBox(self)
-        msg.setWindowTitle("Success")
-        msg.setText("Item Saved successfully!")
-        msg.setIcon(QMessageBox.Icon.Information)
-
-        msg.setStandardButtons(QMessageBox.StandardButton.Ok)
-
-        msg.exec()
-
     def update_education(self):
         education_entries = []
         for i in range(self.education_layout.count()):
@@ -296,7 +292,6 @@ class EducationProfile(QWidget):
             if isinstance(item_widget, EducationEntry):
                 education_entries.append(item_widget.get_data())
         param.set("profile.education", education_entries)
-        self.show_save_confirmation()
         # Do not call refresh_education here to avoid recursion
 
     def add_education(self):

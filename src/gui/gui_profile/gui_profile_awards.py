@@ -72,19 +72,15 @@ class AwardEntry(QWidget):
 
         self.title_edit = QLineEdit(title)
         self.title_edit.setStyleSheet(edit_style)
-        self.title_edit.textChanged.connect(self.update_self)
 
         self.issuer_edit = QLineEdit(issuer)
         self.issuer_edit.setStyleSheet(edit_style)
-        self.issuer_edit.textChanged.connect(self.update_self)
 
         self.date_edit = QLineEdit(date)
         self.date_edit.setStyleSheet(edit_style)
-        self.date_edit.textChanged.connect(self.update_self)
 
         self.description_edit = QTextEdit(description)
         self.description_edit.setStyleSheet(edit_style)
-        self.description_edit.textChanged.connect(self.update_self)
 
         self.include_checkbox = QCheckBox("Include this award")
         self.include_checkbox.setChecked(include)
@@ -170,9 +166,20 @@ class AwardEntry(QWidget):
         main_layout.addWidget(group)
         self.setLayout(main_layout)
 
+    def show_save_confirmation(self):
+        msg = QMessageBox(self)
+        msg.setWindowTitle("Success")
+        msg.setText("Item Saved successfully!")
+        msg.setIcon(QMessageBox.Icon.Information)
+
+        msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+
+        msg.exec()
+
     def update_self(self):
         if self.on_update_callback:
             self.on_update_callback()
+            self.show_save_confirmation()
 
     def delete_self(self):
         if self.on_remove_callback:
@@ -264,16 +271,6 @@ class AwardsProfile(QWidget):
             )
             self.awards_layout.addWidget(item, idx, 0, 1, 2)
 
-    def show_save_confirmation(self):
-        msg = QMessageBox(self)
-        msg.setWindowTitle("Success")
-        msg.setText("Item Saved successfully!")
-        msg.setIcon(QMessageBox.Icon.Information)
-
-        msg.setStandardButtons(QMessageBox.StandardButton.Ok)
-
-        msg.exec()
-
     def update_awards(self):
         awards_entries = []
         for i in range(self.awards_layout.count()):
@@ -284,7 +281,6 @@ class AwardsProfile(QWidget):
             if isinstance(item_widget, AwardEntry):
                 awards_entries.append(item_widget.get_data())
         param.set("profile.awards", awards_entries)
-        self.show_save_confirmation()
         # Do not call refresh_awards here to avoid recursion
 
     def add_award(self):
