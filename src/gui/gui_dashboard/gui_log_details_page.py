@@ -121,7 +121,7 @@ class LogDetailsPage(QWidget):
 
         self.stack = QStackedWidget()
         root_layout.addWidget(self.stack)
-        
+
         # Project list
         self.projects_widget = QWidget()
         layout = QVBoxLayout(self.projects_widget)
@@ -142,10 +142,10 @@ class LogDetailsPage(QWidget):
         layout.addLayout(header_layout)
 
         # Table containing project ids with thumbnail column
-        # Columns: thumbnail | project id | favourite button
+        # Columns: thumbnail | project id | view files button | favourite button
         self.table = QTableWidget()
-        self.table.setColumnCount(3)
-        self.table.setHorizontalHeaderLabels(["", "Project ID", ""])
+        self.table.setColumnCount(4)
+        self.table.setHorizontalHeaderLabels(["", "Project ID", "", ""])
 
         # Thumbnail column: fixed width
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Fixed)
@@ -154,9 +154,13 @@ class LogDetailsPage(QWidget):
         # Project ID column: stretch
         self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
 
+        # View Files button column: resize to contents, with a minimum so text never clips
+        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setMinimumSectionSize(110)
+
         # Favourite button column: fixed width
-        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Fixed)
-        self.table.setColumnWidth(2, 130)
+        self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Fixed)
+        self.table.setColumnWidth(3, 130)
 
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
@@ -225,7 +229,6 @@ class LogDetailsPage(QWidget):
         self.stack.addWidget(self.projects_widget)
 
         self.project_files_page = ProjectFilesPage()
-
         self.stack.addWidget(self.project_files_page)
 
     def set_log_path(self, log_path: Path):
@@ -267,12 +270,24 @@ class LogDetailsPage(QWidget):
 
                 self.table.setItem(idx, 1, QTableWidgetItem(pid))
 
+                self._insert_view_files_button(idx, pid)
                 self._insert_fav_button(idx, pid)
 
         except Exception as e:
             print(f"Error loading CSV: {e}")
 
         self.thumbnail_btn.setEnabled(False)
+
+    def _insert_view_files_button(self, row: int, project_id: str):
+        # Create a View Files button for a table row.
+        btn = QPushButton("View Files")
+        btn.setStyleSheet(styles.BUTTON_STYLE)
+        btn.setMinimumWidth(90)
+        btn.setToolTip(f"View files for '{project_id}'")
+        btn.clicked.connect(
+            lambda checked, r=row: self.on_double_clicked(r, 0)
+        )
+        self.table.setCellWidget(row, 2, btn)
 
     def _fav_button_style(self, is_fav: bool) -> str:
         if is_fav:
@@ -310,7 +325,7 @@ class LogDetailsPage(QWidget):
         btn.clicked.connect(
             lambda checked, pid=project_id, b=btn: self._on_toggle_favourite(pid, b)
         )
-        self.table.setCellWidget(row, 2, btn)
+        self.table.setCellWidget(row, 3, btn)
 
     def _on_toggle_favourite(self, project_id: str, btn: QPushButton):
         # Toggle the favourite state and update the button appearance.
@@ -396,6 +411,7 @@ class LogDetailsPage(QWidget):
         thumb_item.setIcon(QIcon(empty_thumbnail(thumbnail_size)))
         self.table.setItem(row_idx, 0, thumb_item)
         self.table.setItem(row_idx, 1, QTableWidgetItem(new_id))
+        self._insert_view_files_button(row_idx, new_id)
         self._insert_fav_button(row_idx, new_id)
 
         self._project_ids.append(new_id)

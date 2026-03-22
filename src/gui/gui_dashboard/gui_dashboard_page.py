@@ -7,6 +7,7 @@ from datetime import datetime
 import src.log.log as log
 import src.gui.gui_utils.gui_styles as styles
 
+
 class DashboardPage(QWidget):
     log_clicked = pyqtSignal(object)
     
@@ -58,8 +59,8 @@ class DashboardPage(QWidget):
             QLabel("Loading favourites…", alignment=Qt.AlignCenter)
         )
 
-        self._tab_widget.addTab(recent_widget, "Recent") # index 0
-        self._tab_widget.addTab(self._favourites_placeholder, "Favourite") # index 1
+        self._tab_widget.addTab(recent_widget, "Recent")                    # index 0
+        self._tab_widget.addTab(self._favourites_placeholder, "Favourite")  # index 1
         
         layout.addWidget(self._tab_widget)
 
@@ -73,8 +74,8 @@ class DashboardPage(QWidget):
         recent_layout.setContentsMargins(20, 20, 20, 20)
         
         self.table = QTableWidget()
-        self.table.setColumnCount(3)
-        self.table.setHorizontalHeaderLabels(["ID", "Size", "Date Created"])
+        self.table.setColumnCount(4)
+        self.table.setHorizontalHeaderLabels(["ID", "Size", "Date Created", ""])
         
         self.table.cellDoubleClicked.connect(self.on_cell_clicked)
         
@@ -110,9 +111,12 @@ class DashboardPage(QWidget):
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(3, QHeaderView.Fixed)
+        self.table.setColumnWidth(3, 140)
         
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
+        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         
         recent_layout.addWidget(self.table)
         
@@ -166,9 +170,19 @@ class DashboardPage(QWidget):
         
         for idx, (file_name, log_info) in enumerate(sorted_logs):
             self.table.insertRow(idx)
+            self.table.setRowHeight(idx, 48)
             self.table.setItem(idx, 0, QTableWidgetItem(log_info['name']))
             self.table.setItem(idx, 1, QTableWidgetItem(log_info['size']))
             self.table.setItem(idx, 2, QTableWidgetItem(log_info['created']))
+
+            btn = QPushButton("View Projects")
+            btn.setStyleSheet(styles.BUTTON_STYLE)
+            btn.setMinimumWidth(130)
+            btn.setToolTip(f"View projects in '{log_info['name']}'")
+            btn.clicked.connect(
+                lambda checked, path=log_info['path']: self.log_clicked.emit(path)
+            )
+            self.table.setCellWidget(idx, 3, btn)
     
     def refresh_log(self):
         self.load_log_files()

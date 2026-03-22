@@ -54,16 +54,18 @@ class FavouritesPage(QWidget):
 
         # table
         self.table = QTableWidget()
-        self.table.setColumnCount(4)
-        self.table.setHorizontalHeaderLabels(["", "Project ID", "Log File", ""])
+        self.table.setColumnCount(5)
+        self.table.setHorizontalHeaderLabels(["", "Project ID", "Log File", "", ""])
 
         hdr = self.table.horizontalHeader()
         hdr.setSectionResizeMode(0, QHeaderView.Fixed)
         self.table.setColumnWidth(0, _THUMBNAIL_SIZE + 8)
         hdr.setSectionResizeMode(1, QHeaderView.Stretch)
         hdr.setSectionResizeMode(2, QHeaderView.ResizeToContents)
-        hdr.setSectionResizeMode(3, QHeaderView.Fixed)
-        self.table.setColumnWidth(3, 100)
+        hdr.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        hdr.setMinimumSectionSize(100)
+        hdr.setSectionResizeMode(4, QHeaderView.Fixed)
+        self.table.setColumnWidth(4, 100)
 
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
@@ -129,7 +131,16 @@ class FavouritesPage(QWidget):
             # Col 2 – log file name
             self.table.setItem(idx, 2, QTableWidgetItem(log_name))
 
-            # Col 3 – remove button (inline widget)
+            # Col 3 – view files button
+            view_btn = QPushButton("View Files")
+            view_btn.setStyleSheet(styles.BUTTON_STYLE)
+            view_btn.setMinimumWidth(90)
+            view_btn.clicked.connect(
+                lambda checked, pid=project_id, lp=log_path: self._on_view_files(pid, lp)
+            )
+            self.table.setCellWidget(idx, 3, view_btn)
+
+            # Col 4 – remove button (inline widget)
             remove_btn = QPushButton("Remove")
             remove_btn.setStyleSheet("""
                 QPushButton {
@@ -142,11 +153,10 @@ class FavouritesPage(QWidget):
                 }
                     QPushButton:hover { background-color: #e74c3c; }
             """)
-
             remove_btn.clicked.connect(
                 lambda checked, pid=project_id, lp=log_path: self._on_remove(pid, lp)
             )
-            self.table.setCellWidget(idx, 3, remove_btn)
+            self.table.setCellWidget(idx, 4, remove_btn)
 
     def _on_row_double_clicked(self, row: int, _col: int):
         pid_item = self.table.item(row, 1)
@@ -154,6 +164,17 @@ class FavouritesPage(QWidget):
             return
         project_id = pid_item.text()
         log_path: Path = pid_item.data(Qt.UserRole)
+        if log_path and log_path.exists():
+            self.project_clicked.emit(project_id, log_path)
+        else:
+            QMessageBox.warning(
+                self,
+                "Log Not Found",
+                f"The log file for project '{project_id}' could not be found:\n{log_path}",
+            )
+
+    def _on_view_files(self, project_id: str, log_path: Path):
+        # Reuse the same logic as double-clicking the row.
         if log_path and log_path.exists():
             self.project_clicked.emit(project_id, log_path)
         else:
