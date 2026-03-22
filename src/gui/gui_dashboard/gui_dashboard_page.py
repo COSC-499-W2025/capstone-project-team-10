@@ -59,8 +59,8 @@ class DashboardPage(QWidget):
             QLabel("Loading favourites…", alignment=Qt.AlignCenter)
         )
 
-        self._tab_widget.addTab(recent_widget, "Recent")                    # index 0
-        self._tab_widget.addTab(self._favourites_placeholder, "Favourite")  # index 1
+        self._tab_widget.addTab(recent_widget, "Recent") # index 0
+        self._tab_widget.addTab(self._favourites_placeholder, "Favourite") # index 1
         
         layout.addWidget(self._tab_widget)
 
