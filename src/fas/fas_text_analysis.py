@@ -184,7 +184,7 @@ class TextSummary:
                 )
             if stats["lexical_diversity"] < 0.4:
                 return "Extensive length but consider adding more depth to your writing on the topics at hand."
-        elif stats["word_count"] >= 100 & stats["word_count"] < 1000:
+        elif stats["word_count"] >= 100 and stats["word_count"] < 1000:
             if stats["lexical_diversity"] >= 0.6:
                 return "Average length and excellent depth and detail used to explore your ideas."
             if stats["lexical_diversity"] >= 0.4:

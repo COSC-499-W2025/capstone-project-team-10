@@ -122,7 +122,6 @@ class AppShell(QWidget):
         self.page_dashboard = DashboardContainer()
 
         self.page_resume = ResumePage()
-        # self.page_portfolio = PortfolioPage()
 
         self.page_scan = ScanPage()
         self.page_scan_results = ScanResultsPage()

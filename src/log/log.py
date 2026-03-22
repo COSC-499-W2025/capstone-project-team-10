@@ -89,7 +89,7 @@ def open_log_file() -> None:
     oldest_log_number: int = param.log_max_count + 1
     Path(param.result_log_folder_path).mkdir(parents=True, exist_ok=True)
     for file in Path(param.result_log_folder_path).iterdir():
-        if file.is_file:
+        if file.is_file():
             match = re.search(param.log_file_naming_regex, file.name)
             if not match:
                 continue

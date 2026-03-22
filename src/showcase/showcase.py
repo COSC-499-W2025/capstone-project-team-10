@@ -3,11 +3,9 @@ import csv
 import json
 import logging
 import os
-import re
-import shutil
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Callable, Dict, List, Optional
+from typing import Dict, List, Optional
 
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
