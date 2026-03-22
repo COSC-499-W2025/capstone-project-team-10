@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt, pyqtSignal, QObject
 from pathlib import Path
 from datetime import datetime
 import src.log.log as log
+import src.gui.gui_utils.gui_styles as styles
 
 class DashboardPage(QWidget):
     log_clicked = pyqtSignal(object)

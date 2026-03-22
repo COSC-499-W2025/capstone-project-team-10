@@ -10,19 +10,9 @@ from PyQt5.QtGui import QIcon, QPixmap
 
 import src.gui.gui_dashboard.gui_favourites_helper as fav_store
 import utils.project_thumbnails as pt
+import src.gui.gui_utils.gui_styles as styles
 
 _THUMBNAIL_SIZE = 48          # smaller than the LogDetailsPage thumbnails
-_DANGER_BTN_STYLE = """
-    QPushButton {
-        background-color: #c0392b;
-        color: white;
-        border: none;
-        padding: 6px 14px;
-        border-radius: 4px;
-        font-size: 13px;
-    }
-    QPushButton:hover { background-color: #e74c3c; }
-"""
 
 
 def _make_thumbnail(project_id: str, size: int = _THUMBNAIL_SIZE) -> QPixmap:
@@ -141,7 +131,17 @@ class FavouritesPage(QWidget):
 
             # Col 3 – remove button (inline widget)
             remove_btn = QPushButton("Remove")
-            remove_btn.setStyleSheet(_DANGER_BTN_STYLE)
+            remove_btn.setStyleSheet("""
+                QPushButton {
+                    background-color: #c0392b;
+                    color: white;
+                    border: none;
+                    padding: 6px 14px;
+                    border-radius: 4px;
+                    font-size: 13px;
+                }
+                    QPushButton:hover { background-color: #e74c3c; }
+            """)
 
             remove_btn.clicked.connect(
                 lambda checked, pid=project_id, lp=log_path: self._on_remove(pid, lp)
@@ -171,19 +171,8 @@ class FavouritesPage(QWidget):
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msg.setDefaultButton(QMessageBox.No)
         msg.setStyleSheet("QLabel { color: black; font-weight: normal; }")
-        btn_style = """
-            QPushButton {
-                background-color: #002145;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 4px;
-                font-size: 14px;
-            }
-            QPushButton:hover { background-color: #003366; }
-        """
         for button in msg.buttons():
-            button.setStyleSheet(btn_style)
+            button.setStyleSheet(styles.BUTTON_STYLE)
         if msg.exec_() == QMessageBox.Yes:
             fav_store.remove_favourite(project_id, log_path)
             self.refresh()

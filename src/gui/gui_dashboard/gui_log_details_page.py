@@ -12,6 +12,7 @@ import src.log.log as log
 import utils.project_thumbnails as pt
 import src.gui.gui_dashboard.gui_favourites_helper as fav_store
 from src.gui.gui_dashboard.gui_project_files_page import ProjectFilesPage
+import src.gui.gui_utils.gui_styles as styles
 
 thumbnail_size = 128
 
@@ -39,18 +40,9 @@ def styled_msgbox(parent, title: str, text: str, icon=QMessageBox.Information) -
     msg.setWindowTitle(title)
     msg.setText(text)
     msg.setIcon(icon)
-    msg.setStyleSheet("""
-        QLabel { color: black; font-weight: normal; }
-        QPushButton {
-            background-color: #002145;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        QPushButton:hover { background-color: #003366; }
-    """)
+    msg.setStyleSheet("QLabel { color: black; font-weight: normal; }")
+    for button in msg.buttons():
+        button.setStyleSheet(styles.BUTTON_STYLE)
     return msg
 
 class CreateProjectDialog(QDialog):
@@ -86,23 +78,10 @@ class CreateProjectDialog(QDialog):
         form.addRow(desc_lbl, self.desc_edit)
         layout.addLayout(form)
 
-        BUTTON_STYLE = """
-            QPushButton {
-                background-color: #002145;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 4px;
-                font-size: 14px;
-            }
-            QPushButton:hover { background-color: #003366; }
-            QPushButton:disabled { background-color: #aaa; }
-        """
-
         buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         buttons.button(QDialogButtonBox.Ok).setText("Create Project")
-        buttons.button(QDialogButtonBox.Ok).setStyleSheet(BUTTON_STYLE)
-        buttons.button(QDialogButtonBox.Cancel).setStyleSheet(BUTTON_STYLE)
+        buttons.button(QDialogButtonBox.Ok).setStyleSheet(styles.BUTTON_STYLE)
+        buttons.button(QDialogButtonBox.Cancel).setStyleSheet(styles.BUTTON_STYLE)
         buttons.accepted.connect(self._on_accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
@@ -152,15 +131,7 @@ class LogDetailsPage(QWidget):
         header_layout = QHBoxLayout()
 
         back_btn = QPushButton("← Back")
-        back_btn.setStyleSheet("""
-            QPushButton{
-                background-color: #002145; 
-                color: white; 
-                padding: 8px; 
-                border-radius: 4px;}
-            QPushButton:hover { 
-                background-color: #003366; 
-            }""")
+        back_btn.setStyleSheet(styles.BUTTON_STYLE)
         back_btn.clicked.connect(self.back_clicked.emit)
         header_layout.addWidget(back_btn)
 
@@ -238,13 +209,13 @@ class LogDetailsPage(QWidget):
         bottom_layout.addStretch()
 
         self.thumbnail_btn = QPushButton("Select Thumbnail")
-        self.thumbnail_btn.setStyleSheet("""color: black;""")
+        self.thumbnail_btn.setStyleSheet(styles.BUTTON_STYLE)
         self.thumbnail_btn.setEnabled(False)
         self.thumbnail_btn.clicked.connect(self.on_select_thumbnail)
         bottom_layout.addWidget(self.thumbnail_btn)
 
         self.new_project_btn = QPushButton("New Project")
-        self.new_project_btn.setStyleSheet("""color: black;""")
+        self.new_project_btn.setStyleSheet(styles.BUTTON_STYLE)
         self.new_project_btn.setToolTip("Create a new custom project in this log")
         self.new_project_btn.clicked.connect(self.on_new_project)
         bottom_layout.addWidget(self.new_project_btn)
