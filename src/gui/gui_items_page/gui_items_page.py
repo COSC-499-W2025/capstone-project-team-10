@@ -3,8 +3,8 @@ from PyQt5.QtWidgets import (
     QHBoxLayout, QMessageBox
 )
 from PyQt5.QtCore import Qt
+from datetime import datetime
 import subprocess
-import os
 from pathlib import Path
 from .gui_items_manager import GuiItemsManager
 
@@ -30,6 +30,34 @@ class ItemsPage(QWidget):
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setSelectionMode(QTableWidget.SingleSelection)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.verticalHeader().setVisible(False)
+        self.table.setFocusPolicy(Qt.NoFocus)
+        self.table.horizontalHeader().setFixedHeight(34)
+        self.table.setStyleSheet(
+            ""
+            "QTableWidget::item:focus { outline: none; }"
+            "QHeaderView::section {"
+            "background-color: #f3f3f3;"
+            "border-top: 1px solid #d9d9d9;"
+            "border-bottom: 1px solid #d9d9d9;"
+            "border-right: 1px solid #d9d9d9;"
+            "border-left: 0px;"
+            "padding-top: 2px;"
+            "padding-bottom: 2px;"
+            "}"
+            "QHeaderView::section:first {"
+            "border-left: 1px solid #d9d9d9;"
+            "}"
+            ""
+        )
+
+        # Keep headers visually consistent regardless of selection state.
+        for col in range(self.table.columnCount()):
+            header_item = self.table.horizontalHeaderItem(col)
+            if header_item is not None:
+                header_font = header_item.font()
+                header_font.setBold(True)
+                header_item.setFont(header_font)
 
         layout.addWidget(self.table, 1)
 
@@ -37,11 +65,19 @@ class ItemsPage(QWidget):
         button_layout = QHBoxLayout()
         button_layout.setSpacing(10)
 
-        self.visit_btn = QPushButton("Visit File")
-        self.visit_btn.clicked.connect(self.visit_selected_file)
+        self.visit_file_btn = QPushButton("Visit File")
+        self.visit_file_btn.clicked.connect(self.visit_selected_file)
+
+        self.visit_log_btn = QPushButton("Visit Log File")
+        self.visit_log_btn.clicked.connect(self.visit_selected_log_file)
+
+        self.visit_backup_btn = QPushButton("Visit Backup File")
+        self.visit_backup_btn.clicked.connect(self.visit_selected_backup_file)
 
         button_layout.addStretch()
-        button_layout.addWidget(self.visit_btn)
+        button_layout.addWidget(self.visit_file_btn)
+        button_layout.addWidget(self.visit_log_btn)
+        button_layout.addWidget(self.visit_backup_btn)
 
         layout.addLayout(button_layout)
 
@@ -58,8 +94,12 @@ class ItemsPage(QWidget):
         # Check which files no longer exist
         valid_items = []
         for item in items:
-            file_path = item.get("path", "")
-            if file_path and Path(file_path).exists():
+            original_path = item.get("path", "")
+            backup_path = item.get("backup_path", "")
+            original_exists = bool(original_path) and Path(original_path).exists()
+            backup_exists = bool(backup_path) and Path(backup_path).exists()
+
+            if original_exists or backup_exists:
                 valid_items.append(item)
             else:
                 removed_items.append(item)
@@ -78,16 +118,26 @@ class ItemsPage(QWidget):
 
         for row, item in enumerate(items):
             name = item.get("name", "")
-            file_type = item.get("type", "")
-            location = item.get("path", "")
-            created = item.get("created_at", "")
-            log_file = item.get("log", "")
+            file_type = self.clean_type(item.get("type", ""))
+            original_location = item.get("path", "")
+            backup_location = item.get("backup_path", "")
+            created = self.format_datetime(item.get("created_at", ""))
+            full_log_path = item.get("log", "")
+            log_file = self.clean_log_file_name(full_log_path)
 
             self.table.setItem(row, 0, QTableWidgetItem(name))
             self.table.setItem(row, 1, QTableWidgetItem(file_type))
-            self.table.setItem(row, 2, QTableWidgetItem(location))
+
+            location_item = QTableWidgetItem(original_location)
+            location_item.setData(Qt.UserRole, original_location)
+            location_item.setData(Qt.UserRole + 1, backup_location)
+            self.table.setItem(row, 2, location_item)
+
             self.table.setItem(row, 3, QTableWidgetItem(created))
-            self.table.setItem(row, 4, QTableWidgetItem(log_file))
+
+            log_item = QTableWidgetItem(log_file)
+            log_item.setData(Qt.UserRole, full_log_path)
+            self.table.setItem(row, 4, log_item)
 
         self.resize_columns()
 
@@ -104,28 +154,98 @@ class ItemsPage(QWidget):
         super().resizeEvent(event)
         self.resize_columns()
 
-    def visit_selected_file(self):
-        """Open Windows Explorer at the selected file's location"""
+    def clean_type(self, raw_type: str) -> str:
+        """Convert schema type values to user-facing labels."""
+        normalized = str(raw_type).strip().lower()
+        if "portfolio" in normalized:
+            return "Portfolio"
+        if "resume" in normalized:
+            return "Resume"
+        return "Unknown"
+
+    def format_datetime(self, raw_datetime: str) -> str:
+        """Format ISO datetime to a readable table value."""
+        if not raw_datetime:
+            return ""
+        try:
+            dt = datetime.fromisoformat(str(raw_datetime))
+            return dt.strftime("%b %d, %Y %I:%M %p")
+        except ValueError:
+            return str(raw_datetime)
+
+    def clean_log_file_name(self, raw_log_path: str) -> str:
+        """Display only the log filename (e.g., 12.log)."""
+        if not raw_log_path:
+            return ""
+        return Path(str(raw_log_path)).name
+
+    def _open_file_in_explorer(self, file_path: Path, title: str) -> None:
+        """Open Windows Explorer selecting the target file."""
+        if not file_path.exists():
+            QMessageBox.critical(self, "File Not Found", f"File not found:\n{file_path}")
+            return
+
+        try:
+            subprocess.Popen(f'explorer /select,"{file_path}"')
+        except Exception as e:
+            QMessageBox.critical(self, title, f"Failed to open file location:\n{str(e)}")
+
+    def visit_selected_backup_file(self):
+        """Open Windows Explorer at the selected backup file location."""
         current_row = self.table.currentRow()
         if current_row < 0:
             QMessageBox.warning(self, "No Selection", "Please select an item to visit.")
             return
 
-        location = self.table.item(current_row, 2).text()
+        location_item = self.table.item(current_row, 2)
+        location = location_item.data(Qt.UserRole + 1) if location_item else ""
         if not location:
-            QMessageBox.warning(self, "Invalid Path", "File path is empty.")
+            QMessageBox.warning(self, "Invalid Path", "Backup file path is empty.")
             return
 
         file_path = Path(location)
-        if not file_path.exists():
-            QMessageBox.critical(self, "File Not Found", f"File not found:\n{location}")
+        self._open_file_in_explorer(file_path, "Error")
+
+    def visit_selected_file(self):
+        """Visit the original file location, with backup fallback."""
+        current_row = self.table.currentRow()
+        if current_row < 0:
+            QMessageBox.warning(self, "No Selection", "Please select an item to visit.")
             return
 
-        # Open Windows Explorer at the file location
-        try:
-            subprocess.Popen(f'explorer /select,"{file_path}"')
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to open file location:\n{str(e)}")
+        location_item = self.table.item(current_row, 2)
+        original_path = location_item.data(Qt.UserRole) if location_item else ""
+        backup_path = location_item.data(Qt.UserRole + 1) if location_item else ""
+
+        if original_path and Path(original_path).exists():
+            self._open_file_in_explorer(Path(original_path), "Error")
+            return
+
+        if backup_path and Path(backup_path).exists():
+            QMessageBox.information(
+                self,
+                "Original Not Found",
+                "Original file no longer exists. Opening backup file instead.",
+            )
+            self._open_file_in_explorer(Path(backup_path), "Error")
+            return
+
+        QMessageBox.critical(self, "File Not Found", "Neither original nor backup file exists.")
+
+    def visit_selected_log_file(self):
+        """Open Windows Explorer at the selected log file location."""
+        current_row = self.table.currentRow()
+        if current_row < 0:
+            QMessageBox.warning(self, "No Selection", "Please select an item to visit.")
+            return
+
+        log_item = self.table.item(current_row, 4)
+        log_path = log_item.data(Qt.UserRole) if log_item else ""
+        if not log_path:
+            QMessageBox.warning(self, "Invalid Path", "Log file path is empty.")
+            return
+
+        self._open_file_in_explorer(Path(log_path), "Error")
 
     def show_removed_items_popup(self, removed_items):
         """Show popup listing removed/invalidated items"""
