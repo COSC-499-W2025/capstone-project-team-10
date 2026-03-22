@@ -52,18 +52,19 @@ class GuiItemsManager:
         fallback_backup_name = backup.get("name", "") or legacy_filename
 
         if backup_location:
-            full_path = backup_location
+            resolved_backup_path = backup_location
         elif fallback_backup_name:
-            full_path = str((self.items_file.parent / fallback_backup_name).resolve())
-        elif original_location:
-            full_path = original_location
+            resolved_backup_path = str((self.items_file.parent / fallback_backup_name).resolve())
         else:
-            full_path = ""
+            resolved_backup_path = ""
+
+        display_original_path = original_location or resolved_backup_path
 
         return {
             "id": resume.get("id"),
             "name": original_name or fallback_backup_name,
-            "path": full_path,
+            "path": display_original_path,
+            "backup_path": resolved_backup_path,
             "type": resume.get("type", "") or metadata.get("type", ""),
             "created_at": resume.get("created_date", "") or resume.get("created_at", ""),
             "log": resume.get("source_log", "") or metadata.get("source_log", ""),
