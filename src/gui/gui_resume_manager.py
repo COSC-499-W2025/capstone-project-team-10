@@ -141,6 +141,30 @@ class ResumeManager:
     # ------------------------------
     # DATE
     # ------------------------------
+    def get_effective_project_dates(self, project_id: str) -> tuple[str, str]:
+        """Return effective project dates, prioritizing user-edited Project dates over git-derived dates."""
+        fa = self.get_project_info(project_id)
+        if fa:
+            manual_start = fa.created_time or ""
+            manual_end = fa.last_modified or ""
+
+            # If dates were manually set on the Project entry, keep them.
+            if manual_start and manual_start != "N/A" and manual_end and manual_end != "N/A":
+                return manual_start, manual_end
+
+        try:
+            project_manager = showcase.parse_project_entries()
+            project = project_manager.projects.get(project_id)
+            if project is not None:
+                return project.get_start_date(), project.get_end_date()
+        except Exception:
+            pass
+
+        if not fa:
+            return "", ""
+
+        return fa.created_time or "", fa.last_modified or ""
+
     def set_project_dates(self, project_id: str, start_date: str, end_date: str):
         """
         Save the start and end dates for a project in extra_data.
