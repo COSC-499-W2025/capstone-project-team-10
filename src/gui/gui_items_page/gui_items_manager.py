@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 
 import src.param.param as param
 
@@ -37,20 +37,36 @@ class GuiItemsManager:
         return loaded
 
     def _resume_to_item(self, resume: Dict[str, Any]) -> Dict[str, Any]:
-        filename = resume.get("filename", "")
-        full_path = str((self.items_file.parent / filename).resolve()) if filename else ""
+        original = resume.get("original", {}) if isinstance(resume.get("original"), dict) else {}
+        backup = resume.get("backup", {}) if isinstance(resume.get("backup"), dict) else {}
 
         metadata = resume.get("metadata", {}) if isinstance(resume.get("metadata"), dict) else {}
-        item_type = metadata.get("type", "")
-        source_log = metadata.get("source_log", "")
+
+        # Legacy fallback support for pre-migration entries.
+        legacy_filename = resume.get("filename", "")
+        legacy_original_name = resume.get("original_name", "")
+
+        original_name = original.get("name", "") or legacy_original_name
+        original_location = original.get("location", "")
+        backup_location = backup.get("location", "")
+        fallback_backup_name = backup.get("name", "") or legacy_filename
+
+        if backup_location:
+            full_path = backup_location
+        elif fallback_backup_name:
+            full_path = str((self.items_file.parent / fallback_backup_name).resolve())
+        elif original_location:
+            full_path = original_location
+        else:
+            full_path = ""
 
         return {
             "id": resume.get("id"),
-            "name": resume.get("original_name") or filename,
+            "name": original_name or fallback_backup_name,
             "path": full_path,
-            "type": item_type,
-            "created_at": resume.get("created_at", ""),
-            "log": source_log,
+            "type": resume.get("type", "") or metadata.get("type", ""),
+            "created_at": resume.get("created_date", "") or resume.get("created_at", ""),
+            "log": resume.get("source_log", "") or metadata.get("source_log", ""),
         }
 
     def load_items(self) -> List[Dict[str, Any]]:
