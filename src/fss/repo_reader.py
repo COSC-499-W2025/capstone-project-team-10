@@ -19,7 +19,7 @@ class Repository:
             for commit in PyDrillerRepo(self.path).traverse_commits():
                 author = commit.author.name
                 
-                self.authors.setdefault(author)
+                self.authors.setdefault(author, 0)
                 if self.filter_author and author != self.filter_author:
                     continue
 

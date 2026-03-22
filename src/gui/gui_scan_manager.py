@@ -1,5 +1,6 @@
 import PyQt5.QtCore as QtCore
 from src.fss.fss import FSS_Search, search
+import src.log.log as log
 import sys
 
 class _EmitStream(QtCore.QObject):
@@ -35,6 +36,9 @@ class ScanWorker(QtCore.QObject):
         sys.stderr = self._stream
 
         try:
+            if filters.get('clean', False):
+                log.open_log_file()
+
             search_params = FSS_Search(
                 input_path=directory_path,
                 excluded_path=filters.get('excluded_paths', set()),

@@ -20,6 +20,7 @@ class MultiFolderSelector(QWidget):
     def __init__(self):
         super().__init__()
         self.items: List[str] = []
+        self.folders: List[str] = []
         self.line_edit = QLineEdit()
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.line_edit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)

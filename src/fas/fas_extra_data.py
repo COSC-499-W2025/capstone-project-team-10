@@ -85,7 +85,7 @@ def get_file_extra_data(file_path: str, file_type: str) -> Optional[Any]:
         return metadata
 
     except ModuleNotFoundError as e:
-        print(f"No handler found for file type: {file_type}\n{e.msg}")
+        print(f"No handler found for file type: {file_type}\n{e}")
         return None
 
 

@@ -1,7 +1,6 @@
 import argparse
 import builtins
 import sys
-from datetime import datetime
 from pathlib import Path
 
 import src.fss.fss as fss

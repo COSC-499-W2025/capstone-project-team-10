@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, 
-                             QPushButton, QTableWidget, QTableWidgetItem, 
-                             QHeaderView, QTabWidget)
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel,
+                             QPushButton, QTableWidget, QTableWidgetItem,
+                             QHeaderView, QTabWidget, QMessageBox)
 from PyQt5.QtCore import Qt, pyqtSignal, QObject
 from pathlib import Path
 from datetime import datetime
@@ -74,8 +74,8 @@ class DashboardPage(QWidget):
         recent_layout.setContentsMargins(20, 20, 20, 20)
         
         self.table = QTableWidget()
-        self.table.setColumnCount(4)
-        self.table.setHorizontalHeaderLabels(["ID", "Size", "Date Created", ""])
+        self.table.setColumnCount(5)
+        self.table.setHorizontalHeaderLabels(["ID", "Size", "Date Created", "", ""])
         
         self.table.cellDoubleClicked.connect(self.on_cell_clicked)
         
@@ -84,7 +84,7 @@ class DashboardPage(QWidget):
                 background-color: white;
                 gridline-color: #e0e0e0;
                 border: none;
-                color: black; 
+                color: black;
             }
             QHeaderView::section {
                 background-color: white;
@@ -95,9 +95,9 @@ class DashboardPage(QWidget):
                 color: #666;
             }
             QTableWidget::item {
-                padding: 8px;
+                padding: 8px 8px 8px 0px;
                 border-bottom: 1px solid #e0e0e0;
-                color: black; 
+                color: black;
             }
             QTableWidget::item:selected {
                 background-color: #002145;
@@ -114,6 +114,8 @@ class DashboardPage(QWidget):
         header.setSectionResizeMode(3, QHeaderView.Fixed)
         self.table.setColumnWidth(3, 140)
         
+        header.setSectionResizeMode(3, QHeaderView.Fixed)
+        self.table.setColumnWidth(3, 90)
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -183,7 +185,29 @@ class DashboardPage(QWidget):
                 lambda checked, path=log_info['path']: self.log_clicked.emit(path)
             )
             self.table.setCellWidget(idx, 3, btn)
+
+            delete_btn = QPushButton("Delete")
+            delete_btn.setStyleSheet(styles.BUTTON_STYLE)
+            delete_btn.clicked.connect(lambda _, p=log_info['path']: self.delete_log(p))
+            btn_container = QWidget()
+            btn_layout = QHBoxLayout(btn_container)
+            btn_layout.setContentsMargins(6, 4, 6, 4)
+            btn_layout.addWidget(delete_btn)
+            self.table.setCellWidget(idx, 4, btn_container)
     
+    def delete_log(self, log_path):
+        reply = QMessageBox.question(
+            self, "Delete Log",
+            f"Delete {log_path.name}?",
+            QMessageBox.Yes | QMessageBox.No
+        )
+        if reply == QMessageBox.Yes:
+            try:
+                log_path.unlink()
+            except Exception as e:
+                QMessageBox.warning(self, "Error", f"Could not delete log: {e}")
+        self.refresh_log()
+
     def refresh_log(self):
         self.load_log_files()
         self.update_table()
