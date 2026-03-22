@@ -31,6 +31,33 @@ class ItemsPage(QWidget):
         self.table.setSelectionMode(QTableWidget.SingleSelection)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
         self.table.verticalHeader().setVisible(False)
+        self.table.setFocusPolicy(Qt.NoFocus)
+        self.table.horizontalHeader().setFixedHeight(34)
+        self.table.setStyleSheet(
+            ""
+            "QTableWidget::item:focus { outline: none; }"
+            "QHeaderView::section {"
+            "background-color: #f3f3f3;"
+            "border-top: 1px solid #d9d9d9;"
+            "border-bottom: 1px solid #d9d9d9;"
+            "border-right: 1px solid #d9d9d9;"
+            "border-left: 0px;"
+            "padding-top: 2px;"
+            "padding-bottom: 2px;"
+            "}"
+            "QHeaderView::section:first {"
+            "border-left: 1px solid #d9d9d9;"
+            "}"
+            ""
+        )
+
+        # Keep headers visually consistent regardless of selection state.
+        for col in range(self.table.columnCount()):
+            header_item = self.table.horizontalHeaderItem(col)
+            if header_item is not None:
+                header_font = header_item.font()
+                header_font.setBold(True)
+                header_item.setFont(header_font)
 
         layout.addWidget(self.table, 1)
 
