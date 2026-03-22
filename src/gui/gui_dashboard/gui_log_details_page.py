@@ -12,6 +12,7 @@ import src.log.log as log
 import utils.project_thumbnails as pt
 import src.gui.gui_dashboard.gui_favourites_helper as fav_store
 from src.gui.gui_dashboard.gui_project_files_page import ProjectFilesPage
+import src.gui.gui_utils.gui_styles as styles
 
 thumbnail_size = 128
 
@@ -39,18 +40,9 @@ def styled_msgbox(parent, title: str, text: str, icon=QMessageBox.Information) -
     msg.setWindowTitle(title)
     msg.setText(text)
     msg.setIcon(icon)
-    msg.setStyleSheet("""
-        QLabel { color: black; font-weight: normal; }
-        QPushButton {
-            background-color: #002145;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        QPushButton:hover { background-color: #003366; }
-    """)
+    msg.setStyleSheet("QLabel { color: black; font-weight: normal; }")
+    for button in msg.buttons():
+        button.setStyleSheet(styles.BUTTON_STYLE)
     return msg
 
 class CreateProjectDialog(QDialog):
@@ -86,23 +78,10 @@ class CreateProjectDialog(QDialog):
         form.addRow(desc_lbl, self.desc_edit)
         layout.addLayout(form)
 
-        BUTTON_STYLE = """
-            QPushButton {
-                background-color: #002145;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 4px;
-                font-size: 14px;
-            }
-            QPushButton:hover { background-color: #003366; }
-            QPushButton:disabled { background-color: #aaa; }
-        """
-
         buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         buttons.button(QDialogButtonBox.Ok).setText("Create Project")
-        buttons.button(QDialogButtonBox.Ok).setStyleSheet(BUTTON_STYLE)
-        buttons.button(QDialogButtonBox.Cancel).setStyleSheet(BUTTON_STYLE)
+        buttons.button(QDialogButtonBox.Ok).setStyleSheet(styles.BUTTON_STYLE)
+        buttons.button(QDialogButtonBox.Cancel).setStyleSheet(styles.BUTTON_STYLE)
         buttons.accepted.connect(self._on_accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
@@ -142,7 +121,7 @@ class LogDetailsPage(QWidget):
 
         self.stack = QStackedWidget()
         root_layout.addWidget(self.stack)
-        
+
         # Project list
         self.projects_widget = QWidget()
         layout = QVBoxLayout(self.projects_widget)
@@ -152,15 +131,7 @@ class LogDetailsPage(QWidget):
         header_layout = QHBoxLayout()
 
         back_btn = QPushButton("← Back")
-        back_btn.setStyleSheet("""
-            QPushButton{
-                background-color: #002145; 
-                color: white; 
-                padding: 8px; 
-                border-radius: 4px;}
-            QPushButton:hover { 
-                background-color: #003366; 
-            }""")
+        back_btn.setStyleSheet(styles.BUTTON_STYLE)
         back_btn.clicked.connect(self.back_clicked.emit)
         header_layout.addWidget(back_btn)
 
@@ -171,10 +142,10 @@ class LogDetailsPage(QWidget):
         layout.addLayout(header_layout)
 
         # Table containing project ids with thumbnail column
-        # Columns: thumbnail | project id | favourite button
+        # Columns: thumbnail | project id | view files button | favourite button
         self.table = QTableWidget()
-        self.table.setColumnCount(3)
-        self.table.setHorizontalHeaderLabels(["", "Project ID", ""])
+        self.table.setColumnCount(4)
+        self.table.setHorizontalHeaderLabels(["", "Project ID", "", ""])
 
         # Thumbnail column: fixed width
         self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Fixed)
@@ -183,9 +154,13 @@ class LogDetailsPage(QWidget):
         # Project ID column: stretch
         self.table.horizontalHeader().setSectionResizeMode(1, QHeaderView.Stretch)
 
+        # View Files button column: resize to contents, with a minimum so text never clips
+        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
+        self.table.horizontalHeader().setMinimumSectionSize(110)
+
         # Favourite button column: fixed width
-        self.table.horizontalHeader().setSectionResizeMode(2, QHeaderView.Fixed)
-        self.table.setColumnWidth(2, 130)
+        self.table.horizontalHeader().setSectionResizeMode(3, QHeaderView.Fixed)
+        self.table.setColumnWidth(3, 130)
 
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
@@ -238,13 +213,13 @@ class LogDetailsPage(QWidget):
         bottom_layout.addStretch()
 
         self.thumbnail_btn = QPushButton("Select Thumbnail")
-        self.thumbnail_btn.setStyleSheet("""color: black;""")
+        self.thumbnail_btn.setStyleSheet(styles.BUTTON_STYLE)
         self.thumbnail_btn.setEnabled(False)
         self.thumbnail_btn.clicked.connect(self.on_select_thumbnail)
         bottom_layout.addWidget(self.thumbnail_btn)
 
         self.new_project_btn = QPushButton("New Project")
-        self.new_project_btn.setStyleSheet("""color: black;""")
+        self.new_project_btn.setStyleSheet(styles.BUTTON_STYLE)
         self.new_project_btn.setToolTip("Create a new custom project in this log")
         self.new_project_btn.clicked.connect(self.on_new_project)
         bottom_layout.addWidget(self.new_project_btn)
@@ -254,7 +229,6 @@ class LogDetailsPage(QWidget):
         self.stack.addWidget(self.projects_widget)
 
         self.project_files_page = ProjectFilesPage()
-
         self.stack.addWidget(self.project_files_page)
 
     def set_log_path(self, log_path: Path):
@@ -296,12 +270,24 @@ class LogDetailsPage(QWidget):
 
                 self.table.setItem(idx, 1, QTableWidgetItem(pid))
 
+                self._insert_view_files_button(idx, pid)
                 self._insert_fav_button(idx, pid)
 
         except Exception as e:
             print(f"Error loading CSV: {e}")
 
         self.thumbnail_btn.setEnabled(False)
+
+    def _insert_view_files_button(self, row: int, project_id: str):
+        # Create a View Files button for a table row.
+        btn = QPushButton("View Files")
+        btn.setStyleSheet(styles.BUTTON_STYLE)
+        btn.setMinimumWidth(90)
+        btn.setToolTip(f"View files for '{project_id}'")
+        btn.clicked.connect(
+            lambda checked, r=row: self.on_double_clicked(r, 0)
+        )
+        self.table.setCellWidget(row, 2, btn)
 
     def _fav_button_style(self, is_fav: bool) -> str:
         if is_fav:
@@ -339,7 +325,7 @@ class LogDetailsPage(QWidget):
         btn.clicked.connect(
             lambda checked, pid=project_id, b=btn: self._on_toggle_favourite(pid, b)
         )
-        self.table.setCellWidget(row, 2, btn)
+        self.table.setCellWidget(row, 3, btn)
 
     def _on_toggle_favourite(self, project_id: str, btn: QPushButton):
         # Toggle the favourite state and update the button appearance.
@@ -425,6 +411,7 @@ class LogDetailsPage(QWidget):
         thumb_item.setIcon(QIcon(empty_thumbnail(thumbnail_size)))
         self.table.setItem(row_idx, 0, thumb_item)
         self.table.setItem(row_idx, 1, QTableWidgetItem(new_id))
+        self._insert_view_files_button(row_idx, new_id)
         self._insert_fav_button(row_idx, new_id)
 
         self._project_ids.append(new_id)

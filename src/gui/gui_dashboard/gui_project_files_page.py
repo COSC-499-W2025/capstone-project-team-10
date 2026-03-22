@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt, pyqtSignal
 from pathlib import Path
 from src.fas.fas import FileAnalysis
 import src.log.log as log
+import src.gui.gui_utils.gui_styles as styles
 from src.gui.gui_dashboard.gui_add_file_dialouge import AddFileDialog
 
 
@@ -13,18 +14,9 @@ def styled_msgbox(parent, title: str, text: str, icon=QMessageBox.Information) -
     msg.setWindowTitle(title)
     msg.setText(text)
     msg.setIcon(icon)
-    msg.setStyleSheet("""
-        QLabel { color: black; font-weight: normal; }
-        QPushButton {
-            background-color: #002145;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        QPushButton:hover { background-color: #003366; }
-    """)
+    msg.setStyleSheet("QLabel { color: black; font-weight: normal; }")
+    for button in msg.buttons():
+        button.setStyleSheet(styles.BUTTON_STYLE)
     return msg
 
 
@@ -52,17 +44,7 @@ class ProjectFilesPage(QWidget):
 
         # Back Button
         back_btn = QPushButton("← Back")
-        back_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #002145;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 4px;
-                font-size: 14px;
-            }
-            QPushButton:hover { background-color: #003366; }
-        """)
+        back_btn.setStyleSheet(styles.BUTTON_STYLE)
         back_btn.clicked.connect(self.back_clicked.emit)
         header_layout.addWidget(back_btn)
 
@@ -72,28 +54,15 @@ class ProjectFilesPage(QWidget):
         header_layout.addWidget(self.title_label)
         header_layout.addStretch()
 
-        btn_style = """
-            QPushButton {
-                background-color: #002145;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 4px;
-                font-size: 13px;
-            }
-            QPushButton:hover { background-color: #003366; }
-            QPushButton:disabled { background-color: #aaa; }
-        """
-
         # Add file button
         self.add_btn = QPushButton("＋ Add File")
-        self.add_btn.setStyleSheet(btn_style)
+        self.add_btn.setStyleSheet(styles.BUTTON_STYLE)
         self.add_btn.clicked.connect(self.on_file_add)
         header_layout.addWidget(self.add_btn)
 
         # Remove file button
         self.remove_btn = QPushButton("✕ Remove File")
-        self.remove_btn.setStyleSheet(btn_style)
+        self.remove_btn.setStyleSheet(styles.BUTTON_STYLE)
         self.remove_btn.setEnabled(False)   # Enabled only when a row is selected
         self.remove_btn.clicked.connect(self.on_file_remove)
         header_layout.addWidget(self.remove_btn)
@@ -168,17 +137,6 @@ class ProjectFilesPage(QWidget):
 
         rows_to_remove = sorted([index.row() for index in selected_rows], reverse=True)
 
-        btn_style = """
-            QPushButton {
-                background-color: #002145;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 4px;
-                font-size: 14px;
-            }
-            QPushButton:hover { background-color: #003366; }
-        """
         msg = QMessageBox(self)
         msg.setWindowTitle("Remove File")
         msg.setText(f"Remove {len(selected_rows)} file from project '{self._current_project_id}'?")
@@ -186,7 +144,7 @@ class ProjectFilesPage(QWidget):
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msg.setDefaultButton(QMessageBox.No)
         for button in msg.buttons():
-            button.setStyleSheet(btn_style)
+            button.setStyleSheet(styles.BUTTON_STYLE)
         confirm = msg.exec_()
         if confirm != QMessageBox.Yes:
             return
