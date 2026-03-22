@@ -147,6 +147,7 @@ class AppShell(QWidget):
         self.page_scan.scan_started.connect(self.on_scan_started)
         self.page_scan.scan_finished.connect(self.page_scan_results.on_scan_finished)
         self.page_scan.scan_finished.connect(self.page_resume.refresh_from_scan)
+        self.page_scan.scan_finished.connect(lambda _: self.page_dashboard.refresh_log())
         self.page_scan.scan_output.connect(self.page_scan_results.append_output)
         self.page_scan_results.back_to_scan.connect(self.return_to_scan)
         self.page_scan.scan_finished.connect(

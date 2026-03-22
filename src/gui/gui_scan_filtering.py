@@ -13,6 +13,7 @@ class FilterDialog(QtWidgets.QDialog):
         self.file_types = set()
         self.time_lower_bound = None
         self.time_upper_bound = None
+        self.clean_log = False
         
         layout = QtWidgets.QVBoxLayout(self)
         layout.setSpacing(15)
@@ -90,7 +91,11 @@ class FilterDialog(QtWidgets.QDialog):
         
         filetype_group.setLayout(filetype_layout)
         layout.addWidget(filetype_group)
-        
+
+        # New log checkbox
+        self.clean_checkbox = QtWidgets.QCheckBox("New log")
+        layout.addWidget(self.clean_checkbox)
+
         # Dialog buttons
         button_layout = QtWidgets.QHBoxLayout()
         self.apply_btn = QtWidgets.QPushButton("Apply Filters")
@@ -142,5 +147,6 @@ class FilterDialog(QtWidgets.QDialog):
             'excluded_paths': self.excluded_paths,
             'file_types': self.file_types,
             'time_lower_bound': self.time_lower_bound,
-            'time_upper_bound': self.time_upper_bound
+            'time_upper_bound': self.time_upper_bound,
+            'clean': self.clean_checkbox.isChecked()
         }
