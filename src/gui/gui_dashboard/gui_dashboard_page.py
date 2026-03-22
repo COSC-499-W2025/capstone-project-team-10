@@ -113,9 +113,9 @@ class DashboardPage(QWidget):
         header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(3, QHeaderView.Fixed)
         self.table.setColumnWidth(3, 140)
-        
-        header.setSectionResizeMode(3, QHeaderView.Fixed)
-        self.table.setColumnWidth(3, 90)
+        header.setSectionResizeMode(4, QHeaderView.Fixed)
+        self.table.setColumnWidth(4, 100)
+
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
         self.table.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -187,13 +187,10 @@ class DashboardPage(QWidget):
             self.table.setCellWidget(idx, 3, btn)
 
             delete_btn = QPushButton("Delete")
-            delete_btn.setStyleSheet(styles.BUTTON_STYLE)
+            delete_btn.setStyleSheet(styles.DANGER_BUTTON_STYLE)
+            delete_btn.setMinimumWidth(80)
             delete_btn.clicked.connect(lambda _, p=log_info['path']: self.delete_log(p))
-            btn_container = QWidget()
-            btn_layout = QHBoxLayout(btn_container)
-            btn_layout.setContentsMargins(6, 4, 6, 4)
-            btn_layout.addWidget(delete_btn)
-            self.table.setCellWidget(idx, 4, btn_container)
+            self.table.setCellWidget(idx, 4, delete_btn)
     
     def delete_log(self, log_path):
         reply = QMessageBox.question(

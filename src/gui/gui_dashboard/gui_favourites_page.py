@@ -142,17 +142,7 @@ class FavouritesPage(QWidget):
 
             # Col 4 – remove button (inline widget)
             remove_btn = QPushButton("Remove")
-            remove_btn.setStyleSheet("""
-                QPushButton {
-                    background-color: #c0392b;
-                    color: white;
-                    border: none;
-                    padding: 6px 14px;
-                    border-radius: 4px;
-                    font-size: 13px;
-                }
-                    QPushButton:hover { background-color: #e74c3c; }
-            """)
+            remove_btn.setStyleSheet(styles.DANGER_BUTTON_STYLE)
             remove_btn.clicked.connect(
                 lambda checked, pid=project_id, lp=log_path: self._on_remove(pid, lp)
             )
