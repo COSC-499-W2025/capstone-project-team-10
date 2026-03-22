@@ -146,6 +146,22 @@ class ResumePage(QWidget):
 
         self.refresh_project_list()
 
+    def showEvent(self, event):
+        """Refresh from latest log each time this page is shown."""
+        super().showEvent(event)
+
+        selected_project_id = self.current_project_id
+        self.manager.load_log()
+        self.log_path_label.setText(str(self.manager.log_file))
+        self.refresh_project_list()
+
+        if selected_project_id:
+            for i in range(self.project_list.count()):
+                item = self.project_list.item(i)
+                if item.data(Qt.UserRole) == selected_project_id:
+                    self.project_list.setCurrentItem(item)
+                    break
+
     # ---------------- LOG ----------------
     def choose_log_file(self):
         file_path, _ = QFileDialog.getOpenFileName(
