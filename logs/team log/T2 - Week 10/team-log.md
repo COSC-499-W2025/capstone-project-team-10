@@ -1,4 +1,4 @@
-## Sprint for 2026/03/02 - 2026/03/08
+## Sprint for 2026/03/09 - 2026/03/015
 
 ### Milestone goals
 - https://github.com/COSC-499-W2025/capstone-project-team-10/issues/265 Peer Testing 2
