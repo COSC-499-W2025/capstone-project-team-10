@@ -197,8 +197,7 @@ class TestFas:
         newfolder = tmp_path / "some-folder"
         newfolder.mkdir()
         file_path = str(newfolder / "somefile.txt")
-        with patch("src.fas.fas.param") as mock_param, \
-             patch("src.fas.fas.find_git_repo_id", return_value=None):
+        with patch("src.fas.fas.param") as mock_param, patch("src.fas.fas.find_git_repo_id", return_value=None):
             mock_param.get.return_value = "single-project-name"
             result = fas.determine_project_id(file_path, "txt", None)
         assert result == "single-project-name"
@@ -207,8 +206,7 @@ class TestFas:
         isolated = tmp_path / "my-project-folder"
         isolated.mkdir()
         file_path = str(isolated / "somefile.txt")
-        with patch("src.fas.fas.param") as mock_param, \
-             patch("src.fas.fas.find_git_repo_id", return_value=None):
+        with patch("src.fas.fas.param") as mock_param, patch("src.fas.fas.find_git_repo_id", return_value=None):
             mock_param.get.return_value = None
             result = fas.determine_project_id(file_path, "txt", None)
         assert result == "my-project-folder"
