@@ -20,6 +20,8 @@
 - https://github.com/COSC-499-W2025/capstone-project-team-10/issues/292
 - https://github.com/COSC-499-W2025/capstone-project-team-10/issues/274
 - https://github.com/COSC-499-W2025/capstone-project-team-10/issues/267
+- https://github.com/COSC-499-W2025/capstone-project-team-10/issues/294
+
 
 ## In progress
 - https://github.com/COSC-499-W2025/capstone-project-team-10/issues/286
