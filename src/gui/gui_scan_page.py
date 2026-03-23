@@ -16,6 +16,7 @@ class ScanPage(QtWidgets.QWidget):
         self.scan_manager = ScanManager()
         self.selected_directory = None
         self.current_filters = None
+        self.scan_mode = None
 
         self.scan_manager.scan_finished.connect(self._on_scan_finished)
         self.scan_manager.scan_failed.connect(self._on_scan_failed)
@@ -73,11 +74,26 @@ class ScanPage(QtWidgets.QWidget):
         self.layout.addWidget(self.filter_summary)
 
     def browse_files(self):
-        # QFileDialog can't reliably "click-select" a directory when it's configured
-        # for file selection. Use the dedicated directory picker for folders.
+        # Check whether user wants to scan multiple projects in a folder or a single project
+        folder_check = QtWidgets.QMessageBox(self)
+        folder_check.setWindowTitle("Select Input")
+        folder_check.setText("What type of folder would you like to scan?")
+        single_btn = folder_check.addButton("Single Project", QtWidgets.QMessageBox.ActionRole)
+        multi_btn = folder_check.addButton("Projects Folder", QtWidgets.QMessageBox.ActionRole)
+        folder_check.addButton(QtWidgets.QMessageBox.Cancel)
+        folder_check.exec_()
+
+        if folder_check.clickedButton() is single_btn:
+            self.scan_mode = "single"
+        elif folder_check.clickedButton() is multi_btn:
+            self.scan_mode = "multi"
+        else:
+            return
+
+        # Check whether user wants to scan zip or regular folder
         chooser = QtWidgets.QMessageBox(self)
         chooser.setWindowTitle("Select Input")
-        chooser.setText("What would you like to scan?")
+        chooser.setText("Are you scanning a folder or zip file?")
         folder_btn = chooser.addButton("Folder", QtWidgets.QMessageBox.ActionRole)
         zip_btn = chooser.addButton("Zip file (.zip)", QtWidgets.QMessageBox.ActionRole)
         chooser.addButton(QtWidgets.QMessageBox.Cancel)
@@ -128,8 +144,9 @@ class ScanPage(QtWidgets.QWidget):
             )
             return
 
+        scan_filters = {**self.current_filters, 'single_project': self.scan_mode == 'single'}
         started = self.scan_manager.scan_async(
-            directory_path=self.selected_directory, filters=self.current_filters
+            directory_path=self.selected_directory, filters=scan_filters
         )
         if not started:
             QtWidgets.QMessageBox.information(

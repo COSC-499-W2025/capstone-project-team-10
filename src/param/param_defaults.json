@@ -9,7 +9,8 @@
         "supported_file_types": [],
         "excluded_file_types": [],
         "excluded_file_paths": [],
-        "github_username": ""
+        "github_username": "",
+        "single_project": null
     },
     "logging": {
         "log_max_count": 10,
