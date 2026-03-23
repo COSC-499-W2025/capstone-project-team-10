@@ -1,3 +1,46 @@
+# Term 2 Week 11 (03/15/2026 - 03/22/2026):
+
+## Completed tasks
+
+All in review features will be merged by the end of the week
+
+![Term 2 Week 11 Tasks completed](T2W11/image.png)
+
+## Features
+
+![Term 2 Week 11 Inprogress](T2W11/image-1.png)
+
+## Recap
+
+### PRs:
+
+#### UI Changes following Peer-testing
+
+Changed the UI to be more responsive and consistently coloured
+
+PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/275
+
+#### Summary
+
+This week I focused on making the profile part of our application more user friendly for configuring their personal information and experience for usage in the Resume and portfolio generation
+
+## Additional Context
+
+N/A
+
+### What went well:
+
+I think everything went well, the new page looks very clean and contains a lot of room for customizable information
+
+### What didnt go well:
+
+No major problems on my end
+
+### For Next Week:
+
+for next week I will be helping with the Milestone 3 Video demo and doing readme updates to comply with milestone 3. 
+
+
 # Term 2 Week 10 (03/08/2026 - 03/15/2026):
 
 ## Completed tasks
