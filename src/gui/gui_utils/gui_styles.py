@@ -20,7 +20,7 @@ BUTTON_STYLE = f"""
         background-color: {HEADER_BG_COLOR};
         color: white;
         font-weight: bold;
-        padding: 6px 12px;
+        padding: 4px 8px;
     }}
     QPushButton:hover {{
         background-color: {SIDEBAR_ITEM_HOVER_BG};
