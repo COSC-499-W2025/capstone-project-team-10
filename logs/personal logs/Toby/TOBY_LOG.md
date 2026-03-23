@@ -1,3 +1,30 @@
+# T2 - Week 11 (3/16/2026 - 3/22/2026)
+
+![T2 - Week 11 - Task Completed](T2-W11/Done.png)
+
+## Features
+
+![T2 - Week 11 - In Progress](T2-W11/Features.png)
+
+## Recap
+
+- For term 2 week 11, I focused on improving the portfolio and resume pages:
+  - Updated portfolio/resume pages to refresh automatically when clicked
+  - Improved page color clarity for better readability and UI consistency
+  - Enhanced heatmap logic to use PR date of code when available for more accurate tracking
+
++ **Things that went well:** UI responsiveness improved noticeably; heatmap data is more meaningful and accurate  
+- **Things that did not go well:** Some UI refinements still need fine-tuning; small visual inconsistencies remain  
+- **Plans for next week:** Continue polishing UI/UX, refine heatmap visualization further, and add more customization options to the portfolio/resume pages  
+
+## Additional Context
+
+## Team Survey:
+
+![Term 2 Week 11 - Team Survey](T2-W11/Team_Survey_1.png)  
+![Term 2 Week 11 - Team Survey](T2-W11/Team_Survey_2.png)  
+![Term 2 Week 11 - Team Survey](T2-W11/Team_Survey_3.png)
+
 # T2 - Week 10 (3/09/2026 - 3/15/2026)
 
 ![T2 - Week 10 - Task Completed](T2-W10/Done.png)
