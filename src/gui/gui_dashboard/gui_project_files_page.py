@@ -100,7 +100,7 @@ class ProjectFilesPage(QWidget):
                 color: black;
             }
             QTableWidget::item:selected {
-                background-color: #002145;
+                background-color: #B1B2B5;
                 color: white;
             }
         """)

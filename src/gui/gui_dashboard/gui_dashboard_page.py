@@ -100,7 +100,7 @@ class DashboardPage(QWidget):
                 color: black;
             }
             QTableWidget::item:selected {
-                background-color: #002145;
+                background-color: #B1B2B5;
                 color: white;
             }
         """)
@@ -157,7 +157,7 @@ class DashboardPage(QWidget):
                 return f"{size_bytes:.1f} {unit}"
             size_bytes /= 1024.0
         return f"{size_bytes:.1f} TB"
-    
+    5
     def update_table(self):
         if self.table is None:
             return
