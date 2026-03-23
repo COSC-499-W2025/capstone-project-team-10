@@ -1,26 +1,24 @@
-# Week 22 (3/9/2026 = 3/15/2026) ** TERM 2 Week 10 **
-
-![Week 18/19 Tasks](Week21/Week21Tasks.png)
+# Week 22 (3/16/2026 = 3/22/2026) ** TERM 2 Week 11 **
 
 ## Features
 
-![Week 20 Tasks](Week21/Week21KanBan.png)
+![Week 22 Tasks](Week22/Week22KanBan1.png)
+
+## Recap
+Filled out the team log for this week. Also added option in scan page for user to specify if the folder being scanned is a project or a folder containing multiple projects. Using this I changed the project detection method to properly display projects for the different types of folders. 
+
+# Week 21 (3/9/2026 = 3/15/2026) ** TERM 2 Week 10 **
+
+![Week 21 Tasks](Week21/Week21Tasks.png)
+
+## Features
+
+![Week 21 Tasks](Week21/Week21KanBan.png)
 
 ## Recap
 Collaborated with Abdalla on the peer testing document. Fixed many of the bugs found in the code included bugs causing the app to crash. Added a filter to scans to use a new log instead of the same log everytime. Added a delete button to logs so users can remove logs. Next week I want to continue bug fixing and adding new features. Specifically finding bugs that are not errors but are incorrect behaviours.
 
-# Week 20 (1/26/2026 = 2/8/2026) ** TERM 2 Week 6 **
-
-## Features
-
-![Week 20 Tasks](Week20/Week20KanBan1.png)
-![Week 20 Tasks](Week20/Week20KanBan2.png)
-
-## Recap
-Fixed a simple bug in fss that miscounted the number of files scanned during a search. Added thumbnail setting functionality to the gui for projects.
-
-
-# Week 21 (3/2/2026 = 3/8/2026) ** TERM 2 Week 9 **
+# Week 21 (2/23/2026 = 3/8/2026) ** TERM 2 Week 9 **
 
 ## Features
 Team Log
@@ -28,7 +26,7 @@ Team Log
 ## Recap
 This week I filled out the team log. I also looked into and identified areas of the project that can be polished such as the gui pages. Next week I want to work on removing useless or old code as well as updating comments and documentation.
 
-# Week 20 (1/26/2026 = 2/8/2026) ** TERM 2 Week 6 **
+# Week 20 (2/16/2026 = 2/22/2026) ** TERM 2 Week 6 **
 
 ## Features
 
@@ -38,7 +36,7 @@ This week I filled out the team log. I also looked into and identified areas of 
 ## Recap
 Fixed a simple bug in fss that miscounted the number of files scanned during a search. Added thumbnail setting functionality to the gui for projects.
 
-# Week 18/19 (1/26/2026 = 2/8/2026) ** TERM 2 Week 4/5 **
+# Week 18/19 (1/26/2026 = 2/15/2026) ** TERM 2 Week 4/5 **
 
 ![Week 18/19 Tasks](Week18&19/Week18&19Tasks.png)
 

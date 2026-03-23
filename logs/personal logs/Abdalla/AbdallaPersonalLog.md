@@ -145,3 +145,15 @@ https://github.com/COSC-499-W2025/capstone-project-team-10/pull/260
 
 ### Recap
 Me and Brett worked on making preparations for peer testing, in doing so I've identified some files which can use some modification that will be done this week. We prepared the peer testing document with all the instructions along with a questionaire and test files. In the coming week I will work on implementing what is left for milestone 3 along with fixing said issues that I identified.
+
+# Week 11 (3/16/2026 - 3/22/2026)
+
+### Tasks
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/290
+
+### Reviews
+https://github.com/COSC-499-W2025/capstone-project-team-10/pull/287#pullrequestreview-3990107979  
+
+
+### Recap
+Did some touchup and polish on the GUI and made preparations for the milestone 3 presentation. Next week we will make the finishing touches before submitting the project.
