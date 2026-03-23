@@ -31,7 +31,7 @@ class ScanPage(QWidget):
         # Scan hidden files
         self.hidden_files = QCheckBox("Off")
         self.hidden_files.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.hidden_files.setStyleSheet(styles.CHECK_BOX_STYLES + """
+        self.hidden_files.setStyleSheet("""
             QCheckBox {
                 background-color: transparent;
                 spacing: 5px
