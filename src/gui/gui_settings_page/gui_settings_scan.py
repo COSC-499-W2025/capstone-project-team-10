@@ -34,11 +34,7 @@ class ScanPage(QWidget):
         self.hidden_files.setStyleSheet(styles.CHECK_BOX_STYLES + """
             QCheckBox {
                 background-color: transparent;
-                spacing: 6px
-            }
-            QCheckBox::indicator {
-                width: 14px;  /* Shrinks the box width */
-                height: 14px; /* Shrinks the box height */
+                spacing: 5px
             }
         """)
         if str(param.get("scan.scan_hidden_files")).strip().lower() in (
