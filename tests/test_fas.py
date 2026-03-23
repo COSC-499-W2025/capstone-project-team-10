@@ -192,3 +192,23 @@ class TestFas:
     def test_compute_file_hash_fake_file(self):
         hash = fas.compute_file_hash("fake/fakefilepath.txt")
         assert hash == None
+
+    def test_determine_project_id_single_project(self, tmp_path):
+        newfolder = tmp_path / "some-folder"
+        newfolder.mkdir()
+        file_path = str(newfolder / "somefile.txt")
+        with patch("src.fas.fas.param") as mock_param, \
+             patch("src.fas.fas.find_git_repo_id", return_value=None):
+            mock_param.get.return_value = "single-project-name"
+            result = fas.determine_project_id(file_path, "txt", None)
+        assert result == "single-project-name"
+
+    def test_determine_project_id_multi_project(self, tmp_path):
+        isolated = tmp_path / "my-project-folder"
+        isolated.mkdir()
+        file_path = str(isolated / "somefile.txt")
+        with patch("src.fas.fas.param") as mock_param, \
+             patch("src.fas.fas.find_git_repo_id", return_value=None):
+            mock_param.get.return_value = None
+            result = fas.determine_project_id(file_path, "txt", None)
+        assert result == "my-project-folder"
