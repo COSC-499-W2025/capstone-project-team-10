@@ -2,9 +2,9 @@ from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QPushButton,
     QHBoxLayout, QMessageBox
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtGui import QDesktopServices
 from datetime import datetime
-import subprocess
 from pathlib import Path
 from .gui_items_manager import GuiItemsManager
 
@@ -180,13 +180,16 @@ class ItemsPage(QWidget):
         return Path(str(raw_log_path)).name
 
     def _open_file_in_explorer(self, file_path: Path, title: str) -> None:
-        """Open Windows Explorer selecting the target file."""
+        """Open the file location in the platform file manager."""
         if not file_path.exists():
             QMessageBox.critical(self, "File Not Found", f"File not found:\n{file_path}")
             return
 
         try:
-            subprocess.Popen(f'explorer /select,"{file_path}"')
+            folder_path = file_path.resolve().parent
+            opened = QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder_path)))
+            if not opened:
+                raise RuntimeError(f"Could not open folder: {folder_path}")
         except Exception as e:
             QMessageBox.critical(self, title, f"Failed to open file location:\n{str(e)}")
 
