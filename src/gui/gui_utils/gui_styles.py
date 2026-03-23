@@ -10,6 +10,9 @@ SIDEBAR_ITEM_HOVER_BG = "rgba(97, 98, 100, 120)"
 SIDEBAR_TEXT_COLOR = "#000000"
 SIDEBAR_SELECTED_TEXT_COLOR = "#FFFFFF"
 
+DANGER_BG_COLOR = "#c02b2b"
+DANGER_ITEM_HOVER_BG = "#8A5050"
+
 
 BUTTON_STYLE = f"""
     QPushButton {{
@@ -21,6 +24,23 @@ BUTTON_STYLE = f"""
     }}
     QPushButton:hover {{
         background-color: {SIDEBAR_ITEM_HOVER_BG};
+    }}
+    QPushButton:pressed {{
+        background-color: {SIDEBAR_SELECTED_TEXT_COLOR}
+        color: {SIDEBAR_TEXT_COLOR}
+    }}
+"""
+
+DANGER_BUTTON_STYLE = f"""
+    QPushButton {{
+        border-radius: 4px;
+        background-color: {DANGER_BG_COLOR};
+        color: white;
+        font-weight: bold;
+        padding: 6px 12px;
+    }}
+    QPushButton:hover {{
+        background-color: {DANGER_ITEM_HOVER_BG};
     }}
     QPushButton:pressed {{
         background-color: {SIDEBAR_SELECTED_TEXT_COLOR}

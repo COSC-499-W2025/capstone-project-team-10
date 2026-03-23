@@ -5,7 +5,8 @@ from PyQt5.QtCore import Qt, pyqtSignal, QObject
 from pathlib import Path
 from datetime import datetime
 import src.log.log as log
-from src.gui.gui_utils.gui_styles import BUTTON_STYLE
+import src.gui.gui_utils.gui_styles as styles
+
 
 class DashboardPage(QWidget):
     log_clicked = pyqtSignal(object)
@@ -73,8 +74,8 @@ class DashboardPage(QWidget):
         recent_layout.setContentsMargins(20, 20, 20, 20)
         
         self.table = QTableWidget()
-        self.table.setColumnCount(4)
-        self.table.setHorizontalHeaderLabels(["ID", "Size", "Date Created", ""])
+        self.table.setColumnCount(5)
+        self.table.setHorizontalHeaderLabels(["ID", "Size", "Date Created", "", ""])
         
         self.table.cellDoubleClicked.connect(self.on_cell_clicked)
         
@@ -110,12 +111,15 @@ class DashboardPage(QWidget):
         header.setSectionResizeMode(0, QHeaderView.Stretch)
         header.setSectionResizeMode(1, QHeaderView.ResizeToContents)
         header.setSectionResizeMode(2, QHeaderView.ResizeToContents)
-        
         header.setSectionResizeMode(3, QHeaderView.Fixed)
-        self.table.setColumnWidth(3, 90)
+        self.table.setColumnWidth(3, 140)
+        header.setSectionResizeMode(4, QHeaderView.Fixed)
+        self.table.setColumnWidth(4, 100)
+
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
-
+        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        
         recent_layout.addWidget(self.table)
         
         bottom_label = QLabel(f"All logs are located at {self.log_dir}")
@@ -168,18 +172,25 @@ class DashboardPage(QWidget):
         
         for idx, (file_name, log_info) in enumerate(sorted_logs):
             self.table.insertRow(idx)
+            self.table.setRowHeight(idx, 48)
             self.table.setItem(idx, 0, QTableWidgetItem(log_info['name']))
             self.table.setItem(idx, 1, QTableWidgetItem(log_info['size']))
             self.table.setItem(idx, 2, QTableWidgetItem(log_info['created']))
 
+            btn = QPushButton("View Projects")
+            btn.setStyleSheet(styles.BUTTON_STYLE)
+            btn.setMinimumWidth(130)
+            btn.setToolTip(f"View projects in '{log_info['name']}'")
+            btn.clicked.connect(
+                lambda checked, path=log_info['path']: self.log_clicked.emit(path)
+            )
+            self.table.setCellWidget(idx, 3, btn)
+
             delete_btn = QPushButton("Delete")
-            delete_btn.setStyleSheet(BUTTON_STYLE)
+            delete_btn.setStyleSheet(styles.DANGER_BUTTON_STYLE)
+            delete_btn.setMinimumWidth(80)
             delete_btn.clicked.connect(lambda _, p=log_info['path']: self.delete_log(p))
-            btn_container = QWidget()
-            btn_layout = QHBoxLayout(btn_container)
-            btn_layout.setContentsMargins(6, 4, 6, 4)
-            btn_layout.addWidget(delete_btn)
-            self.table.setCellWidget(idx, 3, btn_container)
+            self.table.setCellWidget(idx, 4, delete_btn)
     
     def delete_log(self, log_path):
         reply = QMessageBox.question(

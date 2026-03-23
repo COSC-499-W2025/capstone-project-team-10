@@ -10,19 +10,9 @@ from PyQt5.QtGui import QIcon, QPixmap
 
 import src.gui.gui_dashboard.gui_favourites_helper as fav_store
 import utils.project_thumbnails as pt
+import src.gui.gui_utils.gui_styles as styles
 
 _THUMBNAIL_SIZE = 48          # smaller than the LogDetailsPage thumbnails
-_DANGER_BTN_STYLE = """
-    QPushButton {
-        background-color: #c0392b;
-        color: white;
-        border: none;
-        padding: 6px 14px;
-        border-radius: 4px;
-        font-size: 13px;
-    }
-    QPushButton:hover { background-color: #e74c3c; }
-"""
 
 
 def _make_thumbnail(project_id: str, size: int = _THUMBNAIL_SIZE) -> QPixmap:
@@ -64,16 +54,18 @@ class FavouritesPage(QWidget):
 
         # table
         self.table = QTableWidget()
-        self.table.setColumnCount(4)
-        self.table.setHorizontalHeaderLabels(["", "Project ID", "Log File", ""])
+        self.table.setColumnCount(5)
+        self.table.setHorizontalHeaderLabels(["", "Project ID", "Log File", "", ""])
 
         hdr = self.table.horizontalHeader()
         hdr.setSectionResizeMode(0, QHeaderView.Fixed)
         self.table.setColumnWidth(0, _THUMBNAIL_SIZE + 8)
         hdr.setSectionResizeMode(1, QHeaderView.Stretch)
         hdr.setSectionResizeMode(2, QHeaderView.ResizeToContents)
-        hdr.setSectionResizeMode(3, QHeaderView.Fixed)
-        self.table.setColumnWidth(3, 100)
+        hdr.setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        hdr.setMinimumSectionSize(100)
+        hdr.setSectionResizeMode(4, QHeaderView.Fixed)
+        self.table.setColumnWidth(4, 100)
 
         self.table.verticalHeader().setVisible(False)
         self.table.setSelectionBehavior(QTableWidget.SelectRows)
@@ -139,14 +131,22 @@ class FavouritesPage(QWidget):
             # Col 2 – log file name
             self.table.setItem(idx, 2, QTableWidgetItem(log_name))
 
-            # Col 3 – remove button (inline widget)
-            remove_btn = QPushButton("Remove")
-            remove_btn.setStyleSheet(_DANGER_BTN_STYLE)
+            # Col 3 – view files button
+            view_btn = QPushButton("View Files")
+            view_btn.setStyleSheet(styles.BUTTON_STYLE)
+            view_btn.setMinimumWidth(90)
+            view_btn.clicked.connect(
+                lambda checked, pid=project_id, lp=log_path: self._on_view_files(pid, lp)
+            )
+            self.table.setCellWidget(idx, 3, view_btn)
 
+            # Col 4 – remove button (inline widget)
+            remove_btn = QPushButton("Remove")
+            remove_btn.setStyleSheet(styles.DANGER_BUTTON_STYLE)
             remove_btn.clicked.connect(
                 lambda checked, pid=project_id, lp=log_path: self._on_remove(pid, lp)
             )
-            self.table.setCellWidget(idx, 3, remove_btn)
+            self.table.setCellWidget(idx, 4, remove_btn)
 
     def _on_row_double_clicked(self, row: int, _col: int):
         pid_item = self.table.item(row, 1)
@@ -154,6 +154,17 @@ class FavouritesPage(QWidget):
             return
         project_id = pid_item.text()
         log_path: Path = pid_item.data(Qt.UserRole)
+        if log_path and log_path.exists():
+            self.project_clicked.emit(project_id, log_path)
+        else:
+            QMessageBox.warning(
+                self,
+                "Log Not Found",
+                f"The log file for project '{project_id}' could not be found:\n{log_path}",
+            )
+
+    def _on_view_files(self, project_id: str, log_path: Path):
+        # Reuse the same logic as double-clicking the row.
         if log_path and log_path.exists():
             self.project_clicked.emit(project_id, log_path)
         else:
@@ -171,19 +182,8 @@ class FavouritesPage(QWidget):
         msg.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msg.setDefaultButton(QMessageBox.No)
         msg.setStyleSheet("QLabel { color: black; font-weight: normal; }")
-        btn_style = """
-            QPushButton {
-                background-color: #002145;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 4px;
-                font-size: 14px;
-            }
-            QPushButton:hover { background-color: #003366; }
-        """
         for button in msg.buttons():
-            button.setStyleSheet(btn_style)
+            button.setStyleSheet(styles.BUTTON_STYLE)
         if msg.exec_() == QMessageBox.Yes:
             fav_store.remove_favourite(project_id, log_path)
             self.refresh()
