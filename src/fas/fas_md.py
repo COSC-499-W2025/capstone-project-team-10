@@ -68,6 +68,7 @@ class Markdown:
 
     def get_paragraphs(self):
         # Returns key skills present in the markdown file from the dict
+        import re
         paragraphs_dict = self.analyzer.identify_paragraphs()
 
         if isinstance(paragraphs_dict, dict):
@@ -80,7 +81,16 @@ class Markdown:
                 text = str(text) if text else ''
         else:
             text = str(paragraphs_dict) if paragraphs_dict else ''
-        
+
+        # Strip fenced code blocks (```...```) — C/code tokens break NLTK NLP
+        text = re.sub(r'```[\s\S]*?```', '', text)
+        # Strip inline code (`...`)
+        text = re.sub(r'`[^`]*`', '', text)
+        # Cap text length so NLTK pos_tag/ne_chunk don't OOM on huge READMEs
+        MAX_TEXT = 8000
+        if len(text) > MAX_TEXT:
+            text = text[:MAX_TEXT]
+
         analyzer = TextSummary(text) if text.strip() else None
         if analyzer:
             output = analyzer.generate_text_analysis_data(10, 3)
