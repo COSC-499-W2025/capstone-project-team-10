@@ -125,7 +125,9 @@ class ItemsPage(QWidget):
             full_log_path = item.get("log", "")
             log_file = self.clean_log_file_name(full_log_path)
 
-            self.table.setItem(row, 0, QTableWidgetItem(name))
+            name_item = QTableWidgetItem(name)
+            name_item.setData(Qt.UserRole, item.get("id"))
+            self.table.setItem(row, 0, name_item)
             self.table.setItem(row, 1, QTableWidgetItem(file_type))
 
             location_item = QTableWidgetItem(original_location)
@@ -193,21 +195,75 @@ class ItemsPage(QWidget):
         except Exception as e:
             QMessageBox.critical(self, title, f"Failed to open file location:\n{str(e)}")
 
+    def _delete_entry_by_id(self, item_id) -> bool:
+        items = self.manager.load_items()
+        filtered = [item for item in items if item.get("id") != item_id]
+        if len(filtered) == len(items):
+            return False
+        self.manager.save_items(filtered)
+        return True
+
+    def _prompt_delete_if_both_missing(self, row: int) -> None:
+        name_item = self.table.item(row, 0)
+        item_name = name_item.text() if name_item else "this item"
+        item_id = name_item.data(Qt.UserRole) if name_item else None
+
+        reply = QMessageBox.question(
+            self,
+            "Files Missing",
+            f"Both downloaded/original and backup files are missing for '{item_name}'.\n\n"
+            "Do you want to delete this entry from the list?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if reply != QMessageBox.Yes:
+            return
+
+        if item_id is None:
+            QMessageBox.warning(
+                self,
+                "Delete Failed",
+                "Could not identify the selected entry.",
+            )
+            return
+
+        if self._delete_entry_by_id(item_id):
+            QMessageBox.information(self, "Entry Deleted", f"Deleted '{item_name}' from the list.")
+            self.load_and_validate_items()
+        else:
+            QMessageBox.warning(self, "Delete Failed", f"Could not delete '{item_name}'.")
+
     def visit_selected_backup_file(self):
-        """Open Windows Explorer at the selected backup file location."""
+        """Open the selected backup file location, with original fallback if needed."""
         current_row = self.table.currentRow()
         if current_row < 0:
             QMessageBox.warning(self, "No Selection", "Please select an item to visit.")
             return
 
         location_item = self.table.item(current_row, 2)
-        location = location_item.data(Qt.UserRole + 1) if location_item else ""
-        if not location:
-            QMessageBox.warning(self, "Invalid Path", "Backup file path is empty.")
+        original_path = location_item.data(Qt.UserRole) if location_item else ""
+        backup_path = location_item.data(Qt.UserRole + 1) if location_item else ""
+
+        original_exists = bool(original_path) and Path(original_path).exists()
+        backup_exists = bool(backup_path) and Path(backup_path).exists()
+
+        if backup_exists:
+            self._open_file_in_explorer(Path(backup_path), "Error")
             return
 
-        file_path = Path(location)
-        self._open_file_in_explorer(file_path, "Error")
+        if original_exists:
+            reply = QMessageBox.question(
+                self,
+                "Backup File Missing",
+                "Backup file is missing.\n\nOpen the downloaded/original file instead?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.Yes,
+            )
+            if reply == QMessageBox.Yes:
+                self._open_file_in_explorer(Path(original_path), "Error")
+            return
+
+        self._prompt_delete_if_both_missing(current_row)
 
     def visit_selected_file(self):
         """Visit the original file location, with backup fallback."""
@@ -220,23 +276,29 @@ class ItemsPage(QWidget):
         original_path = location_item.data(Qt.UserRole) if location_item else ""
         backup_path = location_item.data(Qt.UserRole + 1) if location_item else ""
 
-        if original_path and Path(original_path).exists():
+        original_exists = bool(original_path) and Path(original_path).exists()
+        backup_exists = bool(backup_path) and Path(backup_path).exists()
+
+        if original_exists:
             self._open_file_in_explorer(Path(original_path), "Error")
             return
 
-        if backup_path and Path(backup_path).exists():
-            QMessageBox.information(
+        if backup_exists:
+            reply = QMessageBox.question(
                 self,
-                "Original Not Found",
-                "Original file no longer exists. Opening backup file instead.",
+                "Downloaded File Missing",
+                "Downloaded/original file is missing.\n\nOpen backup file instead?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.Yes,
             )
-            self._open_file_in_explorer(Path(backup_path), "Error")
+            if reply == QMessageBox.Yes:
+                self._open_file_in_explorer(Path(backup_path), "Error")
             return
 
-        QMessageBox.critical(self, "File Not Found", "Neither original nor backup file exists.")
+        self._prompt_delete_if_both_missing(current_row)
 
     def visit_selected_log_file(self):
-        """Open Windows Explorer at the selected log file location."""
+        """Open the selected log file location."""
         current_row = self.table.currentRow()
         if current_row < 0:
             QMessageBox.warning(self, "No Selection", "Please select an item to visit.")
