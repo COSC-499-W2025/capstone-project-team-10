@@ -113,16 +113,25 @@ def search(search_params: FSS_Search):
                     search_params.excluded_path.add(file_analysis.file_path)
 
     if os.path.isfile(search_params.input_path):
-        if not search_params.excluded_path:
-            # TODO add in FAS and return value, pass in file and set of repo paths for grouping
-            # single file with no exclusion
-            return 1
-        elif search_params.input_path not in search_params.excluded_path:
-            # TODO add in FAS and return value, pass in file and set of repo paths for grouping
-            # single file accounting for exclusion
-            return 1
-        else:
+        if search_params.input_path in search_params.excluded_path:
             return 0
+
+        if search_params.file_types and not file_type_check(
+            search_params.input_path, search_params.file_types
+        ):
+            return 0
+
+        if (
+            search_params.time_lower_bound or search_params.time_upper_bound
+        ) and not time_check(
+            [search_params.time_lower_bound, search_params.time_upper_bound],
+            Path(search_params.input_path),
+            "create",
+        ):
+            return 0
+
+        # TODO add in FAS and return value, pass in file and set of repo paths for grouping
+        return 1
     scan_hidden = param.get("scan.scan_hidden_files")
     for root, dirs, files in os.walk(search_params.input_path, topdown=True):
         root_abs = os.path.abspath(root)

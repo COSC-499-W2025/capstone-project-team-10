@@ -69,7 +69,7 @@ class FilterDialog(QtWidgets.QDialog):
         layout.addWidget(exclude_group)
         
         # File types section
-        filetype_group = QtWidgets.QGroupBox("File Types")
+        filetype_group = QtWidgets.QGroupBox("File Types to Scan (leave blank to accept all types)")
         filetype_layout = QtWidgets.QVBoxLayout()
         
         self.filetype_list = QtWidgets.QListWidget()
@@ -122,13 +122,22 @@ class FilterDialog(QtWidgets.QDialog):
             self.exclude_list.takeItem(self.exclude_list.row(current_item))
     
     def add_file_type(self):
-        file_type = self.filetype_input.text().strip()
-        if file_type:
-            if not file_type.startswith('.'):
-                file_type = '.' + file_type
-            self.file_types.add(file_type)
-            self.filetype_list.addItem(file_type)
+        file_type = self.filetype_input.text().strip().lower()
+        if not file_type:
+            return
+
+        # Normalize to FSS format: extension without leading dot
+        normalized = file_type.lstrip(".")
+        if not normalized:
             self.filetype_input.clear()
+            return
+
+        # Avoid duplicate rows in the list widget
+        if normalized not in self.file_types:
+            self.file_types.add(normalized)
+            self.filetype_list.addItem(normalized)
+
+        self.filetype_input.clear()
     
     def remove_file_type(self):
         current_item = self.filetype_list.currentItem()
