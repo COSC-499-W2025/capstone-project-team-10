@@ -1,3 +1,17 @@
+# Term 2 Week 11 (03/16/2026 - 03/22/2026)
+
+There is no weekly survey this week
+
+# Features
+
+![Term Two Week Eleven Feature](Term2Week11/WeekElevenFeature.png)
+
+# Recap
+
+This week I implemented changes based on feedback from the peer testing that happened earlier in the week, which involved clarifying how to navigate the dashboard and related pages. As testers were having trouble realizing that they could double click to view further details of a log or project. So this added explicit buttons and changed styling to match the new styling standard.
+
+This next week I intend to work on the video demo to pitch our project as well as doing any last minute fixes that need to be made before submission of the project.
+
 # Term 2 Week 10 (03/09/2026 - 03/15/2026)
 
 ![Term Two Week Ten Tasks](Term2Week10/Week10Tasks.png)
