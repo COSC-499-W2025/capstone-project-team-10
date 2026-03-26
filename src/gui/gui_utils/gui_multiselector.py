@@ -38,11 +38,12 @@ class MultiSelector(QWidget):
         """)
 
         self.add_button = QPushButton("+")
-        self.add_button.setFixedWidth(28)
         self.add_button.setToolTip("Add Folder")
         self.add_button.setStyleSheet("""
             QPushButton {
-                margin-left: 4px;
+                padding: 0px;
+                padding-bottom: 2px;
+                margin: 0px;
                 border-radius: 4px;
                 background-color: #4CAF50;
                 font-weight: bold;
@@ -54,11 +55,13 @@ class MultiSelector(QWidget):
         self.add_button.clicked.connect(self.add_item)
 
         self.remove_button = QPushButton("-")
-        self.remove_button.setFixedWidth(28)
         self.remove_button.setToolTip("Remove Item")
         self.remove_button.clicked.connect(self.remove_selected_item)
         self.remove_button.setStyleSheet("""
             QPushButton {
+                padding: 0px;
+                padding-bottom: 2px;
+                margin: 0px;
                 border-radius: 4px;
                 background-color: #e53935;
                 color: white;
@@ -72,9 +75,8 @@ class MultiSelector(QWidget):
         self.add_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.remove_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-        button_height = self.line_edit.sizeHint().height()
-        self.add_button.setFixedHeight(button_height)
-        self.remove_button.setFixedHeight(button_height)
+        self.add_button.setFixedSize(24, 24)
+        self.remove_button.setFixedSize(24, 24)
 
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
