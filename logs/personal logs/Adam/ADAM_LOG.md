@@ -1,3 +1,50 @@
+# Term 2 Week 12 (03/22/2026 - 03/29/2026):
+
+## Completed tasks
+
+All in review features will be merged by the end of the week
+
+![Term 2 Week 12 Tasks completed](T2W12/image.png)
+
+## Features
+
+No features in progress
+
+## Recap
+
+### PRs:
+
+#### Testing and Open Bugs documentation
+
+This pull request significantly expands the documentation in the README.md by adding a comprehensive overview of the project's testing practices, detailed summaries for each test module, and a list of known bugs with their associated costs and issue links. The new content provides clarity on the scope, coverage, and methodology of both automated and manual tests, as well as transparency about current limitations and outstanding issues.
+
+PR: https://github.com/COSC-499-W2025/capstone-project-team-10/pull/296
+
+#### Video Demo
+
+I helped contribute to the video demo for Milestone 3
+
+#### Summary
+
+This week I focused on documentation, updating the readme and filming a part for the Milestone 3 Video Demo
+
+## Additional Context
+
+N/A
+
+### What went well:
+
+I think everything went well, the demo video and documentation look great
+
+### What didnt go well:
+
+No major problems on my end
+
+### For Next Week:
+
+for next week I will be reviewing other teams demos. 
+
+
 # Term 2 Week 11 (03/15/2026 - 03/22/2026):
 
 ## Completed tasks
