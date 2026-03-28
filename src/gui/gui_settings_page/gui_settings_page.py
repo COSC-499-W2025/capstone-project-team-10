@@ -90,7 +90,7 @@ class SettingsPage(QWidget):
                 border: 1px solid #ccc;
                 text-align: left;
                 border-radius: 4px;
-                padding: 6px;
+                padding: 3px 6px;
             }
                 QLineEdit:focus, QTextEdit:focus {
                 border-color: #66afe9;
