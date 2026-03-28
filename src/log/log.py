@@ -1,6 +1,7 @@
 import csv
 import json
 import re
+import sys
 import threading
 import time
 from pathlib import Path
@@ -46,7 +47,7 @@ def resume_log_file() -> None:
     global initialized_log
     current_logs = {}
     current_log_file = ""
-
+    csv.field_size_limit(sys.maxsize)
     # Set to max int value
     newest_log_number: int = -1
     oldest_log_number: int = param.log_max_count + 1
@@ -436,6 +437,7 @@ def find_existing_analysis(file_hash: str) -> Optional[FileAnalysis]:
         except Exception as e:
             print(f"Warning: Could not read log file {log_file}: {e}")
             continue
+
 
 def get_project_entries():
     """
