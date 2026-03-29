@@ -96,6 +96,11 @@ This links the PR to the issue and automatically closes the issue when the PR is
 
 at least two reviewers must leave comments on a PR before merging
 
+
+## Executable 
+
+https://drive.google.com/file/d/1nfOP5ydFjc_UchZCk-IQdJgh-n_Pbg0N/view?usp=sharing for Windows (only Windows for now)
+
 ## Setup
 
 ### WARNING: USE PYTHON 3.12.X OR NEWER
