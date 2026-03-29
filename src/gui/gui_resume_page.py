@@ -9,6 +9,7 @@ from pathlib import Path
 
 from src.gui.gui_skills_page import SkillsPage
 from src.gui.gui_resume_manager import ResumeManager
+from src.gui.gui_utils.gui_styles import BUTTON_STYLE, CHECK_BOX_STYLES
 
 
 class ResumePage(QWidget):
@@ -42,6 +43,7 @@ class ResumePage(QWidget):
 
         self.choose_log_btn = QPushButton("Choose Log...")
         self.choose_log_btn.clicked.connect(self.choose_log_file)
+        self.choose_log_btn.setStyleSheet(BUTTON_STYLE)
 
         log_row.addWidget(self.log_label)
         log_row.addWidget(self.choose_log_btn)
@@ -94,6 +96,7 @@ class ResumePage(QWidget):
         editor_layout.addWidget(self.rank_spinbox)
 
         self.showcase_checkbox = QCheckBox("Include in Showcase")
+        self.showcase_checkbox.setStyleSheet(CHECK_BOX_STYLES)
         editor_layout.addWidget(self.showcase_checkbox)
         # self.showcase_checkbox.stateChanged.connect(
         #     lambda state: self.update_include_flag(self.current_project_id, state)
@@ -117,21 +120,26 @@ class ResumePage(QWidget):
 
         add_agg_btn = QPushButton("+ Add Skill")
         add_agg_btn.clicked.connect(self.add_aggregate_skill)
+        add_agg_btn.setStyleSheet(BUTTON_STYLE)
         editor_layout.addWidget(add_agg_btn)
 
         # ---------------- BUTTONS ----------------
         btn_layout = QHBoxLayout()
         self.skills_page_btn = QPushButton("View Skills")
         self.skills_page_btn.clicked.connect(self.open_skills_page)
+        self.skills_page_btn.setStyleSheet(BUTTON_STYLE)
 
         self.save_btn = QPushButton("Save Changes")
         self.save_btn.clicked.connect(self.save_changes)
+        self.save_btn.setStyleSheet(BUTTON_STYLE)
 
         self.generate_resume_btn = QPushButton("Generate Resume PDF")
         self.generate_resume_btn.clicked.connect(self.generate_resume)
+        self.generate_resume_btn.setStyleSheet(BUTTON_STYLE)
 
         self.generate_portfolio_btn = QPushButton("Generate Portfolio")
         self.generate_portfolio_btn.clicked.connect(self.generate_portfolio)
+        self.generate_portfolio_btn.setStyleSheet(BUTTON_STYLE)
 
         btn_layout.addWidget(self.skills_page_btn)
         btn_layout.addWidget(self.save_btn)
@@ -145,6 +153,22 @@ class ResumePage(QWidget):
         layout.addWidget(editor_widget, 3)
 
         self.refresh_project_list()
+
+    def showEvent(self, event):
+        """Refresh from latest log each time this page is shown."""
+        super().showEvent(event)
+
+        selected_project_id = self.current_project_id
+        self.manager.load_log()
+        self.log_path_label.setText(str(self.manager.log_file))
+        self.refresh_project_list()
+
+        if selected_project_id:
+            for i in range(self.project_list.count()):
+                item = self.project_list.item(i)
+                if item.data(Qt.UserRole) == selected_project_id:
+                    self.project_list.setCurrentItem(item)
+                    break
 
     # ---------------- LOG ----------------
     def choose_log_file(self):
@@ -215,16 +239,12 @@ class ResumePage(QWidget):
         self.name_edit.setText(fa.file_name)
 
         extra = self.manager.get_project_extra_attributes(project_id)
-        # start_date = fa.get("created_time", QDate.currentDate().toString("yyyy-MM-dd"))
-        # end_date = fa.get("last_modified", QDate.currentDate().toString("yyyy-MM-dd"))
-
-        start_date = fa.created_time
-        end_date = fa.last_modified
+        start_date, end_date = self.manager.get_effective_project_dates(project_id)
 
         if not start_date:
             start_date = QDate.currentDate().toString("yyyy-MM-dd")
 
-        if not end_date:
+        if not end_date or end_date == "Current":
             end_date = QDate.currentDate().toString("yyyy-MM-dd")
 
         self.start_date_edit.setDate(QDate.fromString(start_date, "yyyy-MM-dd"))
@@ -262,6 +282,7 @@ class ResumePage(QWidget):
         remove_btn = QPushButton("-")
         remove_btn.setMaximumWidth(30)
         remove_btn.clicked.connect(lambda: self.remove_skill_row(row))
+        remove_btn.setStyleSheet(BUTTON_STYLE)
         row.addWidget(label)
         row.addWidget(remove_btn)
 

@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QLabel, QTableWidget,
 from PyQt5.QtCore import Qt
 import csv
 from pathlib import Path
+import src.gui.gui_utils.gui_styles as styles
 
 
 class AddFileDialog(QDialog):
@@ -63,21 +64,10 @@ class AddFileDialog(QDialog):
         """)
         layout.addWidget(self.table)
 
-        btn_style = """
-            QPushButton {
-                background-color: #002145;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 4px;
-                font-size: 14px;
-            }
-            QPushButton:hover { background-color: #003366; }
-        """
         buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         buttons.button(QDialogButtonBox.Ok).setText("Add Selected")
-        buttons.button(QDialogButtonBox.Ok).setStyleSheet(btn_style)
-        buttons.button(QDialogButtonBox.Cancel).setStyleSheet(btn_style)
+        buttons.button(QDialogButtonBox.Ok).setStyleSheet(styles.BUTTON_STYLE)
+        buttons.button(QDialogButtonBox.Cancel).setStyleSheet(styles.BUTTON_STYLE)
         buttons.accepted.connect(self.on_accept)
         buttons.rejected.connect(self.reject)
         layout.addWidget(buttons)
