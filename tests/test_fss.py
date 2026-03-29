@@ -1,12 +1,18 @@
 from asyncio.tasks import sleep
+import sys
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
+WORKSPACE_ROOT = Path(__file__).resolve().parents[1]
+if str(WORKSPACE_ROOT) not in sys.path:
+    sys.path.insert(0, str(WORKSPACE_ROOT))
+
 import src.fss.fss as fss
 import src.log.log as log
 import src.param.param as param
+import src.fas.fas as fas
 from src.fas.fas import FileAnalysis, compute_file_hash
 
 path_to_test_folder = str(Path("tests/testdata/test_fss/testScanFolder"))
@@ -24,6 +30,10 @@ path_to_test_zip = str(Path("tests/testdata/test_fss_zip/testzip.zip"))
 
 @pytest.fixture(autouse=True, scope="function")
 def setup():
+    # Avoid expensive repo-level git analysis during unit tests.
+    fas.find_git_repo_root = lambda _path: None
+    fas._logged_git_repos.clear()
+    fas._git_repos_in_progress.clear()
     param.init()
     log.open_log_file()
     yield
