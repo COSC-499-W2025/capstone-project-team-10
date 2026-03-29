@@ -1,6 +1,7 @@
 import csv
 import json
 import re
+import sys
 import threading
 import time
 from pathlib import Path
@@ -16,6 +17,21 @@ current_log_file: str = ""
 log_lock = threading.RLock()
 current_projects = set()
 initialized_log = ""
+
+
+def _configure_csv_field_limit() -> None:
+    """Raise CSV field size limit to support large serialized metadata fields."""
+    max_size = sys.maxsize
+    while True:
+        try:
+            csv.field_size_limit(max_size)
+            return
+        except OverflowError:
+            # Reduce until value is accepted by the platform C long.
+            max_size //= 10
+
+
+_configure_csv_field_limit()
 
 
 def initialize_log() -> None:

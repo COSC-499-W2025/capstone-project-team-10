@@ -837,6 +837,26 @@ def generate_portfolio(
             .level-2 { background: #7bc96f; }
             .level-3 { background: #239a3b; }
             .level-4 { background: #196127; }
+            .heatmap-legend {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 12px;
+                margin-top: 12px;
+                font-size: 14px;
+                color: #555;
+            }
+            .legend-label { font-weight: 600; }
+            .legend-item {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+            .heatmap-legend .heatmap-day {
+                width: 14px;
+                height: 14px;
+                border-radius: 3px;
+            }
             .hidden { display: none !important; }
 
             .toggle-button { margin-bottom: 10px; padding: 6px 12px; font-size: 0.9em; cursor: pointer; border: none; border-radius: 6px; background: #2a3d66; color: #fff; }
