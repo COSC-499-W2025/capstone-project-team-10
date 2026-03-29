@@ -11,6 +11,7 @@ from src.fas.fas_extra_data import get_file_extra_data
 from src.fss.repo_reader import Repository
 from utils.extension_mappings import CODING_FILE_EXTENSIONS as em
 from utils.libraries_mappings import LIBRARY_SKILL_MAP as lsm
+import src.param.param as param
 
 
 # Track git repositories emitted during this process and prevent re-entry
@@ -411,6 +412,10 @@ def determine_project_id(
     repo_id = find_git_repo_id(file_path)
     if repo_id:
         return repo_id
+
+    single_project = param.get("scan.single_project")
+    if single_project:
+        return single_project
 
     return Path(file_path).parent.name
 

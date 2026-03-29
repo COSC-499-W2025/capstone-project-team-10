@@ -28,7 +28,6 @@ class ScanWorker(QtCore.QObject):
     @QtCore.pyqtSlot(str, dict)
     def run_scan(self, directory_path: str, filters: dict):
         self.directory_path = directory_path
-        self.filters = filters
 
         old_stdout = sys.stdout
         old_stderr = sys.stderr
@@ -45,6 +44,7 @@ class ScanWorker(QtCore.QObject):
                 file_types=filters.get('file_types', set()),
                 time_lower_bound=filters.get('time_lower_bound', None),
                 time_upper_bound=filters.get('time_upper_bound', None),
+                single_project=filters.get('single_project', False),
             )
             result = search(search_params)
             self.finished.emit(result)

@@ -19,12 +19,14 @@ class FSS_Search:
         file_types: set = set(),
         time_lower_bound: datetime | None = None,
         time_upper_bound: datetime | None = None,
+        single_project: bool = False,
     ):
         self.input_path = input_path
         self.excluded_path = excluded_path
         self.file_types = file_types
         self.time_lower_bound = time_lower_bound
         self.time_upper_bound = time_upper_bound
+        self.single_project = single_project
 
 
 def search(search_params: FSS_Search):
@@ -53,6 +55,7 @@ def search(search_params: FSS_Search):
             file_types=search_params.file_types,
             time_lower_bound=search_params.time_lower_bound,
             time_upper_bound=search_params.time_upper_bound,
+            single_project=search_params.single_project,
         )
         return search(temp_search)
 
@@ -129,9 +132,11 @@ def search(search_params: FSS_Search):
             "create",
         ):
             return 0
+    if search_params.single_project:
+        param.params["scan"]["single_project"] = os.path.basename(search_params.input_path)
+    else:
+        param.params["scan"]["single_project"] = None
 
-        # TODO add in FAS and return value, pass in file and set of repo paths for grouping
-        return 1
     scan_hidden = param.get("scan.scan_hidden_files")
     for root, dirs, files in os.walk(search_params.input_path, topdown=True):
         root_abs = os.path.abspath(root)
