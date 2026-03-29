@@ -5,6 +5,7 @@ from unittest.mock import patch
 import pytest
 
 import src.fss.fss as fss
+import src.fss.fss_helper as fss_helper
 import src.log.log as log
 import src.param.param as param
 from src.fas.fas import FileAnalysis, compute_file_hash
@@ -147,3 +148,24 @@ class TestFSS:
             file_types={"txt","md"}
         ))
         assert result == 2
+
+    def test_file_type_check_accepts_dotted_supported_types(self, tmp_path):
+        sample_file = tmp_path / "sample.txt"
+        sample_file.write_text("sample content", encoding="utf-8")
+
+        assert fss_helper.file_type_check(sample_file, {".txt"}) is True
+        assert fss_helper.file_type_check(sample_file, {"txt"}) is True
+
+    def test_fss_single_file_respects_file_type_filters(self, tmp_path):
+        sample_file = tmp_path / "single.txt"
+        sample_file.write_text("single file", encoding="utf-8")
+
+        result_matching = fss.search(
+            fss.FSS_Search(str(sample_file), file_types={".txt"})
+        )
+        assert result_matching == 1
+
+        result_non_matching = fss.search(
+            fss.FSS_Search(str(sample_file), file_types={"md"})
+        )
+        assert result_non_matching == 0

@@ -181,7 +181,9 @@ class ScanPage(QtWidgets.QWidget):
 
         # File types
         if filters["file_types"]:
-            summary += f"• File Types: {', '.join(filters['file_types'])}\n"
+            summary += f"File Types Included: {', '.join(filters['file_types'])}\n"
+        else:
+            summary += "File Types Included: None\n"
 
         # Excluded paths
         if filters["excluded_paths"]:

@@ -62,5 +62,11 @@ def time_check(time_criteria: list, path: Path, arg: str) -> bool:
 
 
 def file_type_check(file_path: str | Path, supported_types: set) -> bool:
-    file_extension = str(file_path).split(".")[-1].lower()
-    return file_extension in supported_types
+    # Accept both dotted (".txt") and non-dotted ("txt") extensions.
+    normalized_types = {
+        str(ext).strip().lower().lstrip(".")
+        for ext in supported_types
+        if str(ext).strip()
+    }
+    file_extension = Path(file_path).suffix.lower().lstrip(".")
+    return file_extension in normalized_types
