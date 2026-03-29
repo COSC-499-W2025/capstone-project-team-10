@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QListWidget,
+    QMessageBox,
     QStackedWidget,
     QVBoxLayout,
     QWidget,
@@ -32,6 +33,7 @@ class AppShell(QWidget):
     def __init__(self, on_page_change):
         super().__init__()
         self.on_page_change = on_page_change
+        self._scan_navigation_locked = False
 
         # ---------- Main horizontal layout ----------
         main_layout = QHBoxLayout(self)
@@ -148,6 +150,10 @@ class AppShell(QWidget):
         self.page_scan.scan_finished.connect(self.page_scan_results.on_scan_finished)
         self.page_scan.scan_finished.connect(self.page_resume.refresh_from_scan)
         self.page_scan.scan_finished.connect(lambda _: self.page_dashboard.refresh_log())
+        self.page_scan.scan_finished.connect(lambda _: self._set_scan_navigation_lock(False))
+        self.page_scan.scan_manager.scan_failed.connect(
+            lambda _: self._set_scan_navigation_lock(False)
+        )
         self.page_scan.scan_output.connect(self.page_scan_results.append_output)
         self.page_scan_results.back_to_scan.connect(self.return_to_scan)
         self.page_scan.scan_finished.connect(
@@ -161,6 +167,16 @@ class AppShell(QWidget):
         self.sidebar.setCurrentRow(0)
 
     def change_page(self, page_name: str):
+        if self._scan_navigation_locked and page_name not in ("Scan", "scan_results"):
+            QMessageBox.information(
+                self,
+                "Scan In Progress",
+                "A scan is currently running. Please wait for it to finish before leaving the Scan page.",
+            )
+            self.sidebar.blockSignals(True)
+            self.sidebar.setCurrentRow(1)
+            self.sidebar.blockSignals(False)
+            return
 
         # Switch stack page
         if page_name == "Dashboard":
@@ -190,8 +206,13 @@ class AppShell(QWidget):
         if self.on_page_change:
             self.on_page_change(page_name)
 
+    def _set_scan_navigation_lock(self, locked: bool):
+        self._scan_navigation_locked = locked
+        self.sidebar.setEnabled(not locked)
+
     def on_scan_started(self, scan_params):
         """Switch to results page and start animation"""
+        self._set_scan_navigation_lock(True)
         self.sidebar.blockSignals(True)
         self.change_page("scan_results")
         self.page_scan_results.start_scan_animation()
