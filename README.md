@@ -99,7 +99,9 @@ at least two reviewers must leave comments on a PR before merging
 
 ## Executable 
 
-https://drive.google.com/file/d/1nfOP5ydFjc_UchZCk-IQdJgh-n_Pbg0N/view?usp=sharing for Windows (only Windows for now)
+https://drive.google.com/file/d/1nfOP5ydFjc_UchZCk-IQdJgh-n_Pbg0N/view?usp=sharing for Windows
+
+https://drive.google.com/file/d/1OpmblqmcAyIjlX-BpohVbUaE9TVawXA1/view?usp=sharing for MacOS
 
 ## Setup
 
