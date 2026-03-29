@@ -1,8 +1,5 @@
 import pytest
 import json
-import os
-from pathlib import Path
-from datetime import datetime, timedelta
 from src.resume.resume_manager import ResumeManager
 import src.param.param as param
 
@@ -38,7 +35,10 @@ class TestResumeManager:
 
     def test_create_resume(self, manager, tmp_path):
         """Test creating a resume copies the file and updates the index."""
-        resume_id = manager.create(self.source_file, {"project": "Test Project"})
+        resume_id = manager.create(
+            self.source_file,
+            {"type": "pdf_resume", "source_log": "C:/tmp/example.log"},
+        )
         
         assert resume_id == 1
         
@@ -53,7 +53,13 @@ class TestResumeManager:
             data = json.load(f)
             assert data["next_id"] == 2
             assert str(resume_id) in data["resumes"]
-            assert data["resumes"]["1"]["metadata"]["project"] == "Test Project"
+            entry = data["resumes"]["1"]
+            assert entry["id"] == 1
+            assert entry["type"] == "pdf_resume"
+            assert entry["source_log"] == "C:/tmp/example.log"
+            assert entry["original"]["name"] == self.source_file.name
+            assert entry["backup"]["name"] == "resume_1.pdf"
+            assert entry["created_date"] != ""
 
     def test_get_resume(self, manager, tmp_path):
         """Test retrieving a resume path by ID."""
