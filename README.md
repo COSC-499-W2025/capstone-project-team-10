@@ -103,6 +103,10 @@ https://drive.google.com/file/d/1nfOP5ydFjc_UchZCk-IQdJgh-n_Pbg0N/view?usp=shari
 
 https://drive.google.com/file/d/1OpmblqmcAyIjlX-BpohVbUaE9TVawXA1/view?usp=sharing for MacOS
 
+Or navigate to utils/installation and use the appropriate batch file
+
+NOTE - this will install the files in the folder that the batch file is currently in
+
 ## Setup
 
 ### WARNING: USE PYTHON 3.12.X OR NEWER
