@@ -1,3 +1,26 @@
+# T2 - Week 12 (3/23/2026 - 3/29/2026)
+
+![T2 - Week 12 - Task Completed](T2-W12/Done.png)
+
+## Features
+
+![T2 - Week 12 - In Progress](T2-W12/Features.png)
+
+## Recap
+
+- For term 2 week 12, I focused on finalizing the project:
+  - Ensured all tests are passing and fixed any broken ones
+  - Created the video demo showcasing the project
+  - Applied final styling and UI polish across pages
+
++ **Things that went well:** Most features are stable, tests are passing, and the project feels complete and polished  
+- **Things that did not go well:** Minor styling inconsistencies may still exist; limited time for deeper refinements  
+- **Plans for next week:** Review other teams’ projects and participate in voting  
+
+## Additional Context
+
+This was the final week of the project, mainly focused on wrapping everything up, ensuring stability, and preparing the final presentation/demo.
+
 # T2 - Week 11 (3/16/2026 - 3/22/2026)
 
 ![T2 - Week 11 - Task Completed](T2-W11/Done.png)
