@@ -1,3 +1,17 @@
+# Term 2 Week 12 (03/23/2026 - 03/29/2026)
+
+![Term Two Week Twelve Tasks](Term2Week12/Week12Tasks.png)
+
+# Features
+
+![Term Two Week Twelve Feature](Term2Week12/Week12Feature.png)
+
+# Recap
+
+This week was a closing week, focused on the in class presentation, contributing to the video demo, as well as updating the documentation for it to be complete for the milestone 3 submission. This week I worked on updating both data flow diagrams (level 0 and level 1) as well as helped with the video demo by covering and pitching the benefits of our dashboard page and its ease of use. As well, much of the week was spent on what bugs we should and shouldn't pursue to try and fix in this last week verses reporting them in the documentation.
+
+For this upcoming week, I will be reviewing and voting on other teams projects.
+
 # Term 2 Week 11 (03/16/2026 - 03/22/2026)
 
 There is no weekly survey this week
