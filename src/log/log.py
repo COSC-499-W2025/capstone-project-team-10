@@ -19,6 +19,9 @@ current_projects = set()
 initialized_log = ""
 
 
+
+
+
 def initialize_log() -> None:
     global current_log_file
     global current_projects
