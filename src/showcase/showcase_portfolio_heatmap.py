@@ -110,5 +110,14 @@ class ActivityHeatmap:
             <div class="heatmap-container">
                 {''.join(days)}
             </div>
+
+            <div class="heatmap-legend" aria-label="Heatmap legend">
+                <span class="legend-label">Activity:</span>
+                <span class="legend-item"><span class="heatmap-day level-0"></span>0</span>
+                <span class="legend-item"><span class="heatmap-day level-1"></span>1</span>
+                <span class="legend-item"><span class="heatmap-day level-2"></span>2-3</span>
+                <span class="legend-item"><span class="heatmap-day level-3"></span>4-6</span>
+                <span class="legend-item"><span class="heatmap-day level-4"></span>7+</span>
+            </div>
         </div>
         """

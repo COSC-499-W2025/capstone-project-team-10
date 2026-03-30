@@ -8,6 +8,7 @@ from src.fas.fas_git_grouping import GitGrouping
 MOCK_REPO_PATH = "/unresolved/path/to/repo"
 MOCK_RESOLVED_PATH_STR = str(Path("/resolved/path/to/repo"))
 MOCK_RESOLVED_PATH_OBJ = Path(MOCK_RESOLVED_PATH_STR) 
+MOCK_DEFAULT_REPO_ID = Path(MOCK_REPO_PATH).name
 MOCK_CUSTOM_ID = "CustomRepoID"
 MOCK_GIT_FILES_RAW = ["file1.py", " file2.js ", "", "  \n", "docs/README.md", "a-file-with-no-ext"]
 EXPECTED_FILES = ["file1.py", "file2.js", "docs/README.md", "a-file-with-no-ext"]
@@ -133,8 +134,8 @@ def test_add_repository_complete_output(mock_os, mock_fas, mock_param, mock_repo
     
     # Verify git_output values
     assert git_output["author"] == MOCK_AUTHORS
-    assert git_output["title"] == MOCK_RESOLVED_PATH_STR
-    assert git_output["repo_id"] == MOCK_RESOLVED_PATH_STR
+    assert git_output["title"] == MOCK_DEFAULT_REPO_ID
+    assert git_output["repo_id"] == MOCK_DEFAULT_REPO_ID
     assert git_output["created"] == MOCK_CREATED_DATE
     assert git_output["modified"] == MOCK_MODIFIED_DATE
     

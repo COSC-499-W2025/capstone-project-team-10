@@ -10,6 +10,13 @@ TEST_FILE = os.path.join(TESTDATA_DIR, "fas_test_data.docx")
 
 
 class TestFas:
+    @pytest.fixture(autouse=True)
+    def disable_git_repo_auto_analysis(self, monkeypatch):
+        # Keep unit tests deterministic: avoid repo-level git scans on normal files.
+        monkeypatch.setattr(fas, "find_git_repo_root", lambda _path: None)
+        fas._logged_git_repos.clear()
+        fas._git_repos_in_progress.clear()
+
     def test_run_fas_returns_object(self):
         # run_fas should return a FileAnalysis object
         result = fas.run_fas(TEST_FILE)
@@ -45,7 +52,9 @@ class TestFas:
         assert result is None
 
     def test_git_folder(self, tmp_path):
-        git_dir = tmp_path / ".git"
+        repo_dir = tmp_path / "repo"
+        repo_dir.mkdir()
+        git_dir = repo_dir / ".git"
         git_dir.mkdir()
     
         # Mock the GitGrouping class and its methods
@@ -75,9 +84,9 @@ class TestFas:
         }
         mock_git_grouping.add_repository.return_value = mock_git_output
     
-        # Patch GitGrouping in the fas module
-        with patch('src.fas.fas_git_grouping.GitGrouping', return_value=mock_git_grouping):
-            result = fas.run_fas(str(git_dir))
+        # Patch git extra-data generation so the test does not traverse a real repo.
+        with patch('src.fas.fas.get_file_extra_data', return_value=mock_git_output):
+            result = fas.run_fas(str(repo_dir))
         
             assert result is not None
             assert result.file_type == "git"

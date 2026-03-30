@@ -13,6 +13,23 @@ class TestMarkdown:
     def md(self):
         return Markdown(Path(md_path))
 
+    @pytest.fixture
+    def mock_text_summary(self):
+        # Avoid expensive NLP calls in unit tests while keeping behavior checks.
+        with patch("src.fas.fas_md.TextSummary") as mock_summary, patch(
+            "src.fas.fas_md._extract_text_skills"
+        ) as mock_extract:
+            summary_instance = MagicMock()
+            summary_instance.generate_text_analysis_data.return_value = {
+                "complexity": "medium",
+                "depth": "high",
+                "structure": "clear",
+                "sentiment_insight": "neutral",
+            }
+            mock_summary.return_value = summary_instance
+            mock_extract.return_value = ["python", "analysis", "documentation"]
+            yield
+
     # Test for headers
     def test_headers(self, md):
         headers = md.get_headers()["Header"]
@@ -42,13 +59,13 @@ class TestMarkdown:
         assert "r" in languages
 
     # Tests paragraphs, either a list of skills displayed.
-    def test_paragraphs(self, md):
+    def test_paragraphs(self, md, mock_text_summary):
         skills = md.get_paragraphs()
         assert isinstance(skills, list)
         assert all(isinstance(skill, str) for skill in skills)
 
     # Test to ensure data is returned in the correct format
-    def test_integration_structure(self, md):
+    def test_integration_structure(self, md, mock_text_summary):
         assert isinstance(md.get_headers(), dict)
         assert isinstance(md.get_header(), list) 
         assert isinstance(md.get_code_blocks(), set)
