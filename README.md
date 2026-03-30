@@ -748,6 +748,367 @@ All tests are stored in the src/tests folder, and are organized by API. Each tes
 
 Milestone 2 Presentation link: https://docs.google.com/presentation/d/1M87aeStGNRQF6zvMkJJcOk76a_6EyGdyV-xHyRwfgJQ/edit?usp=sharing
 
+## Testing Practices:
+
+For this project, our primary focus was on automated unit and integration testing, ensuring that the results of any given action were well-defined and accurately reflected the intended functionality. In cases where automated testing was impractical or not cost-effective, we employed manual testing following the same rigorous standards. Manual testing was reserved for user-facing aspects of the application, allowing us to evaluate both user experience and functionality simultaneously. Below is a summary of our modules, test files, and what they test. We have a total of 235 tests, for more detail about how tests work, please refer to the linked files in the tests folder.
+
+## Testing Summary:
+
+### Cli Testing
+
+#### Files:
+
+- `tests/test_cli.py`
+
+#### Testing Summary:
+
+This test suite verifies the command-line interface (CLI) logic of the application. It uses mock classes and monkeypatching to isolate CLI behavior from external dependencies. The tests cover:
+
+- **Argument Parsing:** Ensures CLI arguments (file path, excluded paths, file types, etc.) are parsed and assigned correctly.
+- **User Prompts:** Checks that user input to permission prompts is handled as expected, including proper exit behavior.
+- **Main CLI Workflow:** Simulates running the CLI with various argument combinations, verifying that output includes (or omits, in quiet mode) information about excluded paths, file types, resume/portfolio generation, date bounds, GitHub username, log file location, and completion messages.
+- **Image Allowance Flag:** Confirms that the `--image_allow` flag and its absence correctly affect downstream resume and portfolio generation logic.
+
+Overall, these tests ensure the CLI responds correctly to user input, arguments, and flags, and that it produces the expected output or suppresses it when requested.
+
+### FAS Testing:
+
+#### Files:
+
+- `tests/test_fas.py`
+- `tests/test_fas_code_reader.py`
+- `tests/test_fas_docx.py`
+- `tests/test_fas_excel.py`
+- `tests/test_fas_extra_data.py`
+- `tests/test_fas_git_grouping.py`
+- `tests/test_fas_md.py`
+- `tests/test_fas_odt.py`
+- `tests/test_fas_pdf.py`
+- `tests/test_fas_photoshop.py`
+- `tests/test_fas_rtf.py`
+- `tests/test_fas_unknown_file_type.py`
+- `tests/test_image_format.py`
+- `tests/test_text_analyzer.py`
+- `tests/test_repo_reader.py`
+
+#### Testing Summary:
+
+This test suite validates the functionality and robustness of the File Analysis System (FAS) module. Key areas covered include:
+
+##### test_fas
+
+- **File Analysis Output:** Ensures `run_fas` returns a valid `FileAnalysis` object with correct file name, type, creation/modification times, and handles non-existent files gracefully.
+- **Git Repository Analysis:** Mocks Git repository analysis to verify extraction and structure of metadata such as author, subject, commit stats, and extra data.
+- **Importance & Extra Data:** Checks that the `importance` attribute exists and is numeric, and that `extra_data` is present and JSON serializable.
+- **File Type Detection:** Tests detection of file types for files with/without extensions, dotfiles, and Makefile-style names, ensuring unknown types are handled as expected.
+- **File Hashing:** Verifies that identical files produce the same hash, different files produce different hashes, and non-existent files return `None`.
+- **Error Handling:** Ensures appropriate exceptions are raised for missing files and unknown file extensions.
+
+##### test_fas_code_reader
+
+- **Language Detection & Extraction:** Validates that the `CodeReader` correctly identifies file types and extracts relevant information for Python, JavaScript, C, C++, Java, TypeScript, Go, and Rust files.
+- **Library Extraction:** Checks that imported libraries or dependencies are accurately detected for each language.
+- **Complexity Analysis:** Verifies that the estimated algorithmic complexity is extracted and matches expected values.
+- **OOP Structure Extraction:** Confirms that object-oriented programming elements (such as classes and functions, including a function named "helper") are correctly identified and parsed for each supported language.
+
+##### test_fas_docx
+
+- **Content Extraction:** Ensures that `extract_docx_data` correctly retrieves metadata (author, title, subject, creation/modification dates, etc.), document statistics (paragraphs, tables, characters, words, unique words, sentences), and advanced metrics (lexical diversity, top keywords, sentiment, summary, complexity, depth, structure, and sentiment insight).
+- **Error Handling:** Confirms that attempting to extract data from an invalid or non-`.docx` file returns an error message in the result.
+
+These tests ensure the FAS module reliably analyzes files, extracts metadata, handles edge cases, and produces consistent, serializable results.
+
+##### test_fas_excel
+
+- **Sheet Analysis:** Ensures correct detection of sheet count and names, and validates per-sheet statistics such as row/column counts, formula and merged cell counts, and chart detection.
+- **Workbook Metadata:** Checks extraction of document properties including creator, last modified by, title, subject, keywords, category, and description.
+- **Chart Detection:** Confirms that charts embedded in sheets are accurately counted and reported.
+- **Key Skills Extraction:** Verifies that relevant skills (e.g., Analytical Skills, Excel Proficiency, Data Visualization) are identified based on workbook content.
+- **Error Handling:** Ensures that invalid or corrupted Excel files return an appropriate error message.
+
+##### test_fas_extra_data
+
+- **Feedback-to-Skill Mapping:** Ensures that different feedback strings are correctly mapped to corresponding skill labels, including handling of unknown or empty feedback.
+- **Code File Analysis:** Mocks code file analysis to verify extraction of language, libraries, key skills (such as OOP and algorithmic complexity), and ensures correct handling for code files.
+- **Markdown Handling:** Mocks Markdown file analysis to check extraction of headers, word counts, paragraphs, and verifies the presence of expected metadata.
+- **PDF/DOCX Metadata Processing:** Verifies that summary cleanup (removal of newlines) and skill extraction from complexity and sentiment metadata are performed correctly.
+- **Unsupported File Types:** Ensures that unsupported file types return fallback data with key skills present.
+- **JSON Serializability:** Confirms that the extra data produced for any file type is JSON serializable.
+
+##### test_fas_git_grouping
+
+- **Repository Addition:** Ensures repositories can be added with default or custom IDs, and that the resulting metadata includes authors, titles, creation/modification dates, commit analysis, and file analysis.
+- **File Extraction:** Verifies correct extraction and filtering of repository files, including handling of `.git` suffixes and exceptions.
+- **Date Extraction:** Tests extraction of repository creation and modification dates, including cases with no commits or exceptions.
+- **Commit Analysis:** Validates calculation of total commits, insertions, deletions, net change, and categorization of commit messages (e.g., fix, feature, docs, refactor, style, other), including case-insensitive handling and empty input.
+- **Internal State:** Confirms the correct initialization and updating of internal state for repositories, files, and commits, including handling multiple repositories.
+- **Error Handling:** Ensures robust handling of exceptions and edge cases throughout repository and file analysis.
+
+##### test_fas_md
+
+- **Header Extraction:** Ensures that headers and their hierarchy (including text and level) are correctly identified and extracted.
+- **Header Hierarchy:** Validates that the header structure is returned as a list of strings representing the document outline.
+- **Word Count:** Checks that the total word count is accurately computed and is within a reasonable range.
+- **Code Block Detection:** Confirms that code blocks are detected and their languages (e.g., Python, R) are correctly identified.
+- **Paragraph Extraction:** Verifies that paragraphs or skill lists are extracted as lists of strings.
+- **Integration & Data Structure:** Ensures that all extraction methods return data in the expected formats (dicts, lists, sets, integers) and that integration across methods is consistent.
+
+##### test_fas_odt
+
+- **Content Extraction:** Ensures that `extract_odt_data` correctly retrieves metadata (author, title, subject, creation/modification dates), document statistics (paragraphs, characters, words, unique words, sentences), and advanced metrics (lexical diversity, top keywords, sentiment, named entities, summary, complexity, depth, structure, and sentiment insight).
+- **Error Handling:** Confirms that attempting to extract data from an invalid or non-`.odt` file returns an error message in the result.
+
+##### test_fas_pdf
+
+- **File Existence & Type Handling:** Ensures appropriate error messages are returned for missing or invalid files.
+- **Metadata Extraction:** Validates extraction of file path, file size, and PDF metadata fields (author, creator, producer, title, subject, keywords).
+- **Content & Structure Analysis:** Checks extraction of text, page count, word and character counts, and ensures that counts for images, tables, and hyperlinks match the actual lists extracted.
+- **Multi-Page & Edge Case Handling:** Verifies correct handling of multi-page PDFs, PDFs with no tables/links/images, and ligature handling in text extraction.
+- **Text Analysis:** Confirms extraction of top keywords, unique word count, sentence count, lexical diversity, filtered word count, sentiment, summary, complexity, depth, structure, and sentiment insight.
+- **Integration & Consistency:** Ensures all extracted data is consistent and in the expected format.
+
+##### test_fas_photoshop
+
+- **Basic Metadata Extraction:** Ensures that basic metadata (such as width) is extracted and that the result is a dictionary containing expected keys.
+- **ICC Profile & Compression:** Checks for the presence of ICC profile and compression fields in the extracted metadata, or appropriate error handling if unavailable.
+- **Layer Metadata:** Verifies that layer information is extracted as a dictionary when present, or that errors are reported for unsupported or invalid files.
+- **Document Info Fields:** Confirms extraction (or error reporting) of additional document information such as resolution info, XMP metadata, and thumbnail.
+- **Error Handling:** Ensures that invalid or corrupted Photoshop files return an error message in the result.
+
+##### test_fas_rtf
+
+- **Datetime and Data Extraction:** Ensures correct extraction of creation/modification datetimes and specific metadata fields from RTF content, including handling of missing data.
+- **Content Extraction:** Validates extraction of author, title, subject, creation/modification dates, character/word/paragraph counts, filtered and unique word counts, sentence count, lexical diversity, top keywords, sentiment, named entities, summary, complexity, depth, structure, and sentiment insight.
+- **Error Handling:** Confirms that invalid or non-existent RTF files return an error message in the result.
+
+##### test_fas_unknown_file_type
+
+- **Generic Metadata Extraction:** Ensures that files with unknown extensions return safe, generic metadata instead of causing errors or returning `None`.
+- **Empty File Handling:** Confirms that empty files with unknown types still return valid metadata with appropriate zero-length content.
+- **Binary Content Handling:** Verifies that binary-like content in unknown file types does not raise exceptions and is handled gracefully.
+- **JSON Serializability:** Ensures that the metadata produced for unknown file types is always JSON serializable for safe storage or transmission.
+
+##### test_image_format
+
+- **Metadata Extraction:** Ensures correct extraction of file size, image format, width, height, and type-specific metadata for JPEG, PNG, GIF, WEBP, and TIFF images.
+- **Format-Specific Checks:** Confirms detection of format-specific properties, such as color type for PNG, animation and frame count for GIF, and appropriate fields for other formats.
+- **Error Handling:** Verifies that invalid or non-existent image files result in appropriate warnings without causing crashes.
+
+##### test_text_analyzer
+
+- **Initialization & Structure:** Ensures that the `TextSummary` class correctly initializes with text content and produces lists of sentences and words.
+- **Empty String Handling:** Confirms that empty input is handled gracefully, returning neutral sentiment, empty summaries, and zero statistics.
+- **Common Words Extraction:** Verifies that the most frequent words are correctly identified and counted.
+- **Sentiment Analysis:** Checks that sentiment detection returns valid categories (positive, negative, neutral) and appropriate scores.
+- **Summary Generation:** Ensures that text summaries are generated as non-empty strings when appropriate.
+- **Named Entity Recognition:** Validates extraction of named entities, confirming correct identification of entity names and types (e.g., PERSON, GPE).
+
+##### test_repo_reader
+
+- **Repository Analysis:** Ensures correct extraction of authors, commit counts, commit content, and language statistics from mocked commit data.
+- **Author Filtering:** Verifies that filtering by author returns only relevant commits, and that non-existent authors yield empty commit lists.
+- **Commit Content Structure:** Confirms that commit metadata (author, date, message, insertions, deletions) is correctly structured and populated.
+- **Initialization & State:** Tests repository initialization with and without author filters, and validates correct internal state for authors, languages, and commit content.
+- **Language Detection:** Checks that file extensions are mapped to the correct programming languages, and that unknown or extensionless files are handled as "Other."
+- **Exception Handling:** Ensures that exceptions during repository analysis clear internal state and do not cause crashes.
+- **Edge Cases:** Tests handling of multiple commits from the same author, commits with zero changes, and empty repository states.
+
+### FSS Testing
+
+#### Files:
+
+- `tests/test_fss.py`
+- `tests/test_fss_time_criteria.py`
+- `tests/test_zip.py`
+
+#### Testing Summary
+
+##### test_fss
+
+- **Single File and Folder Scanning:** Ensures correct file count results when scanning individual files or entire directories.
+- **Exclusion Handling:** Verifies that excluded files and folders are properly omitted from scan results.
+- **Invalid Path Handling:** Confirms that invalid paths are handled gracefully and return the expected error code.
+- **Delta Scanning:** Tests that previously scanned files are skipped in subsequent scans, and that modifications to files trigger re-scans.
+- **Duplicate Detection:** Checks that duplicate files are detected using file hashes, and that non-duplicates are not falsely flagged.
+- **Zip Archive Scanning:** Ensures that files within zip archives are scanned correctly, including support for file type filters (e.g., `.txt`, `.md`).
+
+##### test_fss_time_criteria
+
+- **Path Conversion:** Ensures that string paths are correctly converted to `Path` objects and that existing `Path` objects are returned unchanged.
+- **Creation and Modification Time Extraction:** Verifies that file creation and modification times are accurately extracted from file metadata, using both primary and fallback attributes.
+- **Time-Based Filtering:** Tests the `time_check` function for correct behavior when filtering files with both lower and upper bounds, only upper or lower bounds, or no bounds at all, for both creation and modification times.
+- **Mocking and Edge Cases:** Uses mocking to simulate file metadata and confirms that the logic works correctly across various scenarios.
+
+##### test_zip
+
+- **Zip Extraction:** Ensures that valid zip files are extracted to the correct directory, with the resulting path matching expected naming conventions and directory structure.
+- **Existence and Structure:** Confirms that the extracted directory exists and is properly located relative to the program's file path.
+- **Error Handling:** Verifies that invalid zip paths or attempts to extract non-zip files return `None` and do not cause errors.
+
+### Log Testing
+
+#### Files:
+
+- `tests/test_log.py`
+- `tests/test_log_converter.py`
+- `tests/test_log_sorter.py`
+
+#### Testing Summary
+
+##### test_log
+
+- **Log File Creation and Writing:** Ensures log files are created, written, and appended correctly, with proper CSV formatting and expected content.
+- **Log Continuation and Rotation:** Verifies correct behavior when resuming logs, handling maximum log file counts, and rotating/deleting old logs as needed.
+- **Updating Log Entries:** Confirms that log entries can be updated, with safeguards against updating entries marked as customized.
+- **Thread Safety:** Tests concurrent writing and reading of log files from multiple threads to ensure data integrity and correct output.
+- **Log Following:** Validates the `follow_log` functionality for real-time log reading, including handling of close signals and multi-threaded updates.
+- **Duplicate and Project Entry Retrieval:** Checks that duplicate file entries can be found by hash and that project-specific entries are correctly retrieved.
+- **Internal Utilities:** Ensures helper functions for cleaning, setup, and log file discovery work as intended.
+- **Error Handling:** Confirms that the system gracefully handles missing files, blocked updates, and other edge cases.
+
+##### test_log_converter
+
+- **CSV Loading:** Ensures CSV files (including empty ones) are loaded correctly, with proper parsing of headers and data.
+- **JSON Conversion:** Confirms that log data can be converted to JSON, the output file is created, and the content is valid and structured as expected.
+- **Markdown Conversion:** Verifies that log data can be converted to Markdown, the output file is created, and the content includes expected headers and data.
+- **PDF Conversion:** Checks that log data can be converted to PDF, the output file is created, and is non-empty.
+- **Multiple Conversions:** Ensures that multiple conversions (to JSON, Markdown, and PDF) can be performed together and all output files are generated.
+- **Output Naming:** Confirms that converted files have the correct naming convention (e.g., `_converted.json`).
+- **Error Handling:** Validates that attempting to load a non-existent file raises a `FileNotFoundError`.
+- **Idempotency:** Ensures repeated conversions produce the same output file path and do not duplicate files unnecessarily.
+
+##### test_log_sorter
+
+- **Initialization and CSV Loading:** Ensures correct loading of log data from CSV files, including handling of empty and non-existent files.
+- **Available Columns:** Confirms that only valid columns are available for sorting, and that excluded columns (like "Extra data") are not included.
+- **Sorting Parameter Validation:** Verifies that sorting parameters are validated for existence, non-emptiness, and correct length, and that invalid parameters raise appropriate errors.
+- **Sorting Functionality:** Tests sorting by single and multiple columns, including tie-breaking and order (ascending/descending).
+- **Previewing Sorted Data:** Ensures that previews of sorted data are generated correctly, with the original data remaining unmodified.
+- **CSV Export:** Confirms that sorted data can be exported to a new CSV file with the correct naming convention and content.
+- **Error Handling:** Validates that errors are raised when attempting to sort or preview without parameters, or when initializing with invalid files.
+
+### Param Testing
+
+#### Files:
+
+- `tests/test_param.py`
+
+#### Testing Summary
+
+##### test_param
+
+- **Initialization and Clearing:** Ensures parameters are properly initialized and can be cleared, resetting the configuration state.
+- **Parsing and Loading:** Verifies that parameters are correctly loaded from files, including handling of corrupted or missing parameter files, and that default configuration values are restored as needed.
+- **Saving and Persistence:** Confirms that parameters can be saved and reloaded, and that changes persist across sessions.
+- **Get/Set/Remove Operations:** Tests retrieval, setting, and removal of parameters, including correct handling of invalid keys and unsuccessful operations.
+- **Error Handling:** Ensures robust handling of invalid JSON, missing files, and invalid operations without causing crashes.
+
+### Showcase Testing
+
+#### Files:
+
+- `tests/test_showcase.py`
+- `tests/test_resume_manager.py`
+
+#### Testing Summary
+
+##### test_showcase
+
+- **Resume and Portfolio Generation:** Ensures that resumes (PDF) and portfolios (HTML/ZIP) are generated correctly from log data, and that output files are created in the expected locations.
+- **Skill Timeline Generation:** Confirms that skill timeline PDFs are generated and saved as expected.
+- **ShowcaseProject and ShowcaseProjectManager:** Tests the aggregation and management of project data, including adding files, skill extraction and ranking, date range calculation, and project inclusion/exclusion logic.
+- **Project Sorting and Ranking:** Verifies that projects are sorted by rank and insertion order, and that skill lists are limited and sorted as specified.
+- **Project Entry Handling:** Checks that project entries correctly set fields such as title, description, skills, rank, and inclusion flag, and that date ranges are managed appropriately.
+- **Edge Cases and Warnings:** Ensures that non-list skill data triggers warnings, and that overrides for project skills work as intended.
+- **File and Directory Management:** Validates setup and cleanup of test directories and files, including handling of mock git projects and output artifacts.
+- **Integration with External Libraries:** Confirms that generated PDFs and HTML files contain expected content and structure by parsing with libraries like `pdfplumber` and `BeautifulSoup`.
+
+##### test_resume_manager
+
+- **Initialization:** Ensures that initializing the manager creates the necessary storage directories and index file.
+- **Resume Creation:** Confirms that creating a resume copies the file to the storage location, assigns a unique ID, and updates the index with metadata.
+- **Resume Retrieval:** Verifies that resumes can be retrieved by ID, and that non-existent IDs return `None`.
+- **Listing and Sorting:** Checks that all resumes can be listed and sorted by ID, and that the results are accurate and ordered as expected.
+- **Deletion:** Ensures that deleting a resume removes both the file and its entry from the index, and that attempting to delete a non-existent resume returns `False`.
+- **Metadata Handling:** Confirms that metadata is correctly stored and retrievable for each resume.
+
+### GUI Testing
+
+#### Testing Summary
+
+Because our GUI testing needed to be manual, testing was done whenever changes were made to UI elements or their containers that could have resulted in visual bug or integration issues. All features were tested in the following manner
+
+- Proper usage
+- Improper usage
+    - Invalid data
+    - No Data
+    - improper order
+- Resizing the window
+
+And the outcomes were evaluated by the usability, response, and error recovery after the input.
+For further documentation on GUI testing, please refer to the relevant PR's for changes to the GUI
+
+## Test Report
+
+![Test report from Main](tests/test_report.png)
+
+## Known Bugs:
+
+### existence of a .git file doesnt block other files from being scanned
+
+#### Cost of fix:
+
+Low cost. FSS should stop recursive search for folders that contain git, this is how the FSS was initially supposed to work
+
+Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/282
+
+### Resume/Portfolio page doesn't refresh when a project is added in Dashboard
+
+#### Cost of fix:
+
+Low cost. Project page should call a refresh on the resume/portfolio page
+Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/281
+
+### Heatmap doesn't work on zip extracted files
+
+#### Cost of fix:
+
+Unfixable, the way zip extraction works on Mac and windows erases the typical way of checking how files are modified, still works on zipped Git files
+
+Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/280
+
+### NLTK is used to scan incompatible files, and floods the log with large entries
+
+#### Cost of fix:
+
+Low cost, stop scanning unsupported files, it is not necessary
+
+Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/279
+
+### Switching off the scan page during a scan does not allow the user to view the progress of the scan
+
+#### Cost of fix:
+
+Low cost, Scan page state management should be done properly
+
+Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/278
+
+### Large projects break the logging
+
+#### Cost of fix:
+
+Medium cost. during the initial design we were unaware that the csv reader library had a maximum file size. This bug can be fixed by using a better CSV library, or replacing the traditional log with an SQLlite database manager. The major problem is how .git attributes are written to logs, reducing that will reduce log size fixing this bug.
+
+Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/276
+
+### Portfolio heatmap cant handle large spreads of dates without overflowing
+
+#### Cost of fix:
+
+Low cost. Heatmap should be created in pages with dates.
+
+Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/295
+
 ## Updated Data Flow Diagrams
 
 Level 0 Data Flow Diagram:
