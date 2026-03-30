@@ -1108,3 +1108,9 @@ Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/276
 Low cost. Heatmap should be created in pages with dates.
 
 Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/295
+
+
+## Updated System Architecture Diagram
+
+System Architecture Diagram:
+![System Architecture Diagram](docs/System%20Architecture%20Diagram.png)
