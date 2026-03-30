@@ -1109,6 +1109,13 @@ Low cost. Heatmap should be created in pages with dates.
 
 Ticket: https://github.com/COSC-499-W2025/capstone-project-team-10/issues/295
 
+
+## Updated System Architecture Diagram
+
+System Architecture Diagram:
+![System Architecture Diagram](docs/diagrams/System%20Architecture%20Diagram.png)
+  
+  
 ## Updated Data Flow Diagrams
 
 Level 0 Data Flow Diagram:
