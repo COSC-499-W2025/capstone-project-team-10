@@ -1,11 +1,13 @@
-# Week 22 (3/16/2026 = 3/22/2026) ** TERM 2 Week 11 **
+# Week 22&23 (3/16/2026 = 3/29/2026) ** TERM 2 Week 11/12 **
+
+![Week 22&23 Tasks](Week22&23/tasks.png)
 
 ## Features
 
-![Week 22 Tasks](Week22/Week22KanBan1.png)
+![Week 22&23 Tasks](Week22&23/KanBan1.png)
 
 ## Recap
-Filled out the team log for this week. Also added option in scan page for user to specify if the folder being scanned is a project or a folder containing multiple projects. Using this I changed the project detection method to properly display projects for the different types of folders. 
+Filled out the team log for week 11. Also added option in scan page for user to specify if the folder being scanned is a project or a folder containing multiple projects. Using this I changed the project detection method to properly display projects for the different types of folders. In week 12 I recorded a part for the video demo and made changes to my work from week 11 to handle an edge case.
 
 # Week 21 (3/9/2026 = 3/15/2026) ** TERM 2 Week 10 **
 
