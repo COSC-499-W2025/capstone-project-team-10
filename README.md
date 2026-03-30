@@ -13,7 +13,7 @@
 
 - [System Architecture Diagram](docs/System%20Architecture%20Diagram.pdf)
   Outlines the structure of our project, highlighting the different services and processes and the relationships between them. The SAD shows how UI, File search, Analysis, and File export services communicate and interact with one another to mine and display file data.
-- [Data Flow Diagram](docs/Data%20Flow%20Diagram.pdf) Illustrates the flow of data throughout the project components and data stores. The DFD shows where information is gathered from and the processes and data stores it flows through. The DFD includes data from user input, data gathered from user selected files, and formated and polished data ready to be displayed to the user.
+- [Data Flow Diagram](docs/Data%20Flow%20Diagram%20Milestone%203.pdf) Illustrates the flow of data throughout the project components and data stores. The DFD shows where information is gathered from and the processes and data stores it flows through. The DFD includes data from user input, data gathered from user selected files, and formated and polished data ready to be displayed to the user.
 
 - [Work Breakdown Structure](docs/Work%20Breakdown%20Structure.md)
 
@@ -747,3 +747,11 @@ python -m pytest
 All tests are stored in the src/tests folder, and are organized by API. Each test file starts with "test\_" and contains a class that also starts with "Test\_" followed by the name of the API being tested. Each test function within the class starts with "test\_" and tests a specific functionality of the API.
 
 Milestone 2 Presentation link: https://docs.google.com/presentation/d/1M87aeStGNRQF6zvMkJJcOk76a_6EyGdyV-xHyRwfgJQ/edit?usp=sharing
+
+## Updated Data Flow Diagrams
+
+Level 0 Data Flow Diagram:
+![Level 0 Data Flow Diagram](docs/diagrams/Data%20Flow%20Diagram%20Level%200.png)
+
+Level 1 Data Flow Diagram:
+![Level 1 Data Flow Diagram](docs/diagrams/Data%20Flow%20Diagram%20Level%201.png)
