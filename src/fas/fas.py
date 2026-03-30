@@ -413,9 +413,23 @@ def determine_project_id(
     if repo_id:
         return repo_id
 
-    single_project = param.get("scan.single_project")
-    if single_project:
-        return single_project
+    input_path = param.get("scan.input_path")
+    is_single = param.get("scan.single_project")
+
+    if is_single and input_path:
+        return os.path.basename(input_path)
+
+    if not is_single and input_path:
+        try:
+            resolved_file = Path(file_path).resolve()
+            resolved_root = Path(input_path).resolve()
+            relative = resolved_file.relative_to(resolved_root)
+            if len(relative.parts) > 0:
+                return relative.parts[0]
+        except ValueError:
+            pass
+
+    return Path(file_path).parent.name
 
     return Path(file_path).parent.name
 

@@ -132,15 +132,14 @@ def search(search_params: FSS_Search):
             "create",
         ):
             return 0
-    if search_params.single_project:
-        param.params["scan"]["single_project"] = os.path.basename(search_params.input_path)
-    else:
-        param.params["scan"]["single_project"] = None
+        
+    param.params["scan"]["single_project"] = search_params.single_project
+    param.params["scan"]["input_path"] = search_params.input_path
 
     scan_hidden = param.get("scan.scan_hidden_files")
     for root, dirs, files in os.walk(search_params.input_path, topdown=True):
         root_abs = os.path.abspath(root)
-
+  
         # Skip this directory entirely if it is under an excluded path
         if any(root_abs.startswith(excluded) for excluded in excluded_set):
             continue
