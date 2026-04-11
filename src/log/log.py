@@ -50,7 +50,7 @@ def resume_log_file() -> None:
     global initialized_log
     current_logs = {}
     current_log_file = ""
-    csv.field_size_limit(sys.maxsize)
+    csv.field_size_limit(min(sys.maxsize, 2**31 - 1))
     # Set to max int value
     newest_log_number: int = -1
     oldest_log_number: int = param.log_max_count + 1
